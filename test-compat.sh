@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+clear
 # Ensure we're using a clean PATH to avoid Windows path issues in WSL
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 

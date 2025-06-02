@@ -13,7 +13,7 @@ describe("lexer", () => {
   it("should lex simple select statement", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere"));
     expect(ast.all).toBe(true);
-    expect(ast.columns.length).toBe(0);
+    expect(ast.fields).toEqual([]);
     expect(ast.mainfile).toBe("fileNameGoesHere");
     expect(Object.keys(ast.joinFiles)).toEqual([]);
     expect(ast.order).toBe(undefined);
@@ -94,16 +94,22 @@ describe("lexer", () => {
     expect(ast.order).toEqual(["date", -1]);
   });
 
-  it("should set 'all' to true when SELECT *", () => {
+  it("should keep 'all' as true when SELECT *", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere"));
     expect(ast.all).toBe(true);
-    expect(ast.columns.length).toBe(0);
+    expect(ast.fields).toEqual([]);
   });
 
-  it("should set 'all' to false and have explicit columns when SELECT foo, bar", () => {
+  it("should set fields with aliases when SELECT foo, bar", () => {
     const ast = lex(tokenize("SELECT foo, bar from fileNameGoesHere"));
     expect(ast.all).toBe(false);
-    expect(ast.columns).toEqual(["foo", "bar"]);
+    expect(ast.fields).toEqual([{ field: "foo", alias: "foo" }, { field: "bar", alias: "bar" }]);
+  });
+
+  it("should handle column aliasing with AS keyword", () => {
+    const ast = lex(tokenize("SELECT foo as f, bar as b from fileNameGoesHere"));
+    expect(ast.all).toBe(false);
+    expect(ast.fields).toEqual([{ field: "foo", alias: "f" }, { field: "bar", alias: "b" }]);
   });
 
   it("should set 'mainfile' to whatever is in FROM", () => {

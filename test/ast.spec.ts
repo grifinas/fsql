@@ -1,7 +1,7 @@
 import { AST } from "../src/ast";
 import { fileUtils } from "../src/utils/file";
 
-describe("AST ", () => {
+describe("AST", () => {
   const mainData = [
     { foo: 1, bar: "bar1" },
     { foo: 2, bar: "bar2" },
@@ -30,7 +30,7 @@ describe("AST ", () => {
     jest.spyOn(fileUtils, "readJson").mockResolvedValue(mainData);
     const ast = new AST();
     ast.mainfile = "foo/bar.txt";
-    ast.columns = ["foo"];
+    ast.addField("foo");
     const result = await ast.execute();
 
     expect(result).toEqual([

@@ -23,23 +23,27 @@ function parseFrom(ast: AST, stream: TokenStream) {
 
 function parseSelectArgs(ast: AST, stream: TokenStream) {
   stream.assert(Type.word, "SELECT", false);
-  if (stream.next().is(Type.special, "*")) {
-    ast.all = true;
+  if (stream.popNextIf(Type.special, "*")) {
     stream.next();
-  } else {
-    ast.all = false;
-    let token = stream.get();
-    while (token) {
-      stream.assert(Type.word);
-      ast.columns.push(token.value);
-      if (stream.next().is(Type.comma)) {
-        token = stream.next();
-        continue;
-      } else {
-        break;
-      }
-    }
+    return;
   }
+
+  do {
+    stream.assertNext(Type.word);
+    const fieldName = stream.get().value;
+
+    // Check for alias with 'as' keyword
+    if (stream.popNextIf(Type.word, "as", false)) {
+      stream.assertNext(Type.word);
+      const alias = stream.get().value;
+      ast.addField(fieldName, alias);
+    } else {
+      ast.addField(fieldName);
+    }
+  } while (stream.popNextIf(Type.comma))
+
+  //move from last fieldName
+  stream.next();
 }
 
 function parseFile(stream: TokenStream): string {
@@ -151,7 +155,6 @@ function __whereFunction(stream: TokenStream): WhereFunction {
 
     return (row) => {
       const key = row[property as keyof typeof row] as any;
-      console.log(property, `(${key})`, comparatorToken.value, value);
       switch (comparatorToken.value) {
         case ">":
           return key > value;

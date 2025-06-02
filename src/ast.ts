@@ -1,9 +1,14 @@
 import { fileUtils } from "./utils/file";
 export type WhereFunction = (row: object) => boolean;
 
+interface FieldAlias {
+  field: string;
+  alias: string;
+}
+
 export class AST {
-  public all: boolean = false;
-  public columns: string[] = [];
+  public all: boolean = true;
+  public fields: FieldAlias[] = [];
   public mainfile: string = "";
   public joinFiles: Record<string, WhereFunction> = {};
   public where: WhereFunction = () => true;
@@ -27,24 +32,23 @@ export class AST {
       }
     }
 
-    const mapped = this.all
-      ? data
-      : data.map((row) => {
-        const m: Record<string, unknown> = {};
+    const mapped = data.map((row) => {
+      if (this.all) return row;
 
-        for (const column of this.columns) {
-          if (column in row) {
-            m[column] = row[column as keyof typeof row];
-          } else {
-            throw new Error(`Unknown column: ${column}`);
-          }
+      const m: Record<string, any> = {};
+      this.fields.forEach(({ field, alias }) => {
+        const parts = field.split(".");
+        let value: any = row;
+        for (const part of parts) {
+          value = value[part];
         }
-
-        return m;
+        m[alias] = value;
       });
+
+      return m;
+    });
     const filtered = mapped.filter(row => {
       const result = this.where(row);
-      console.log(row, result);
       return result;
     });
 
@@ -90,6 +94,11 @@ export class AST {
 
   assignVariable(name: string, data: object[]) {
     this.variables[name] = data;
+  }
+
+  addField(field: string, alias?: string) {
+    this.all = false;
+    this.fields.push({ field, alias: alias || field });
   }
 
   private async getMainData(): Promise<object[]> {

@@ -5,7 +5,6 @@ export class TokenStream {
   private index: number = -1;
 
   constructor(private readonly tokens: Token[]) {
-    // console.log("tokens", tokens);
   }
 
   get length(): number {
@@ -55,7 +54,7 @@ export class TokenStream {
   popNextIf(type: Type, value?: string, caseSensitive = true): boolean {
     if (!this.hasNext()) return false;
     if (this.peek().is(type, value, caseSensitive)) {
-    this.next();
+      this.next();
       return true;
     }
 
@@ -79,34 +78,45 @@ export class TokenStream {
   }
 
   stringifyTokenContext(start: number = 5, end: number = 2): string {
-    const relevantTokens = [...this.tokens].splice(
-      this.index - start,
-      start + end
-    );
+    const startIdx = Math.max(0, this.index - start);
+    const endIdx = Math.min(this.tokens.length, this.index + end);
+    const relevantTokens = this.tokens.slice(startIdx, endIdx);
 
-    const beforeTokens = [...relevantTokens].splice(0, start);
-    const length = beforeTokens.reduce(
-      (l, token) => l + stringifyToken(token).length,
+    // Create the token visualization line
+    const tokenLine = relevantTokens.map((token, i) => {
+      const str = stringifyToken(token);
+      return startIdx + i === this.index ? `[${str}]` : str;
+    }).join(' ');
+
+    // Create the pointer line
+    const beforeTokens = relevantTokens.slice(0, this.index - startIdx);
+    const pointerOffset = beforeTokens.reduce(
+      (l, token) => l + stringifyToken(token).length + 1, // +1 for the space we added
       0
     );
-    const relevantLine = relevantTokens.map(stringifyToken).join("");
-    return (
-      "\n" +
-      relevantLine +
-      "\n" +
-      " ".repeat(length) +
-      "^" +
-      "\n" +
+
+    // Create a detailed token info line
+    const currentToken = this.tokens[this.index];
+    const tokenInfo = currentToken ?
+      `Current token: ${currentToken.type}::${currentToken.value}` :
+      'No current token';
+
+    return [
+      '\nToken stream context:',
+      tokenLine,
+      ' '.repeat(pointerOffset) + '^',
+      tokenInfo,
+      `Position: ${this.index + 1}/${this.tokens.length}`,
       new Error().stack
-    );
+    ].join('\n');
   }
+
   assert(type: Type, value?: string, caseSensitive = true) {
     const token = this.get();
     cliAssert(
       token.is(type, value, caseSensitive),
       () =>
-        `Expected token to be ${type}${
-          value ? `::${value}` : ""
+        `Expected token to be ${type}${value ? `::${value}` : ""
         }, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
     );
   }
@@ -116,8 +126,7 @@ export class TokenStream {
     cliAssert(
       token.is(type, value, caseSensitive),
       () =>
-        `Expected token to be ${type}${
-          value ? `::${value}` : ""
+        `Expected token to be ${type}${value ? `::${value}` : ""
         }, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
     );
   }
