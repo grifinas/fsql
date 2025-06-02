@@ -1,5 +1,4 @@
-import * as fs from "fs/promises";
-
+import { fileUtils } from "./utils/file";
 export type WhereFunction = (row: object) => boolean;
 
 export class AST {
@@ -9,18 +8,15 @@ export class AST {
   public joinFiles: Record<string, WhereFunction> = {};
   public where: WhereFunction = () => true;
   public order: [string, number] | undefined = undefined;
+  public readonly variables: Record<string, object[]> = {};
+  public intoName: string | undefined = undefined;
+  public next: AST | null = null;
 
-  async execute() {
-    const content = await fs.readFile(this.mainfile);
-    const unknown: unknown = JSON.parse(content.toString());
-    const data: object[] = Array.isArray(unknown) ? unknown : [unknown];
+  async execute(): Promise<object[]> {
+    const data: object[] = await this.getMainData();
 
     for (const [filePath, whereFn] of Object.entries(this.joinFiles)) {
-      const joinContent = await fs.readFile(filePath);
-      const joinUnknown: unknown = JSON.parse(joinContent.toString());
-      const joinData: object[] = Array.isArray(joinUnknown)
-        ? joinUnknown
-        : [joinUnknown];
+      const joinData = await this.getJoinData(filePath);
       const filteredJoin = joinData.filter(whereFn);
 
       const oldData: object[] = data.splice(0, data.length);
@@ -34,19 +30,23 @@ export class AST {
     const mapped = this.all
       ? data
       : data.map((row) => {
-          const m: Record<string, unknown> = {};
+        const m: Record<string, unknown> = {};
 
-          for (const column of this.columns) {
-            if (column in row) {
-              m[column] = row[column as keyof typeof row];
-            } else {
-              throw new Error(`Unknown column: ${column}`);
-            }
+        for (const column of this.columns) {
+          if (column in row) {
+            m[column] = row[column as keyof typeof row];
+          } else {
+            throw new Error(`Unknown column: ${column}`);
           }
+        }
 
-          return m;
-        });
-    const filtered = mapped.filter(this.where);
+        return m;
+      });
+    const filtered = mapped.filter(row => {
+      const result = this.where(row);
+      console.log(row, result);
+      return result;
+    });
 
     if (this.order) {
       const [key, value] = this.order;
@@ -65,6 +65,17 @@ export class AST {
       });
     }
 
+    if (this.intoName) {
+      this.assignVariable(this.intoName, filtered);
+    }
+
+    if (this.next) {
+      Object.entries(this.variables).forEach(([key, value]) => {
+        (this.next as AST).assignVariable(key, value);
+      });
+      return this.next.execute();
+    }
+
     return filtered;
   }
 
@@ -75,5 +86,26 @@ export class AST {
       if (!already) return false;
       return fn(row);
     };
+  }
+
+  assignVariable(name: string, data: object[]) {
+    this.variables[name] = data;
+  }
+
+  private async getMainData(): Promise<object[]> {
+    if (this.mainfile.startsWith("@")) {
+      return this.variables[this.mainfile.slice(1)];
+    } else {
+      const unknown: unknown = await fileUtils.readJson(this.mainfile);
+      return Array.isArray(unknown) ? unknown : [unknown as object];
+    }
+  }
+
+  private async getJoinData(filePath: string): Promise<object[]> {
+    if (filePath.startsWith('@')) {
+      return this.variables[filePath.slice(1)];
+    }
+    const unknown: unknown = await fileUtils.readJson(filePath);
+    return Array.isArray(unknown) ? unknown : [unknown as object];
   }
 }

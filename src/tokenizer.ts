@@ -1,9 +1,10 @@
 import { Token, Type } from "./token";
 import { TokenStream } from "./tokenStream";
 import { cliAssert } from "./cliAssert";
+import { TypeError } from "./errors";
 
 function isWord(char: string): boolean {
-  return /[a-zA-Z\-]/.test(char);
+  return /[a-zA-Z\-\_]/.test(char);
 }
 
 function isNumber(char: string): boolean {
@@ -112,6 +113,7 @@ export function tokenize(input: string): TokenStream {
       "Unexpected char near:",
       input.substring(current - 10, current + 10)
     );
+
     throw new TypeError("Unexpected character: " + char);
   }
 

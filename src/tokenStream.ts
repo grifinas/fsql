@@ -2,13 +2,19 @@ import { cliAssert } from "./cliAssert";
 import { Token, Type } from "./token";
 
 export class TokenStream {
-  private index: number = 0;
+  private index: number = -1;
 
   constructor(private readonly tokens: Token[]) {
     // console.log("tokens", tokens);
   }
 
+  get length(): number {
+    return this.tokens.length;
+  }
+
   get(): Token {
+    //Index starts counting from -1 just so while(stream.hasNext()) stream.next() would work propperly
+    if (this.index < 0) this.index = 0;
     const token = this.tokens[this.index];
     if (!token) {
       throw new Error(
@@ -44,6 +50,16 @@ export class TokenStream {
 
   peek(offset: number = 1): Token {
     return this.getIndexed(this.index + offset);
+  }
+
+  popNextIf(type: Type, value?: string, caseSensitive = true): boolean {
+    if (!this.hasNext()) return false;
+    if (this.peek().is(type, value, caseSensitive)) {
+    this.next();
+      return true;
+    }
+
+    return false;
   }
 
   multiPeek(offset: number = 1): Token[] {
@@ -95,12 +111,10 @@ export class TokenStream {
     );
   }
 
-  assertNext(type: Token["type"], value?: string) {
+  assertNext(type: Token["type"], value?: string, caseSensitive = true) {
     const token = this.next();
-    const typesEqual = token.type === type;
-    const valuesEqual = value ? token.value === value : true;
     cliAssert(
-      typesEqual && valuesEqual,
+      token.is(type, value, caseSensitive),
       () =>
         `Expected token to be ${type}${
           value ? `::${value}` : ""

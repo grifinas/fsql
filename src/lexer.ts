@@ -1,5 +1,5 @@
 import { AST, WhereFunction } from "./ast";
-import { Type } from "./token";
+import { Token, Type } from "./token";
 import { TokenStream } from "./tokenStream";
 
 export function lex(stream: TokenStream): AST {
@@ -10,17 +10,19 @@ export function lex(stream: TokenStream): AST {
   optional(parseJoin, ast, stream);
   optional(parseWhere, ast, stream);
   optional(parseOrderBy, ast, stream);
+  optional(parseInto, ast, stream);
+  optional(parseSemicolon, ast, stream);
 
   return ast;
 }
 
 function parseFrom(ast: AST, stream: TokenStream) {
-  stream.assert(Type.word, "from", false);
+  stream.assert(Type.word, "FROM", false);
   ast.mainfile = parseFile(stream);
 }
 
 function parseSelectArgs(ast: AST, stream: TokenStream) {
-  stream.assert(Type.word, "select", false);
+  stream.assert(Type.word, "SELECT", false);
   if (stream.next().is(Type.special, "*")) {
     ast.all = true;
     stream.next();
@@ -43,25 +45,35 @@ function parseSelectArgs(ast: AST, stream: TokenStream) {
 function parseFile(stream: TokenStream): string {
   let path = "";
   let lastWasText = false;
+  //If the next token is an @, then we're selecting from a variable, so we return the token after that
+  if (stream.popNextIf(Type.special, "@", false)) {
+    return '@' + stream.next().value;
+  }
+
   while (stream.hasNext()) {
     const fileToken = stream.next();
     if (fileToken.is(Type.dot) || fileToken.is(Type.special, '/')) {
-        path += fileToken.value;
-        lastWasText = false;
+      path += fileToken.value;
+      lastWasText = false;
     } else if (fileToken.is(Type.word)) {
-        if (lastWasText) {
-            return path;
-        } else {
-            path += fileToken.value;
-            lastWasText = true;
-        }    
-    } else if (fileToken.is(Type.number)) {
+      if (lastWasText) {
+        stream.prev();
+        return path;
+      } else {
         path += fileToken.value;
+        lastWasText = true;
+      }
+    } else if (fileToken.is(Type.semicolon)) {
+      stream.prev();
+      return path;
+    } else if (fileToken.is(Type.number)) {
+      path += fileToken.value;
     } else {
-        stream.unexpectedToken();
+      stream.unexpectedToken();
     }
   }
 
+  //At this point we're at the final word
   return path;
 }
 
@@ -78,34 +90,28 @@ function optional(
 }
 
 function parseJoin(ast: AST, stream: TokenStream): void {
-  if (!stream.peek().is(Type.word, "JOIN", false)) {
-    return;
+  while (stream.popNextIf(Type.word, "JOIN", false)) {
+    const file = parseFile(stream);
+    if (stream.popNextIf(Type.word, "ON", false)) {
+      ast.joinFiles[file] = __whereFunction(stream);
+    } else {
+      ast.joinFiles[file] = () => true;
+    }
   }
-
-  stream.next();
-  const file = parseFile(stream);
-  if (stream.next().is(Type.word, "ON", false)) {
-    ast.joinFiles[file] = __whereFunction(stream);
-  } else {
-    ast.joinFiles[file] = () => true;
-  }
-  console.log("after join", stream.get());
 }
 
 function parseWhere(ast: AST, stream: TokenStream): void {
-  if (!stream.peek().is(Type.word, "WHERE", false)) {
+  if (!stream.popNextIf(Type.word, "WHERE", false)) {
     return;
   }
 
-  stream.next();
   ast.addAnd(__whereFunction(stream));
 }
 
 function parseOrderBy(ast: AST, stream: TokenStream): void {
-  if (!stream.peek().is(Type.word, "ORDER", false)) {
+  if (!stream.popNextIf(Type.word, "ORDER", false)) {
     return;
   }
-  stream.next();
   stream.next();
   stream.assert(Type.word, "BY", false);
   const parameter = stream.next();
@@ -119,20 +125,33 @@ function parseOrderBy(ast: AST, stream: TokenStream): void {
   }
 }
 
+function parseInto(ast: AST, stream: TokenStream): void {
+  if (!stream.popNextIf(Type.word, "INTO", false)) {
+    return;
+  }
+  stream.assertNext(Type.special, "@", false);
+  stream.assertNext(Type.word);
+  ast.intoName = stream.get().value;
+}
+
+function parseSemicolon(ast: AST, stream: TokenStream): void {
+  if (stream.popNextIf(Type.semicolon) && stream.hasNext()) {
+    stream.next();
+    ast.next = lex(stream);
+  }
+}
+
 function __whereFunction(stream: TokenStream): WhereFunction {
-  const propertyToken = stream.next();
-  stream.assert(Type.word);
-  const property = propertyToken.value; //b
-  const comparatorToken = stream.next(); // >
+  stream.assertNext(Type.word);
+  const property = stream.get().value;
+  const comparatorToken = stream.next();
   if (comparatorToken.is(Type.comp) || comparatorToken.is(Type.equals)) {
     const valueToken = stream.next();
-    const value = valueToken.is(Type.number)
-      ? Number(valueToken.value)
-      : valueToken.value;
+    const value = getValueFromToken(valueToken);
 
     return (row) => {
       const key = row[property as keyof typeof row] as any;
-      //   console.log(property, `(${key})`, comparatorToken.value, value);
+      console.log(property, `(${key})`, comparatorToken.value, value);
       switch (comparatorToken.value) {
         case ">":
           return key > value;
@@ -146,5 +165,15 @@ function __whereFunction(stream: TokenStream): WhereFunction {
     };
   } else {
     stream.unexpectedToken();
+  }
+
+  function getValueFromToken(token: Token): string | number | boolean {
+    if (token.is(Type.number)) {
+      return Number(token.value);
+    } else if (token.is(Type.word)) {
+      return ['true', 'false'].includes(token.value) ? token.value === 'true' : token.value;
+    } else {
+      throw new Error(`Unknown token type: ${token.type}`);
+    }
   }
 }

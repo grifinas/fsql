@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "pairID": 3,
+    "productName": "First Item",
+    "is_active": true,
+    "unit-price": 19.99,
+    "tags": ["new", "featured"],
+    "ProductMetadata": {
+      "color_code": "blue",
+      "itemSize": "medium"
+    }
+  },
+  {
+    "id": 2,
+    "pairID": 5,
+    "productName": "Second Item",
+    "is_active": false,
+    "unit-price": 29.99,
+    "tags": ["sale", "limited"],
+    "ProductMetadata": {
+      "color_code": "red",
+      "itemSize": "large"
+    }
+  },
+  {
+    "id": 3,
+    "pairID": 1,
+    "productName": "Third Item",
+    "is_active": true,
+    "unit-price": 15.50,
+    "tags": ["clearance"],
+    "ProductMetadata": {
+      "color_code": "green",
+      "itemSize": "small"
+    }
+  },
+  {
+    "id": 4,
+    "pairID": null,
+    "productName": "Fourth Item",
+    "is_active": true,
+    "unit-price": 45.00,
+    "tags": ["premium", "new-arrival"],
+    "ProductMetadata": {
+      "color_code": "black",
+      "itemSize": "xl"
+    }
+  },
+  {
+    "id": 5,
+    "pairID": 2,
+    "productName": "Fifth Item",
+    "is_active": false,
+    "unit-price": 9.99,
+    "tags": ["last-chance", "budget-friendly"],
+    "ProductMetadata": {
+      "color_code": "white",
+      "itemSize": "xs"
+    }
+  }
+]
