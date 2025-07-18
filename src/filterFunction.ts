@@ -1,5 +1,5 @@
 import { MeshedRow } from "./meshData";
-import { getMeshedRowValue } from "./utils/getMeshedRowValue";
+import { resolveValue } from "./utils/getMeshedRowValue";
 import { logger } from "./utils/logger";
 
 export interface FieldProperty {
@@ -7,16 +7,20 @@ export interface FieldProperty {
     field: string;
 }
 
+export type Scalar = string | number | boolean;
+
 export interface ResolvedProperty {
-    value: string | number | boolean;
+    value: Scalar;
 }
+
+export type Operator = '<' | '>' | '=';
 
 export class FilterFunction {
     private left: FilterFunction | FieldProperty | ResolvedProperty;
     private right: FilterFunction | FieldProperty | ResolvedProperty;
-    private operator: string;
+    private operator: Operator;
 
-    constructor(left: FilterFunction | FieldProperty | ResolvedProperty, operator: string, right: FilterFunction | FieldProperty | ResolvedProperty) {
+    constructor(left: FilterFunction | FieldProperty | ResolvedProperty, operator: Operator, right: FilterFunction | FieldProperty | ResolvedProperty) {
         this.left = left;
         this.operator = operator;
         this.right = right;
@@ -39,8 +43,8 @@ export class FilterFunction {
         }
 
         const result = this.compare(
-            this.resolveValue(this.left, row),
-            this.resolveValue(this.right, row)
+            resolveValue(this.left, row),
+            resolveValue(this.right, row)
         )
 
         logger.info("Resolved", row, this.left, this.operator, this.right, result);
@@ -75,16 +79,6 @@ export class FilterFunction {
                 return a.value === b.value;
             default:
                 throw new Error(`Unknown comparator: ${this.operator}`);
-        }
-    }
-
-    private resolveValue(value: FieldProperty | ResolvedProperty, row: MeshedRow): ResolvedProperty {
-        if ('value' in value) {
-            return value;
-        }
-        return {
-            //TODO fix types
-            value: getMeshedRowValue(row, value.source, value.field) as string | number | boolean
         }
     }
 }

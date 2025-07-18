@@ -1,6 +1,7 @@
 import { tokenize } from "../src/tokenizer";
 import { lex } from "../src/lexer/lexer";
 import { AST } from "../src/ast";
+import { FilterFunction } from "../src/filterFunction";
 
 /*
  * Tested together with parser cause that's how it makes sense, If tokenize tests don't pass don't even look here
@@ -57,13 +58,16 @@ describe("lexer", () => {
 
   it("WHERE clauses should be chainable with AND", () => {
     const conditions = ["a=b", "c=d", "d=a"];
-    expect(() =>
-      lex(
-        tokenize(
-          `SELECT * from file_name_goes_here where ${conditions.join(" AND ")}`
-        )
+    const ast = lex(
+      tokenize(
+        `SELECT * from file_name_goes_here where ${conditions.join(" AND ")}`
       )
-    ).not.toThrow();
+    );
+
+    console.log(ast.where);
+    expect(ast.where?.getLeft()).toBeInstanceOf(FilterFunction);
+    expect(ast.where?.getRight()).toBeInstanceOf(FilterFunction);
+    expect(ast.where?.getOperator()).toBe("=");
   });
 
   it("should lex JOIN and WHERE clauses together", () => {

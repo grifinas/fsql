@@ -65,7 +65,9 @@ function parseJoin(ast: AST, stream: TokenStream): void {
 }
 
 function parseWhere(ast: AST, stream: TokenStream): void {
-  ast.addAnd(parseFilterFunction(stream));
+  do {
+    ast.addAnd(parseFilterFunction(stream));
+  } while (stream.advanceIf(Type.word, "AND"));
 }
 
 function parseOrderBy(ast: AST, stream: TokenStream): void {

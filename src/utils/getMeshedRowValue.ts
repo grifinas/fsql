@@ -1,3 +1,4 @@
+import { FieldProperty, ResolvedProperty } from "../filterFunction";
 import { MeshedRow } from "../meshData";
 import { logger } from "./logger";
 import { pathValue } from "./pathValue";
@@ -31,5 +32,15 @@ export function getMeshedRowValue(row: MeshedRow, source: string | null, field: 
     } else {
         logger.debug('Ambiguous field', { field, row, source });
         throw new Error(`Ambiguous field ${field}`);
+    }
+}
+
+export function resolveValue(value: FieldProperty | ResolvedProperty, row: MeshedRow): ResolvedProperty {
+    if ('value' in value) {
+        return value;
+    }
+    return {
+        //TODO fix types
+        value: getMeshedRowValue(row, value.source, value.field) as string | number | boolean
     }
 }

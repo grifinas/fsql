@@ -12,6 +12,7 @@ export const KEYWORD = {
     ASC: new Token(Type.word, "ASC"),
     DESC: new Token(Type.word, "DESC"),
     AS: new Token(Type.word, "AS"),
+    AND: new Token(Type.word, "AND"),
 } as const;
 
 export const RESERVED_WORDS = Object.values(KEYWORD);
