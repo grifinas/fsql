@@ -1,12 +1,17 @@
 import { Token, Type } from "../token";
 
-export const RESERVED_WORDS = [
-    new Token(Type.word, "SELECT", 0),
-    new Token(Type.word, "FROM", 0),
-    new Token(Type.word, "WHERE", 0),
-    new Token(Type.word, "INTO", 0),
-    new Token(Type.word, "JOIN", 0),
-    new Token(Type.word, "ON", 0),
-    new Token(Type.word, "ORDER BY", 0),
-    new Token(Type.word, "AS", 0),
-] as const;
+export const KEYWORD = {
+    SELECT: new Token(Type.word, "SELECT"),
+    FROM: new Token(Type.word, "FROM"),
+    WHERE: new Token(Type.word, "WHERE"),
+    INTO: new Token(Type.word, "INTO"),
+    JOIN: new Token(Type.word, "JOIN"),
+    ON: new Token(Type.word, "ON"),
+    ORDER: new Token(Type.word, "ORDER"),
+    BY: new Token(Type.word, "BY"),
+    ASC: new Token(Type.word, "ASC"),
+    DESC: new Token(Type.word, "DESC"),
+    AS: new Token(Type.word, "AS"),
+} as const;
+
+export const RESERVED_WORDS = Object.values(KEYWORD);

@@ -1,25 +1,31 @@
 import { AST } from "../ast";
-import { Type } from "../token";
+import { Token, Type } from "../token";
 import { TokenStream } from "../tokenStream";
 import { parseInto } from "./parseInto";
 import { parseFile } from "./parseFile";
 import { parseFilterFunction } from "./parseFilterFunction";
 import { parseSelectArgs } from "./parseSelectArgs";
 import { logger } from "../utils/logger";
+import { KEYWORD } from "./constants";
 
-export function lex(stream: TokenStream): AST {
-  const ast = new AST();
+let ast: AST;
+let stream: TokenStream;
+
+export function lex(_stream: TokenStream): AST {
+  stream = _stream;
+  const _ast = new AST();
+  ast = _ast;
 
   logger.info("lex", stream.toString());
   parseSelectArgs(ast, stream);
   parseFrom(ast, stream);
-  optional(parseJoin, ast, stream);
-  optional(parseWhere, ast, stream);
-  optional(parseOrderBy, ast, stream);
-  optional(parseInto, ast, stream);
-  optional(parseSemicolon, ast, stream);
+  chainable(KEYWORD.JOIN, parseJoin);
+  optional(KEYWORD.WHERE, parseWhere);
+  optional(KEYWORD.ORDER, parseOrderBy);
+  optional(KEYWORD.INTO, parseInto);
+  optional(new Token(Type.semicolon, ";"), parseSemicolon);
 
-  return ast;
+  return _ast;
 }
 
 function parseFrom(ast: AST, stream: TokenStream) {
@@ -27,49 +33,50 @@ function parseFrom(ast: AST, stream: TokenStream) {
   ast.setMain(parseFile(stream));
 }
 
-function optional(
+export function optional(
+  token: Token,
   fn: (ast: AST, stream: TokenStream) => void,
-  ast: AST,
-  stream: TokenStream
 ): void {
-  if (!stream.hasNext()) {
+  if (stream.done()) {
+    logger.debug("Stream is done");
     return;
   }
 
-  fn(ast, stream);
+  if (stream.advanceIf(token.type, token.value)) {
+    fn(ast, stream);
+  } else {
+    logger.debug("Token not found", token);
+  }
+}
+
+export function chainable(token: Token, fn: (ast: AST, stream: TokenStream) => void): void {
+  while (stream.advanceIf(token.type, token.value)) {
+    fn(ast, stream);
+  }
 }
 
 function parseJoin(ast: AST, stream: TokenStream): void {
-  while (stream.advanceIf(Type.word, "JOIN")) {
-    const file = parseFile(stream);
-    if (stream.advanceIf(Type.word, "ON")) {
-      ast.addJoin(file, parseFilterFunction(stream));
-    } else {
-      ast.addJoin(file);
-    }
+  const file = parseFile(stream);
+  if (stream.advanceIf(Type.word, "ON")) {
+    ast.addJoin(file, parseFilterFunction(stream));
+  } else {
+    ast.addJoin(file);
   }
 }
 
 function parseWhere(ast: AST, stream: TokenStream): void {
-  if (!stream.advanceIf(Type.word, "WHERE")) {
-    logger.debug("No WHERE found");
-    return;
-  }
-
   ast.addAnd(parseFilterFunction(stream));
 }
 
 function parseOrderBy(ast: AST, stream: TokenStream): void {
-  if (!stream.advanceIf(Type.word, "ORDER")) {
-    logger.debug("No ORDER BY found");
-    return;
-  }
   stream.assert(Type.word, "BY");
-  const parameter = stream.next();
-  stream.assert(Type.word);
-  if (stream.next().is(Type.word, "ASC")) {
+  stream.assertNext(Type.word);
+  const parameter = stream.get();
+  const direction = stream.next();
+
+  if (direction.is(KEYWORD.ASC)) {
     ast.order = [parameter.value, 1];
-  } else if (stream.get().is(Type.word, "DESC")) {
+  } else if (direction.is(KEYWORD.DESC)) {
     ast.order = [parameter.value, -1];
   } else {
     stream.unexpectedToken();
@@ -77,10 +84,6 @@ function parseOrderBy(ast: AST, stream: TokenStream): void {
 }
 
 function parseSemicolon(ast: AST, stream: TokenStream): void {
-  if (!stream.advanceIf(Type.semicolon)) {
-    logger.debug("No semicolon found");
-    return;
-  }
   if (stream.done()) {
     logger.debug("Found semicolon finishing statement");
     return;

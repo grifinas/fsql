@@ -1,3 +1,3 @@
 import { logger, LogLevel } from './src/utils/logger';
 
-logger.setLevel(LogLevel.DEBUG);
+logger.setLevel(LogLevel.NONE);
