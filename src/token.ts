@@ -44,6 +44,7 @@ export class Token implements TokenMatcher {
 
 export enum Type {
   word = "word",
+  string = "string",
   number = "number",
   bracket = "bracket",
   brace = "brace",

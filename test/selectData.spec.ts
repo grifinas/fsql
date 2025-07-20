@@ -1,10 +1,10 @@
 import { selectData } from '../src/selectData';
 import { MeshedRow } from '../src/meshData';
-import { AliasedPropperty } from '../src/ast';
+import { FieldProperty, Property } from '../src/property';
 
 describe('selectData', () => {
   describe('when fields array is empty (SELECT *)', () => {
-    const emptyFields: AliasedPropperty[] = [];
+    const emptyFields: Property[] = [];
 
     it('should return an empty array if rows are empty', () => {
       const rows: MeshedRow[] = [];
@@ -83,8 +83,8 @@ describe('selectData', () => {
       const rows: MeshedRow[] = [
         { '@sourceA': { id: 1, name: 'Alice' } },
       ];
-      const fields: AliasedPropperty[] = [
-        { field: 'name', alias: 'firstname' },
+      const fields: Property[] = [
+        new FieldProperty(null, 'name').setAlias('firstname'),
       ];
       expect(selectData(rows, fields)).toEqual([
         { firstname: 'Alice' },
@@ -95,8 +95,8 @@ describe('selectData', () => {
       const rows: MeshedRow[] = [
         { '@sourceA': { id: 1, name: 'Alice' }, '@sourceB': { id: 2, name: 'Bob' } },
       ];
-      const fields: AliasedPropperty[] = [
-        { field: '@sourceA.name', alias: 'firstname' },
+      const fields: Property[] = [
+        new FieldProperty('@sourceA', 'name').setAlias('firstname'),
       ];
       expect(selectData(rows, fields)).toEqual([
         { firstname: 'Alice' },
@@ -107,8 +107,8 @@ describe('selectData', () => {
       const rows: MeshedRow[] = [
         { '@sourceA': { id: 1, name: 'Alice', address: { city: 'New York' } } },
       ];
-      const fields: AliasedPropperty[] = [
-        { field: '@sourceA.address.city', alias: 'city' },
+      const fields: Property[] = [
+        new FieldProperty('@sourceA', 'address.city').setAlias('city'),
       ];
       expect(selectData(rows, fields)).toEqual([
         { city: 'New York' },

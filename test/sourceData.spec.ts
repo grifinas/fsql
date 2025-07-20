@@ -2,8 +2,13 @@ import { sourceData } from "../src/sourceData";
 import { fileUtils } from "../src/utils/file";
 import { FilterFunction } from "../src/filterFunction";
 import { JoinMap } from "../src/ast";
+import { FileDataSource } from "../src/dataSource";
 
 describe("sourceData", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   const mainData = [
     { foo: 1, bar: "bar1" },
     { foo: 2, bar: "bar2" },
@@ -23,7 +28,7 @@ describe("sourceData", () => {
 
   it("should return main data when no joins", async () => {
     jest.spyOn(fileUtils, "readJson").mockResolvedValue(mainData);
-    const result = await sourceData({ field: "main.json", alias: "@m" }, {}, {});
+    const result = await sourceData(new FileDataSource("main.json").setAlias("@m"), {}, {});
     expect(result).toEqual([
       { source: '@m', data: mainData }
     ]);
@@ -35,13 +40,13 @@ describe("sourceData", () => {
       { value: 20 },
     ];
     const joins: JoinMap = {
-      "join.json": { where: blankFilter, alias: "@j" }
+      "@j": { where: blankFilter, source: new FileDataSource("join.json").setAlias("@j") }
     };
     jest.spyOn(fileUtils, "readJson")
       .mockResolvedValueOnce(mainData)
       .mockResolvedValueOnce(joinData);
 
-    const result = await sourceData({ field: "main.json", alias: "@m" }, joins, {});
+    const result = await sourceData(new FileDataSource("main.json").setAlias("@m"), joins, {});
     expect(result).toEqual([
       { source: "@m", data: mainData },
       { source: "@j", where: blankFilter, data: joinData }
@@ -50,13 +55,13 @@ describe("sourceData", () => {
 
   it("should not load the same file twice", async () => {
     const joins: JoinMap = {
-      "main.json": { where: blankFilter, alias: "@j" }
+      "@j": { where: blankFilter, source: new FileDataSource("main.json").setAlias("@j") }
     };
 
     jest.spyOn(fileUtils, "readJson")
       .mockResolvedValueOnce(mainData);
 
-    const result = await sourceData({ field: "main.json", alias: "@m" }, joins, {});
+    const result = await sourceData(new FileDataSource("main.json").setAlias("@m"), joins, {});
     expect(result).toEqual([
       { source: "@m", data: mainData },
       { source: "@j", where: blankFilter, data: mainData }
@@ -68,10 +73,10 @@ describe("sourceData", () => {
 
   it("should throw error if two aliases are the same", async () => {
     const joins: JoinMap = {
-      "join.json": { where: blankFilter, alias: "@m" }
+      "@j": { where: blankFilter, source: new FileDataSource("join.json").setAlias("@j") }
     };
-    await expect(sourceData({ field: "main.json", alias: "@m" }, joins, {}))
-      .rejects.toThrow("Duplicate alias: @m");
+    await expect(sourceData(new FileDataSource("main.json").setAlias("@j"), joins, {}))
+      .rejects.toThrow("Duplicate alias: @j");
   });
 
 

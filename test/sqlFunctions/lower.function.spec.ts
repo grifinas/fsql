@@ -2,7 +2,7 @@ import { FieldProperty, ResolvedProperty } from "../../src/property";
 import { MeshedRow } from "../../src/meshData";
 import { LowerFunction } from "../../src/sqlFunctions/lower.function";
 
-describe.skip("LOWER function", () => {
+describe("LOWER function", () => {
     const testRow: MeshedRow = {
         main: {
             text: "Hello World",
@@ -28,16 +28,16 @@ describe.skip("LOWER function", () => {
 
     it("should throw if argument is not a string", () => {
         const fn = new LowerFunction("LOWER", [new FieldProperty("main", "number")]);
-        expect(() => fn.resolve(testRow)).toThrow("Lower function requires a string argument");
+        expect(() => fn.resolve(testRow)).toThrow("Lower function requires 1st argument to be of type string");
     });
 
     it("should throw if no arguments provided", () => {
         const fn = new LowerFunction("LOWER");
-        expect(() => fn.resolve(testRow)).toThrow("Lower function requires exactly one argument");
+        expect(() => fn.resolve(testRow)).toThrow("Lower function requires 1st argument to be of type string");
     });
 
     it("should throw if multiple arguments provided", () => {
         const fn = new LowerFunction("LOWER", [new ResolvedProperty("test1"), new ResolvedProperty("test2")]);
-        expect(() => fn.resolve(testRow)).toThrow("Lower function requires exactly one argument");
+        expect(() => fn.resolve(testRow)).toThrow("Lower function requires less than or equal to 1 arguments");
     });
 });

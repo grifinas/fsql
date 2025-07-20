@@ -26,5 +26,5 @@ echo "Test file: $TEST_FILE"
 echo "Project root: $PROJECT_ROOT"
 
 node "$PROJECT_ROOT/node_modules/jest/bin/jest.js" "$TEST_FILE" \
-    --config="$PROJECT_ROOT/jest.config.ts" "${@:3}"
-    # | tee "$PROJECT_ROOT/jest_output.log"
+    --config="$PROJECT_ROOT/jest.config.ts" "${@:3}" 
+    #| tee "$PROJECT_ROOT/jest_output.log"

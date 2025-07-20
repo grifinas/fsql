@@ -93,6 +93,17 @@ export function tokenize(input: string): TokenStream {
       continue;
     }
 
+    if(['"', "'", "`"].includes(char)) {
+      current++;
+      const start = current;
+      while (current < input.length && char !== input[current]) {
+        current++;
+      }
+      tokens.push(new Token(Type.string, input.substring(start, current)));
+      current++;
+      continue;
+    }
+
     //Comment
     if (char === "#") {
       let comment = "";

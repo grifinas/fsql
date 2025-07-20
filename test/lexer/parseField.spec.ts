@@ -123,7 +123,17 @@ describe("parseField", () => {
     expect(stream.getIndex()).toBe(stream.length);
   });
 
-  it("should parse function", () => {
+  it("should parse string literals", () => {
+    const stream = new TokenStream([
+      new Token(Type.string, 'foo')
+    ]);
+    const result = parseField(stream);
+    expect(result).toBeInstanceOf(ResolvedProperty);
+    expect((result as ResolvedProperty).value).toEqual('foo');
+    expect(stream.getIndex()).toBe(stream.length);
+  });
+
+  it("should parse functions", () => {
     const stream = new TokenStream([
       new Token(Type.word, 'fname'),
       new Token(Type.parenthesis, '('),
@@ -139,7 +149,7 @@ describe("parseField", () => {
     expect(stream.getIndex()).toBe(stream.length);
   });
 
-  it("should be able to nest function", () => {
+  it("should be able to nest functions", () => {
     const stream = new TokenStream([
       new Token(Type.word, 'fname'),
       new Token(Type.parenthesis, '('),

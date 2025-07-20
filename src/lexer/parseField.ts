@@ -1,12 +1,17 @@
 import { TokenStream } from "../tokenStream";
 import { Type } from "../token";
 import { FieldProperty, FunctionProperty, Property, ResolvedProperty } from "../property";
+import { RESERVED_WORDS } from "./constants";
 
 export function parseField(stream: TokenStream): Property {
     const parts: string[] = [];
     let start = stream.getIndex();
 
     while (true) {
+        const token = stream.get();
+        if (stream.advanceIf(Type.string)) {
+            return new ResolvedProperty(token.value);
+        }
         const value = getValueFromStream(stream);
         if (typeof value === 'string') {
             parts.push(value);
@@ -30,7 +35,12 @@ export function parseField(stream: TokenStream): Property {
         return parseFunction(stream);
     }
 
-    return new FieldProperty(null, parts.join('.'));
+    const fieldName = parts.join('.');
+    if (RESERVED_WORDS.some(token => token.value.toLocaleLowerCase() === fieldName.toLocaleLowerCase())) {
+        stream.unexpectedToken();
+    }
+
+    return new FieldProperty(null, fieldName);
 }
 
 function getValueFromStream(stream: TokenStream): string | number | boolean {
@@ -39,6 +49,8 @@ function getValueFromStream(stream: TokenStream): string | number | boolean {
         return Number(token.value);
     } else if (token.is(Type.word)) {
         return ['true', 'false'].includes(token.value.toLocaleLowerCase()) ? token.value === 'true' : token.value;
+    } else if (token.is(Type.string)) {
+        return token.value;
     } else {
         stream.unexpectedToken();
     }

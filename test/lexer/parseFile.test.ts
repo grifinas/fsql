@@ -1,7 +1,7 @@
 import { parseFile } from '../../src/lexer/parseFile';
 import { TokenStream } from '../../src/tokenStream';
 import { Token, Type } from '../../src/token';
-import { AliasedPropperty } from '../../src/ast';
+import { FileDataSource, VariableDataSource } from '../../src/dataSource';
 
 describe('parseFile - Integration Tests', () => {
   let stream: TokenStream;
@@ -13,7 +13,8 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.semicolon, ';'),
     ]);
     const result = parseFile(stream);
-    expect(result).toEqual<AliasedPropperty>({ field: '@myVar', alias: '@myVar' });
+    expect(result).toBeInstanceOf(VariableDataSource);
+    expect(result.ref()).toBe('@myVar');
     expect(stream.get().value).toBe(';'); // Stream should be at the semicolon
   });
 
@@ -23,7 +24,8 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.word, 'myVar'),
     ]);
     const result = parseFile(stream);
-    expect(result).toEqual<AliasedPropperty>({ field: '@myVar', alias: '@myVar' });
+    expect(result).toBeInstanceOf(VariableDataSource);
+    expect(result.ref()).toBe('@myVar');
     expect(stream.done()).toBe(true);
   });
 
@@ -34,7 +36,8 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.word, 'json'),
     ]);
     const result = parseFile(stream);
-    expect(result).toEqual<AliasedPropperty>({ field: 'data.json', alias: null });
+    expect(result).toBeInstanceOf(FileDataSource);
+    expect(result.ref()).toBe('data.json');
     expect(stream.done()).toBe(true);
   });
 
@@ -46,7 +49,8 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.semicolon, ';'),
     ]);
     const result = parseFile(stream);
-    expect(result).toEqual<AliasedPropperty>({ field: 'data.json', alias: null });
+    expect(result).toBeInstanceOf(FileDataSource);
+    expect(result.ref()).toBe('data.json');
     expect(stream.get().value).toBe(';'); // Should stop before semicolon and regress
   });
 
@@ -57,11 +61,11 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.word, 'file'),
       new Token(Type.dot, '.'),
       new Token(Type.word, 'txt'),
-      new Token(Type.word, 'AS'), // Stop before AS
     ]);
     const result = parseFile(stream);
-    expect(result).toEqual<AliasedPropperty>({ field: 'folder/file.txt', alias: null });
-    expect(stream.get().value).toBe('AS'); // Should stop before AS and regress
+    expect(result).toBeInstanceOf(FileDataSource);
+    expect(result.ref()).toBe('folder/file.txt');
+    expect(stream.done()).toBe(true);
   });
 
   it('should parse a file path with numbers like data123.config.js', () => {
@@ -75,21 +79,25 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.word, 'WHERE'),
     ]);
     const result = parseFile(stream);
-    expect(result).toEqual<AliasedPropperty>({ field: 'data123.config.js', alias: null });
+    expect(result).toBeInstanceOf(FileDataSource);
+    expect(result.ref()).toBe('data123.config.js');
     expect(stream.get().value).toBe('WHERE');
   });
 
-  it('should stop parsing before an alias keyword (AS)', () => {
+  it('should parse a file path with alias keyword (AS)', () => {
     stream = new TokenStream([
       new Token(Type.word, 'myFile'),
       new Token(Type.dot, '.'),
       new Token(Type.word, 'csv'),
       new Token(Type.word, 'AS'),
+      new Token(Type.special, '@'),
       new Token(Type.word, 'm'),
     ]);
     const result = parseFile(stream);
-    expect(result).toEqual<AliasedPropperty>({ field: 'myFile.csv', alias: null });
-    expect(stream.get().value).toBe('AS'); // parseFile regresses to AS
+    expect(result).toBeInstanceOf(FileDataSource);
+    expect((result as FileDataSource).filePath).toBe('myFile.csv');
+    expect(result.ref()).toBe('@m');
+    expect(stream.done()).toBe(true);
   });
 
   it('should throw unexpected token for path like file@name.json (current buggy behavior)', () => {
@@ -128,7 +136,8 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.semicolon, ';'),
     ]);
     const result = parseFile(stream);
-    expect(result).toEqual<AliasedPropperty>({ field: 'folder/file123', alias: null });
+    expect(result).toBeInstanceOf(FileDataSource);
+    expect(result.ref()).toBe('folder/file123');
     expect(stream.get().value).toBe(';');
   });
 
@@ -138,7 +147,8 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.word, 'AS'),
     ]);
     const result = parseFile(stream);
-    expect(result).toEqual<AliasedPropperty>({ field: '12345AS', alias: null });
+    expect(result).toBeInstanceOf(FileDataSource);
+    expect(result.ref()).toBe('12345AS');
     expect(stream.done()).toBe(true);
   });
 });

@@ -1,6 +1,7 @@
-import { AliasedPropperty, JoinMap } from "./ast";
+import { JoinMap } from "./ast";
 import { fileUtils } from "./utils/file";
 import { FilterFunction } from "./filterFunction";
+import { DataSource, FileDataSource } from "./dataSource";
 
 export interface SourceData {
   source: string;
@@ -8,52 +9,51 @@ export interface SourceData {
   data: object[];
 }
 
-export async function sourceData(main: AliasedPropperty, joins: JoinMap, variables: Record<string, object[]>): Promise<SourceData[]> {
-  async function loadData(file: string): Promise<object[]> {
-    if (file.startsWith("@")) {
-      return variables[file];
+export async function sourceData(main: DataSource, joins: JoinMap, variables: Record<string, object[]>): Promise<SourceData[]> {
+  const refMap = new Map<string, Promise<object[]>>();
+  const fileMap = new Map<string, Promise<object[]>>();
+  const sources = [main, ...Object.values(joins).map(j => j.source)];
+  const aliases = new Set();
+
+  for (const source of sources) {
+    if (source instanceof FileDataSource) {
+      const filePromise = fileMap.get(source.filePath);
+
+      if (source.getAlias()) {
+        if (aliases.has(source.getAlias())) throw new Error(`Duplicate alias: ${source.getAlias()}`);
+        aliases.add(source.getAlias());
+      }
+
+      if (filePromise) {
+        refMap.set(source.ref(), filePromise);
+      } else {
+        const promise = loadData(source.filePath);
+        fileMap.set(source.filePath, promise);
+        refMap.set(source.ref(), promise);
+      }
+    } else {
+      refMap.set(source.ref(), Promise.resolve(variables[source.ref()]));
     }
-
-    const data = await fileUtils.readJson(file);
-    return Array.isArray(data) ? data : [data as object];
   }
 
-  // Check for duplicate aliases
-  const aliases = new Set([main.alias]);
-  for (const [_, { alias }] of Object.entries(joins)) {
-    if (aliases.has(alias)) {
-      throw new Error(`Duplicate alias: ${alias}`);
-    }
-    aliases.add(alias);
-  }
-
-  // Get unique files to load
-  const uniqueFiles = new Set([main.field]);
-  for (const [joinFile] of Object.entries(joins)) {
-    uniqueFiles.add(joinFile);
-  }
-
-  // Load all unique files in parallel
-  const fileLoads = Array.from(uniqueFiles).map(async file => ({
-    file,
-    data: await loadData(file)
-  }));
-  const loadedData = await Promise.all(fileLoads);
-  const fileDataMap = new Map(loadedData.map(({ file, data }) => [file, data]));
-
-  // Build result array in order
   const result: SourceData[] = [{
-    source: main.alias || main.field,
-    data: fileDataMap.get(main.field)!
+    source: main.ref(),
+    data: await refMap.get(main.ref())!
   }];
 
   for (const [joinFile, joinConfig] of Object.entries(joins)) {
     result.push({
-      source: joinConfig.alias || joinFile,
+      source: joinConfig.source.ref(),
       where: joinConfig.where,
-      data: fileDataMap.get(joinFile)!
+      data: await refMap.get(joinFile)!
     });
   }
 
   return result;
+
+}
+
+async function loadData(file: string): Promise<object[]> {
+  const data = await fileUtils.readJson(file);
+  return Array.isArray(data) ? data : [data as object];
 }

@@ -21,7 +21,7 @@ export class FilterFunction {
     }
 
     isEmpty(): boolean {
-        return 'value' in this.left && 'value' in this.right && this.left.value === true && this.right.value === true && this.operator === "=";
+        return this.left instanceof ResolvedProperty && this.right instanceof ResolvedProperty && this.left.value === true && this.right.value === true && this.operator === "=";
     }
 
     resolve(row: MeshedRow): boolean {
@@ -37,7 +37,7 @@ export class FilterFunction {
             resolveValue(this.right, row)
         )
 
-        logger.info("Resolved", row, this.left, this.operator, this.right, result);
+        logger.info("Filter result", row, result);
 
         return result;
     }

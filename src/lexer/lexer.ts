@@ -7,6 +7,8 @@ import { parseFilterFunction } from "./parseFilterFunction";
 import { parseSelectArgs } from "./parseSelectArgs";
 import { logger } from "../utils/logger";
 import { KEYWORD } from "./constants";
+import { withAlias } from "./parseAlias";
+import { DataSource, FileDataSource } from "../dataSource";
 
 let ast: AST;
 let stream: TokenStream;

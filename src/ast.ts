@@ -3,18 +3,15 @@ import { sourceData } from "./sourceData";
 import { FilterFunction } from "./filterFunction";
 import { selectData } from "./selectData";
 import { logger } from "./utils/logger";
+import { Property } from "./property";
+import { DataSource } from "./dataSource";
 
-export interface AliasedPropperty {
-  field: string;
-  alias: string | null;
-}
-
-export type JoinMap = Record<string, { where: FilterFunction; alias: string | null }>;
+export type JoinMap = Record<string, { where: FilterFunction; source: DataSource }>;
 
 export class AST {
   public all: boolean = true;
-  public fields: AliasedPropperty[] = [];
-  public mainfile: AliasedPropperty | undefined;
+  public fields: Property[] = [];
+  public mainfile: DataSource | undefined;
   public joinFiles: JoinMap = {};
   public where: FilterFunction | undefined;
   public order: [string, number] | undefined = undefined;
@@ -88,34 +85,21 @@ export class AST {
     this.variables[name] = data;
   }
 
-  setMain(prop: AliasedPropperty) {
-    if (prop.alias && !prop.alias.startsWith("@")) {
-      throw new Error(`Invalid alias: ${prop.alias}. Table aliases must start with @`);
-    }
-    this.mainfile = prop;
+  setMain(dataSource: DataSource) {
+    this.mainfile = dataSource;
   }
 
-  addJoin(prop: AliasedPropperty, where?: FilterFunction) {
-    if (prop.alias && !prop.alias.startsWith("@")) {
-      throw new Error(`Invalid alias: ${prop.alias}. Table aliases must start with @`);
-    }
-    this.joinFiles[prop.field] = { where: where || FilterFunction.Empty(), alias: prop.alias };
+  addJoin(source: DataSource, where?: FilterFunction) {
+    this.joinFiles[source.ref()] = { where: where || FilterFunction.Empty(), source };
   }
 
-  addField(field: string, alias?: string) {
-    const effectiveAlias = alias || field.split('.').pop()!;
-
+  addField(property: Property) {
     // Check for duplicate fields when no alias is provided
-    if (!alias && this.fields.some(f => f.field === field && !f.alias)) {
-      throw new Error(`Field '${field}' has already been added`);
-    }
-
-    // Check for duplicate aliases
-    if (this.fields.some(f => f.alias === effectiveAlias)) {
-      throw new Error(`Alias '${effectiveAlias}' has already been used`);
+    if (this.fields.some(f => f.ref() === property.ref())) {
+      throw new Error(`Field '${property.ref()}' has already been added`);
     }
 
     this.all = false;
-    this.fields.push({ field, alias: effectiveAlias });
+    this.fields.push(property);
   }
 }

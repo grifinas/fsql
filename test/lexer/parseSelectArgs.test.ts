@@ -2,6 +2,7 @@ import { parseSelectArgs } from '../../src/lexer/parseSelectArgs';
 import { AST } from '../../src/ast';
 import { TokenStream } from '../../src/tokenStream';
 import { Token, Type } from '../../src/token';
+import { FieldProperty } from '../../src/property';
 
 describe('parseSelectArgs - Integration Tests', () => {
   let ast: AST;
@@ -30,7 +31,9 @@ describe('parseSelectArgs - Integration Tests', () => {
       new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
-    expect(ast.fields).toEqual([{ field: 'fieldA', alias: 'fieldA' }]);
+    expect(ast.fields).toEqual([
+      new FieldProperty(null, 'fieldA'),
+    ]);
     expect(stream.get().value).toBe('FROM');
   });
 
@@ -43,7 +46,9 @@ describe('parseSelectArgs - Integration Tests', () => {
       new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
-    expect(ast.fields).toEqual([{ field: 'fieldA', alias: 'aliasA' }]);
+    expect(ast.fields).toEqual([
+      new FieldProperty(null, 'fieldA').setAlias('aliasA'),
+    ]);
     expect(stream.get().value).toBe('FROM');
   });
 
@@ -56,7 +61,9 @@ describe('parseSelectArgs - Integration Tests', () => {
       new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
-    expect(ast.fields).toEqual([{ field: 'fieldA', alias: 'aliasA' }]);
+    expect(ast.fields).toEqual([
+      new FieldProperty(null, 'fieldA').setAlias('aliasA'),
+    ]);
     expect(stream.get().value).toBe('FROM');
   });
 
@@ -70,8 +77,8 @@ describe('parseSelectArgs - Integration Tests', () => {
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([
-      { field: 'fieldA', alias: 'fieldA' },
-      { field: 'fieldB', alias: 'fieldB' },
+      new FieldProperty(null, 'fieldA'),
+      new FieldProperty(null, 'fieldB'),
     ]);
     expect(stream.get().value).toBe('FROM');
   });
@@ -90,8 +97,8 @@ describe('parseSelectArgs - Integration Tests', () => {
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([
-      { field: 'fieldA', alias: 'aliasA' },
-      { field: 'fieldB', alias: 'aliasB' },
+      new FieldProperty(null, 'fieldA').setAlias('aliasA'),
+      new FieldProperty(null, 'fieldB').setAlias('aliasB'),
     ]);
     expect(stream.get().value).toBe('FROM');
   });
@@ -110,9 +117,9 @@ describe('parseSelectArgs - Integration Tests', () => {
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([
-      { field: 'fieldA', alias: 'fieldA' },
-      { field: 'fieldB', alias: 'aliasB' },
-      { field: 'fieldC', alias: 'fieldC' },
+      new FieldProperty(null, 'fieldA'),
+      new FieldProperty(null, 'fieldB').setAlias('aliasB'),
+      new FieldProperty(null, 'fieldC'),
     ]);
     expect(stream.get().value).toBe('FROM');
   });
@@ -163,7 +170,9 @@ describe('parseSelectArgs - Integration Tests', () => {
       new Token(Type.word, 'fieldC'),
     ]);
     parseSelectArgs(ast, stream);
-    expect(ast.fields).toEqual([{ field: 'fieldA', alias: 'fieldA' }]);
+    expect(ast.fields).toEqual([
+      new FieldProperty(null, 'fieldA'),
+    ]);
     // The loop for 'fieldA' finishes. popNextIf(',') fails.
     // Then stream.advance() is called, consuming 'fieldB'.
     expect(stream.get().value).toBe('fieldB');

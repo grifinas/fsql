@@ -2,7 +2,7 @@ import { FieldProperty, ResolvedProperty } from "../../src/property";
 import { MeshedRow } from "../../src/meshData";
 import { LengthFunction } from "../../src/sqlFunctions/length.function";
 
-describe.skip("LENGTH function", () => {
+describe("LENGTH function", () => {
     const testRow: MeshedRow = {
         main: {
             text: "Hello World",
@@ -27,16 +27,16 @@ describe.skip("LENGTH function", () => {
 
     it("should throw if argument is not a string", () => {
         const fn = new LengthFunction("LENGTH", [new FieldProperty("main", "number")]);
-        expect(() => fn.resolve(testRow)).toThrow("Length function requires a string argument");
+        expect(() => fn.resolve(testRow)).toThrow("Length function requires 1st argument to be of type string");
     });
 
     it("should throw if no arguments provided", () => {
         const fn = new LengthFunction("LENGTH");
-        expect(() => fn.resolve(testRow)).toThrow("Length function requires exactly one argument");
+        expect(() => fn.resolve(testRow)).toThrow("Length function requires 1st argument to be of type string");
     });
 
     it("should throw if multiple arguments provided", () => {
         const fn = new LengthFunction("LENGTH", [new ResolvedProperty("test1"), new ResolvedProperty("test2")]);
-        expect(() => fn.resolve(testRow)).toThrow("Length function requires exactly one argument");
+        expect(() => fn.resolve(testRow)).toThrow("Length function requires less than or equal to 1 arguments");
     });
 });

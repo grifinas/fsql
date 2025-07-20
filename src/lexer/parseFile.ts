@@ -1,20 +1,25 @@
 import { TokenStream } from "../tokenStream";
-import { AliasedPropperty } from "../ast";
 import { Type } from "../token";
 import { parseVariable } from "./parseVariable";
 import { logger } from "../utils/logger";
+import { DataSource, FileDataSource, VariableDataSource } from "../dataSource";
+import { withVarAlias } from './parseAlias';
 
-export function parseFile(stream: TokenStream): AliasedPropperty {
-    let path = "";
-    let lastWasText = false;
-
+export function parseFile(stream: TokenStream): DataSource {
     const variable = parseVariable(stream);
     if (variable) {
-        const result = { field: variable, alias: variable };
-        logger.debug("File is a variable", result);
-        return result;
+        logger.debug("File is a variable", variable);
+        return new VariableDataSource(variable);
     }
 
+    const file = withVarAlias(parseFileDataSource, stream);
+    logger.debug("File is a path", file);
+    return file;
+}
+
+function parseFileDataSource(stream: TokenStream) {
+    let path = "";
+    let lastWasText = false;
     while (!stream.done()) {
         const fileToken = stream.get();
         if (fileToken.is(Type.dot) || fileToken.is(Type.special, '/')) {
@@ -22,30 +27,15 @@ export function parseFile(stream: TokenStream): AliasedPropperty {
             lastWasText = false;
         } else if (fileToken.is(Type.word)) {
             if (lastWasText) {
-                const result = { field: path, alias: null };
-                logger.debug("File is a path", result);
-                return result;
+                return new FileDataSource(path);
             } else {
                 path += fileToken.value;
                 lastWasText = true;
             }
         } else if (fileToken.is(Type.semicolon)) {
-            const result = { field: path, alias: null };
-            logger.debug("File is a path", result);
-            return result;
+            return new FileDataSource(path);
         } else if (fileToken.is(Type.number)) {
             path += fileToken.value;
-        } else if (fileToken.is(Type.special, "@")) {
-            if (path.length > 0) {
-                stream.unexpectedToken();
-            }
-            const variable = parseVariable(stream);
-            if (!variable) {
-                stream.unexpectedToken();
-            }
-            const result = { field: variable, alias: variable };
-            logger.debug("File is a variable", result);
-            return result;
         } else {
             stream.unexpectedToken();
         }
@@ -53,7 +43,5 @@ export function parseFile(stream: TokenStream): AliasedPropperty {
         stream.advance();
     }
 
-    const result = { field: path, alias: null };
-    logger.debug("File is a path", result);
-    return result;
+    return new FileDataSource(path);
 }

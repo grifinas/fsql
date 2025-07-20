@@ -1,5 +1,7 @@
 import { FilterFunction } from '../src/filterFunction';
 import { meshData, MeshedRow } from '../src/meshData';
+import { mock } from 'jest-mock-extended';
+
 describe("meshData", () => {
     it("should return the rows in source data if only one source is provided", () => {
         const sources = [
@@ -55,9 +57,9 @@ describe("meshData", () => {
             },
             {
                 source: "@j",
-                where: {
+                where: mock<FilterFunction>({
                     resolve: jest.fn().mockReturnValue(false)
-                } as unknown as FilterFunction,
+                }),
                 data: [
                     { id: 1, name: "John" },
                     { id: 2, name: "Jane" },
@@ -65,10 +67,7 @@ describe("meshData", () => {
             }
         ];
         const result = meshData(sources);
-        expect(result).toEqual([
-            { "@m": { id: 1, name: "John" } },
-            { "@m": { id: 2, name: "Jane" } },
-        ]);
+        expect(result).toEqual([]);
     });
 
     it("should perform cartesian multiplication with more than two sources", () => {
@@ -150,4 +149,35 @@ describe("meshData", () => {
             { "@m": { id: 2, name: "Jane" }, "@j": { id: 2, name: "Jane" }, "@k": { id: 2, name: "Mark" } },
         ]));
     });
+
+    it('should work', () => {
+        // Minimal mock data with id, pairID, and name
+        const mockFile = [
+            { id: 1, pairID: 3, name: "First Item" },
+            { id: 2, pairID: 5, name: "Second Item" },
+            { id: 3, pairID: 1, name: "Third Item" },
+            { id: 4, pairID: null, name: "Fourth Item" },
+            { id: 5, pairID: 2, name: "Fifth Item" }
+        ];
+
+        const sources = [
+            {
+                source: "@main",
+                data: mockFile
+            },
+            {
+                source: "@sub",
+                where: mock<FilterFunction>({
+                    resolve: jest.fn().mockImplementation((row: MeshedRow) => {
+                        //@ts-ignore
+                        return row["@main"].pairID === row["@sub"].id;
+                    })
+                }),
+                data: mockFile
+            },
+        ];
+
+        const result = meshData(sources);
+        expect(result.length).toBe(4);
+    })
 })

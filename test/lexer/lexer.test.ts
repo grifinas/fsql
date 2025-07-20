@@ -1,11 +1,9 @@
-import { tokenize } from "../src/tokenizer";
-import { lex } from "../src/lexer/lexer";
-import { AST } from "../src/ast";
-import { FilterFunction } from "../src/filterFunction";
+import { tokenize } from "../../src/tokenizer";
+import { lex } from "../../src/lexer/lexer";
+import { AST } from "../../src/ast";
+import { FilterFunction } from "../../src/filterFunction";
+import { FieldProperty, FunctionProperty } from "../../src/property";
 
-/*
- * Tested together with parser cause that's how it makes sense, If tokenize tests don't pass don't even look here
- */
 describe("lexer", () => {
   it("should expose lex function", () => {
     expect(typeof lex).toBe("function");
@@ -15,7 +13,7 @@ describe("lexer", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere"));
     expect(ast.all).toBe(true);
     expect(ast.fields).toEqual([]);
-    expect(ast.mainfile?.field).toBe("fileNameGoesHere");
+    expect(ast.mainfile?.ref()).toBe("fileNameGoesHere");
     expect(Object.keys(ast.joinFiles)).toEqual([]);
     expect(ast.order).toBe(undefined);
     expect(ast.next).toBeNull();
@@ -23,12 +21,12 @@ describe("lexer", () => {
 
   it("should lex file with hyphens", () => {
     const ast = lex(tokenize("SELECT * from file-name-goes-here"));
-    expect(ast.mainfile?.field).toBe("file-name-goes-here");
+    expect(ast.mainfile?.ref()).toBe("file-name-goes-here");
   });
 
   it("should lex file with underscores", () => {
     const ast = lex(tokenize("SELECT * from file_name_goes_here"));
-    expect(ast.mainfile?.field).toBe("file_name_goes_here");
+    expect(ast.mainfile?.ref()).toBe("file_name_goes_here");
   });
 
   it("should lex JOIN clause", () => {
@@ -64,7 +62,6 @@ describe("lexer", () => {
       )
     );
 
-    console.log(ast.where);
     expect(ast.where?.getLeft()).toBeInstanceOf(FilterFunction);
     expect(ast.where?.getRight()).toBeInstanceOf(FilterFunction);
     expect(ast.where?.getOperator()).toBe("=");
@@ -108,18 +105,24 @@ describe("lexer", () => {
   it("should set fields with aliases when SELECT foo, bar", () => {
     const ast = lex(tokenize("SELECT foo, bar from fileNameGoesHere"));
     expect(ast.all).toBe(false);
-    expect(ast.fields).toEqual([{ field: "foo", alias: "foo" }, { field: "bar", alias: "bar" }]);
+    expect(ast.fields).toEqual([
+      new FieldProperty(null, 'foo'),
+      new FieldProperty(null, 'bar'),
+    ]);
   });
 
   it("should handle column aliasing with AS keyword", () => {
     const ast = lex(tokenize("SELECT foo as f, bar as b from fileNameGoesHere"));
     expect(ast.all).toBe(false);
-    expect(ast.fields).toEqual([{ field: "foo", alias: "f" }, { field: "bar", alias: "b" }]);
+    expect(ast.fields).toEqual([
+      new FieldProperty(null, 'foo').setAlias('f'),
+      new FieldProperty(null, 'bar').setAlias('b'),
+    ]);
   });
 
   it("should set 'mainfile' to whatever is in FROM", () => {
     const ast = lex(tokenize("SELECT foo, bar from fileNameGoesHere"));
-    expect(ast.mainfile?.field).toBe("fileNameGoesHere");
+    expect(ast.mainfile?.ref()).toBe("fileNameGoesHere");
   });
 
   it("should set 'joinFiles' to whatever is in JOIN", () => {
@@ -160,12 +163,27 @@ describe("lexer", () => {
 
   it("should allow selecting from variables", () => {
     const ast = lex(tokenize("SELECT * from @var"));
-    expect(ast.mainfile?.field).toBe("@var");
-    expect(ast.mainfile?.alias).toBe("@var");
+    expect(ast.mainfile?.ref()).toBe("@var");
   });
 
   it("should allow joining from variables", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere JOIN @var"));
     expect(Object.keys(ast.joinFiles)).toEqual(["@var"]);
+  });
+
+  it("should allow using SQL functions in WHERE", () => {
+    const ast = lex(tokenize("SELECT * from fileNameGoesHere WHERE UPPER(foo) = foo"));
+    expect(ast.where?.isEmpty()).toBe(false);
+    expect(ast.where?.getLeft()).toBeInstanceOf(FunctionProperty);
+    expect(ast.where?.getRight()).toBeInstanceOf(FieldProperty);
+    expect(ast.where?.getOperator()).toBe("=");
+  });
+
+  it("should allow nesting SQL functions in WHERE", () => {
+    const ast = lex(tokenize("SELECT * from fileNameGoesHere WHERE UPPER(LOWER(foo)) = foo"));
+    expect(ast.where?.isEmpty()).toBe(false);
+    expect(ast.where?.getLeft()).toBeInstanceOf(FunctionProperty);
+    expect(ast.where?.getRight()).toBeInstanceOf(FieldProperty);
+    expect(ast.where?.getOperator()).toBe("=");
   });
 });
