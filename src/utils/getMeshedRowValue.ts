@@ -1,9 +1,10 @@
-import { FieldProperty, ResolvedProperty } from "../filterFunction";
 import { MeshedRow } from "../meshData";
+import { Scalar } from "../property";
 import { logger } from "./logger";
 import { pathValue } from "./pathValue";
 
-export function getMeshedRowValue(row: MeshedRow, source: string | null, field: string): unknown {
+//TODO this file is very core and should not be in utils
+export function getMeshedRowValue(row: MeshedRow, source: string | null, field: string): Scalar {
     if (source) {
         const sourceData = row[source];
         if (!sourceData) {
@@ -14,15 +15,15 @@ export function getMeshedRowValue(row: MeshedRow, source: string | null, field: 
         if (!result.result) {
             throw new Error(`No field ${field} on source ${source}`);
         }
-        return result.value;
+        return result.value as Scalar;
     }
 
     const results = Object.values(row).map(sourceData => {
         const result = pathValue(sourceData, field);
         if (result.result) {
-            return result.value;
+            return result.value as Scalar;
         }
-    }).filter((result): result is unknown => result !== undefined);
+    }).filter((result): result is Scalar => result !== undefined);
 
     if (results.length === 0) {
         logger.debug('No field on any source', { field, row, source });
@@ -32,15 +33,5 @@ export function getMeshedRowValue(row: MeshedRow, source: string | null, field: 
     } else {
         logger.debug('Ambiguous field', { field, row, source });
         throw new Error(`Ambiguous field ${field}`);
-    }
-}
-
-export function resolveValue(value: FieldProperty | ResolvedProperty, row: MeshedRow): ResolvedProperty {
-    if ('value' in value) {
-        return value;
-    }
-    return {
-        //TODO fix types
-        value: getMeshedRowValue(row, value.source, value.field) as string | number | boolean
     }
 }

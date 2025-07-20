@@ -8,9 +8,9 @@ describe('parseFile - Integration Tests', () => {
 
   it('should parse a variable like @myVar', () => {
     stream = new TokenStream([
-      new Token(Type.special, '@', 0),
-      new Token(Type.word, 'myVar', 1),
-      new Token(Type.semicolon, ';', 2),
+      new Token(Type.special, '@'),
+      new Token(Type.word, 'myVar'),
+      new Token(Type.semicolon, ';'),
     ]);
     const result = parseFile(stream);
     expect(result).toEqual<AliasedPropperty>({ field: '@myVar', alias: '@myVar' });
@@ -19,8 +19,8 @@ describe('parseFile - Integration Tests', () => {
 
   it('should parse a variable like @myVar even without semicolon', () => {
     stream = new TokenStream([
-      new Token(Type.special, '@', 0),
-      new Token(Type.word, 'myVar', 1),
+      new Token(Type.special, '@'),
+      new Token(Type.word, 'myVar'),
     ]);
     const result = parseFile(stream);
     expect(result).toEqual<AliasedPropperty>({ field: '@myVar', alias: '@myVar' });
@@ -29,9 +29,9 @@ describe('parseFile - Integration Tests', () => {
 
   it('should parse a simple file path like data.json even without semicolon', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'data', 0),
-      new Token(Type.dot, '.', 1),
-      new Token(Type.word, 'json', 2),
+      new Token(Type.word, 'data'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'json'),
     ]);
     const result = parseFile(stream);
     expect(result).toEqual<AliasedPropperty>({ field: 'data.json', alias: null });
@@ -40,10 +40,10 @@ describe('parseFile - Integration Tests', () => {
 
   it('should parse a simple file path like data.json', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'data', 0),
-      new Token(Type.dot, '.', 1),
-      new Token(Type.word, 'json', 2),
-      new Token(Type.semicolon, ';', 3),
+      new Token(Type.word, 'data'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'json'),
+      new Token(Type.semicolon, ';'),
     ]);
     const result = parseFile(stream);
     expect(result).toEqual<AliasedPropperty>({ field: 'data.json', alias: null });
@@ -52,12 +52,12 @@ describe('parseFile - Integration Tests', () => {
 
   it('should parse a file path with folders like folder/file.txt', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'folder', 0),
-      new Token(Type.special, '/', 1),
-      new Token(Type.word, 'file', 2),
-      new Token(Type.dot, '.', 3),
-      new Token(Type.word, 'txt', 4),
-      new Token(Type.word, 'AS', 5), // Stop before AS
+      new Token(Type.word, 'folder'),
+      new Token(Type.special, '/'),
+      new Token(Type.word, 'file'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'txt'),
+      new Token(Type.word, 'AS'), // Stop before AS
     ]);
     const result = parseFile(stream);
     expect(result).toEqual<AliasedPropperty>({ field: 'folder/file.txt', alias: null });
@@ -66,13 +66,13 @@ describe('parseFile - Integration Tests', () => {
 
   it('should parse a file path with numbers like data123.config.js', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'data', 0),
-      new Token(Type.number, '123', 1),
-      new Token(Type.dot, '.', 2),
-      new Token(Type.word, 'config', 3),
-      new Token(Type.dot, '.', 4),
-      new Token(Type.word, 'js', 5),
-      new Token(Type.word, 'WHERE', 6),
+      new Token(Type.word, 'data'),
+      new Token(Type.number, '123'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'config'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'js'),
+      new Token(Type.word, 'WHERE'),
     ]);
     const result = parseFile(stream);
     expect(result).toEqual<AliasedPropperty>({ field: 'data123.config.js', alias: null });
@@ -81,11 +81,11 @@ describe('parseFile - Integration Tests', () => {
 
   it('should stop parsing before an alias keyword (AS)', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'myFile', 0),
-      new Token(Type.dot, '.', 1),
-      new Token(Type.word, 'csv', 2),
-      new Token(Type.word, 'AS', 3),
-      new Token(Type.word, 'm', 4),
+      new Token(Type.word, 'myFile'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'csv'),
+      new Token(Type.word, 'AS'),
+      new Token(Type.word, 'm'),
     ]);
     const result = parseFile(stream);
     expect(result).toEqual<AliasedPropperty>({ field: 'myFile.csv', alias: null });
@@ -94,11 +94,11 @@ describe('parseFile - Integration Tests', () => {
 
   it('should throw unexpected token for path like file@name.json (current buggy behavior)', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'file', 0),
-      new Token(Type.special, '@', 1),
-      new Token(Type.word, 'name', 2),
-      new Token(Type.dot, '.', 3),
-      new Token(Type.word, 'json', 4),
+      new Token(Type.word, 'file'),
+      new Token(Type.special, '@'),
+      new Token(Type.word, 'name'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'json'),
     ]);
     // parseFile reads '@', then calls parseVariable. parseVariable expects current token to be '@',
     // but it's 'name'. So parseVariable returns null. parseFile then throws unexpectedToken.
@@ -108,24 +108,24 @@ describe('parseFile - Integration Tests', () => {
 
   it('should throw for unexpected token in path like path/!/file.json', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'path', 0),
-      new Token(Type.special, '/', 1),
-      new Token(Type.special, '!', 2), // Unexpected token
-      new Token(Type.special, '/', 3),
-      new Token(Type.word, 'file', 4),
-      new Token(Type.dot, '.', 5),
-      new Token(Type.word, 'json', 6),
+      new Token(Type.word, 'path'),
+      new Token(Type.special, '/'),
+      new Token(Type.special, '!',), // Unexpected token
+      new Token(Type.special, '/'),
+      new Token(Type.word, 'file'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'json'),
     ]);
     expect(() => parseFile(stream)).toThrowError(); // Error for '!'
   });
 
    it('should parse path ending with number like folder/file123', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'folder', 0),
-      new Token(Type.special, '/', 1),
-      new Token(Type.word, 'file', 2),
-      new Token(Type.number, '123', 3),
-      new Token(Type.semicolon, ';', 4),
+      new Token(Type.word, 'folder'),
+      new Token(Type.special, '/'),
+      new Token(Type.word, 'file'),
+      new Token(Type.number, '123'),
+      new Token(Type.semicolon, ';'),
     ]);
     const result = parseFile(stream);
     expect(result).toEqual<AliasedPropperty>({ field: 'folder/file123', alias: null });
@@ -134,8 +134,8 @@ describe('parseFile - Integration Tests', () => {
 
   it('should parse path starting with numbers like 12345', () => {
     stream = new TokenStream([
-      new Token(Type.number, '12345', 0),
-      new Token(Type.word, 'AS', 1),
+      new Token(Type.number, '12345'),
+      new Token(Type.word, 'AS'),
     ]);
     const result = parseFile(stream);
     expect(result).toEqual<AliasedPropperty>({ field: '12345AS', alias: null });

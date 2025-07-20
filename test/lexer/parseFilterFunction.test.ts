@@ -1,6 +1,7 @@
 import { TokenStream } from "../../src/tokenStream";
 import { parseFilterFunction } from "../../src/lexer/parseFilterFunction";
 import { Token, Type } from "../../src/token";
+import { FieldProperty } from "../../src/property";
 
 describe("parseWhereFunction Integration tests", () => {
     it("should parse where function", () => {
@@ -10,9 +11,13 @@ describe("parseWhereFunction Integration tests", () => {
             new Token(Type.word, "value")
         ]);
         const filter = parseFilterFunction(stream);
-        expect(filter.getLeft()).toEqual({ source: null, field: "column" });
+        expect(filter.getLeft()).toBeInstanceOf(FieldProperty);
+        expect((filter.getLeft() as FieldProperty).source).toEqual(null);
+        expect((filter.getLeft() as FieldProperty).field).toEqual("column");
         expect(filter.getOperator()).toBe("=");
-        expect(filter.getRight()).toEqual({ source: null, field: "value" });
+        expect(filter.getRight()).toBeInstanceOf(FieldProperty);
+        expect((filter.getRight() as FieldProperty).source).toEqual(null);
+        expect((filter.getRight() as FieldProperty).field).toEqual("value");
         expect(stream.getIndex()).toBe(stream.length);
     });
 });

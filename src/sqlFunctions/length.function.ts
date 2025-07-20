@@ -1,18 +1,21 @@
-import { cliAssert } from "../cliAssert";
-import { MeshedRow } from "../meshData";
-import { resolveValue } from "../utils/getMeshedRowValue";
-import { SQLFunction, SQLFunctions } from "./sqlFunction";
+import { SQLFactory } from "./sqlFactory";
+import { SQLFunction, ValidatedArgs } from "./sqlFunction";
+import * as z from "zod";
 
-export class LengthFunction extends SQLFunction<number> {
-    public resolve(row: MeshedRow): number {
-        cliAssert(this.arguments.length === 1, "Length function requires exactly one argument");
-        const [first] = this.arguments;
+const Validation = z.tuple([
+    z.string()
+]);
 
-        const { value } = resolveValue(first, row);
+export class LengthFunction extends SQLFunction<number, typeof Validation> {
+    public validation(): typeof Validation {
+        return Validation;
+    }
 
-        cliAssert(typeof value === "string", "Length function requires a string argument");
-        return value.length;
+    public subResolve(args: ValidatedArgs<this>): number {
+        const [str] = args;
+
+        return str.length;
     }
 }
 
-SQLFunctions.set("LENGTH", LengthFunction);
+SQLFactory.register("LENGTH", LengthFunction);

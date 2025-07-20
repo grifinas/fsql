@@ -1,5 +1,6 @@
-import { FilterFunction, FieldProperty, ResolvedProperty, Operator } from "../src/filterFunction";
+import { FilterFunction, Operator } from "../src/filterFunction";
 import { MeshedRow } from "../src/meshData";
+import { FieldProperty, ResolvedProperty, Property } from "../src/property";
 
 describe("FilterFunction", () => {
     describe("Empty", () => {
@@ -14,38 +15,38 @@ describe("FilterFunction", () => {
         const testCases = [
             {
                 operator: "=",
-                left: { value: 5 },
-                right: { value: 5 },
+                left: new ResolvedProperty(5),
+                right: new ResolvedProperty(5),
                 expected: true
             },
             {
                 operator: "=",
-                left: { value: 5 },
-                right: { value: 6 },
+                left: new ResolvedProperty(5),
+                right: new ResolvedProperty(6),
                 expected: false
             },
             {
                 operator: ">",
-                left: { value: 6 },
-                right: { value: 5 },
+                left: new ResolvedProperty(6),
+                right: new ResolvedProperty(5),
                 expected: true
             },
             {
                 operator: ">",
-                left: { value: 5 },
-                right: { value: 6 },
+                left: new ResolvedProperty(5),
+                right: new ResolvedProperty(6),
                 expected: false
             },
             {
                 operator: "<",
-                left: { value: 5 },
-                right: { value: 6 },
+                left: new ResolvedProperty(5),
+                right: new ResolvedProperty(6),
                 expected: true
             },
             {
                 operator: "<",
-                left: { value: 6 },
-                right: { value: 5 },
+                left: new ResolvedProperty(6),
+                right: new ResolvedProperty(5),
                 expected: false
             }
         ];
@@ -53,9 +54,9 @@ describe("FilterFunction", () => {
         testCases.forEach(({ operator, left, right, expected }) => {
             it(`should handle ${operator} operator correctly`, () => {
                 const filter = new FilterFunction(
-                    left as ResolvedProperty,
+                    left,
                     operator as Operator,
-                    right as ResolvedProperty
+                    right
                 );
                 expect(filter.resolve({} as MeshedRow)).toBe(expected);
             });
@@ -63,9 +64,9 @@ describe("FilterFunction", () => {
 
         it("should throw on unknown operator", () => {
             const filter = new FilterFunction(
-                { value: 5 },
+                new ResolvedProperty(5),
                 "invalid" as Operator,
-                { value: 5 }
+                new ResolvedProperty(5)
             );
             expect(() => filter.resolve({} as MeshedRow)).toThrow("Unknown comparator: invalid");
         });
@@ -86,27 +87,27 @@ describe("FilterFunction", () => {
 
         it("should resolve field properties from main source", () => {
             const filter = new FilterFunction(
-                { source: "main", field: "value" } as FieldProperty,
+                new FieldProperty("main", "value"),
                 "=",
-                { value: 42 } as ResolvedProperty
+                new ResolvedProperty(42)
             );
             expect(filter.resolve(testRow)).toBe(true);
         });
 
         it("should resolve field properties from joined source", () => {
             const filter = new FilterFunction(
-                { source: "join", field: "score" } as FieldProperty,
+                new FieldProperty("join", "score"),
                 "=",
-                { value: 100 } as ResolvedProperty
+                new ResolvedProperty(100)
             );
             expect(filter.resolve(testRow)).toBe(true);
         });
 
         it("should handle boolean values", () => {
             const filter = new FilterFunction(
-                { source: "main", field: "active" } as FieldProperty,
+                new FieldProperty("main", "active"),
                 "=",
-                { value: true } as ResolvedProperty
+                new ResolvedProperty(true)
             );
             expect(filter.resolve(testRow)).toBe(true);
         });
@@ -119,14 +120,14 @@ describe("FilterFunction", () => {
 
         it("should handle nested AND conditions", () => {
             const filter1 = new FilterFunction(
-                { source: "main", field: "value" },
+                new FieldProperty("main", "value"),
                 "=",
-                { value: 5 }
+                new ResolvedProperty(5)
             );
             const filter2 = new FilterFunction(
-                { source: "main", field: "other" },
+                new FieldProperty("main", "other"),
                 "=",
-                { value: 10 }
+                new ResolvedProperty(10)
             );
 
             const combined = filter1.and(filter2);
@@ -135,14 +136,14 @@ describe("FilterFunction", () => {
 
         it("should handle nested AND conditions with false result", () => {
             const filter1 = new FilterFunction(
-                { source: "main", field: "value" },
+                new FieldProperty("main", "value"),
                 "=",
-                { value: 5 }
+                new ResolvedProperty(5)
             );
             const filter2 = new FilterFunction(
-                { source: "main", field: "other" },
+                new FieldProperty("main", "other"),
                 "=",
-                { value: 11 } // Wrong value
+                new ResolvedProperty(11) // Wrong value
             );
 
             const combined = filter1.and(filter2);
@@ -152,9 +153,9 @@ describe("FilterFunction", () => {
 
     describe("Getters", () => {
         it("should return the correct left operand, operator, and right operand", () => {
-            const left = { value: 5 };
+            const left = new ResolvedProperty(5);
             const operator = "=";
-            const right = { value: 5 };
+            const right = new ResolvedProperty(5);
             const filter = new FilterFunction(left, operator, right);
 
             expect(filter.getLeft()).toBe(left);

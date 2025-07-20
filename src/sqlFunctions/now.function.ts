@@ -1,12 +1,17 @@
-import { cliAssert } from "../cliAssert";
-import { MeshedRow } from "../meshData";
-import { SQLFunction, SQLFunctions } from "./sqlFunction";
+import { SQLFactory } from "./sqlFactory";
+import { SQLFunction, ValidatedArgs } from "./sqlFunction";
+import * as z from "zod";
 
-export class NowFunction extends SQLFunction<Date> {
-    public resolve(_row: MeshedRow): Date {
-        cliAssert(this.arguments.length === 0, "NOW function does not accept any arguments");
+const Validation = z.tuple([]);
+
+export class NowFunction extends SQLFunction<Date, typeof Validation> {
+    public validation(): typeof Validation {
+        return Validation;
+    }
+
+    public subResolve(args: ValidatedArgs<this>): Date {
         return new Date();
     }
 }
 
-SQLFunctions.set("NOW", NowFunction);
+SQLFactory.register("NOW", NowFunction);

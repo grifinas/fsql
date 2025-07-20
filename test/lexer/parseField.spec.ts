@@ -2,13 +2,17 @@ import { TokenStream } from "../../src/tokenStream";
 import { parseField } from "../../src/lexer/parseField";
 import { Type } from "../../src/token";
 import { Token } from "../../src/token";
+import { FieldProperty, FunctionProperty, ResolvedProperty } from "../../src/property";
 
 describe("parseField", () => {
   it("should parse a single word field", () => {
     const stream = new TokenStream([
       new Token(Type.word, "foo")
     ]);
-    expect(parseField(stream)).toEqual({ source: null, field: "foo" });
+    const result = parseField(stream);
+    expect(result).toBeInstanceOf(FieldProperty);
+    expect((result as FieldProperty).source).toEqual(null);
+    expect((result as FieldProperty).field).toEqual("foo");
     expect(stream.getIndex()).toBe(stream.length);
   });
 
@@ -18,7 +22,10 @@ describe("parseField", () => {
       new Token(Type.dot, "."),
       new Token(Type.word, "bar")
     ]);
-    expect(parseField(stream)).toEqual({ source: null, field: "foo.bar" });
+    const result = parseField(stream);
+    expect(result).toBeInstanceOf(FieldProperty);
+    expect((result as FieldProperty).source).toEqual(null);
+    expect((result as FieldProperty).field).toEqual("foo.bar");
     expect(stream.getIndex()).toBe(stream.length);
   });
 
@@ -30,7 +37,10 @@ describe("parseField", () => {
       new Token(Type.dot, "."),
       new Token(Type.word, "baz")
     ]);
-    expect(parseField(stream)).toEqual({ source: null, field: "foo.bar.baz" });
+    const result = parseField(stream);
+    expect(result).toBeInstanceOf(FieldProperty);
+    expect((result as FieldProperty).source).toEqual(null);
+    expect((result as FieldProperty).field).toEqual("foo.bar.baz");
     expect(stream.getIndex()).toBe(stream.length);
   });
 
@@ -39,8 +49,11 @@ describe("parseField", () => {
       new Token(Type.word, "foo"),
       new Token(Type.word, "FROM")
     ]);
-    
-    expect(parseField(stream)).toEqual({ source: null, field: "foo" });
+
+    const result = parseField(stream);
+    expect(result).toBeInstanceOf(FieldProperty);
+    expect((result as FieldProperty).source).toEqual(null);
+    expect((result as FieldProperty).field).toEqual("foo");
     expect(stream.get().is(Type.word, 'FROM')).toBe(true);
   });
 
@@ -69,7 +82,9 @@ describe("parseField", () => {
       new Token(Type.comma, ",")
     ]);
     const result = parseField(stream);
-    expect(result).toEqual({ source: null, field: "foo.bar" });
+    expect(result).toBeInstanceOf(FieldProperty);
+    expect((result as FieldProperty).source).toEqual(null);
+    expect((result as FieldProperty).field).toEqual("foo.bar");
     expect(stream.getIndex()).toBe(stream.length - 1);
   });
 
@@ -77,7 +92,9 @@ describe("parseField", () => {
     const stream = new TokenStream([
       new Token(Type.number, '1')
     ]);
-    expect(parseField(stream)).toEqual({ value: 1 });
+    const result = parseField(stream);
+    expect(result).toBeInstanceOf(ResolvedProperty);
+    expect((result as ResolvedProperty).value).toEqual(1);
     expect(stream.getIndex()).toBe(stream.length);
   });
 
@@ -85,7 +102,9 @@ describe("parseField", () => {
     const stream = new TokenStream([
       new Token(Type.word, 'true')
     ]);
-    expect(parseField(stream)).toEqual({ value: true });
+    const result = parseField(stream);
+    expect(result).toBeInstanceOf(ResolvedProperty);
+    expect((result as ResolvedProperty).value).toEqual(true);
     expect(stream.getIndex()).toBe(stream.length);
   });
 
@@ -97,7 +116,10 @@ describe("parseField", () => {
       new Token(Type.dot, '.'),
       new Token(Type.number, '1')
     ]);
-    expect(parseField(stream)).toEqual({ source: null, field: 'foo.true.1' });
+    const result = parseField(stream);
+    expect(result).toBeInstanceOf(FieldProperty);
+    expect((result as FieldProperty).source).toEqual(null);
+    expect((result as FieldProperty).field).toEqual('foo.true.1');
     expect(stream.getIndex()).toBe(stream.length);
   });
 
@@ -111,8 +133,9 @@ describe("parseField", () => {
       new Token(Type.parenthesis, ')')
     ]);
     const result = parseField(stream);
-    console.log(result);
-    expect(result).toEqual({ name: 'fname', arguments: [{ source: null, field: 'arg1' }, { source: null, field: 'arg2' }] });
+    expect(result).toBeInstanceOf(FunctionProperty);
+    expect((result as FunctionProperty).name).toEqual('fname');
+    expect((result as FunctionProperty).args).toEqual([new FieldProperty(null, 'arg1'), new FieldProperty(null, 'arg2')]);
     expect(stream.getIndex()).toBe(stream.length);
   });
 
@@ -129,8 +152,9 @@ describe("parseField", () => {
       new Token(Type.parenthesis, ')')
     ]);
     const result = parseField(stream);
-    console.log(result);
-    expect(result).toEqual({ name: 'fname', arguments: [{ name: 'f2name', arguments: [{ source: null, field: 'arg1' }] }, { source: null, field: 'arg2' }] });
+    expect(result).toBeInstanceOf(FunctionProperty);
+    expect((result as FunctionProperty).name).toEqual('fname');
+    expect((result as FunctionProperty).args).toEqual([new FunctionProperty('f2name', [new FieldProperty(null, 'arg1')]), new FieldProperty(null, 'arg2')]);
     expect(stream.getIndex()).toBe(stream.length);
   });
 });

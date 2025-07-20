@@ -1,18 +1,19 @@
 import { Type } from "../token";
 import { TokenStream } from "../tokenStream";
-import { FieldProperty, ResolvedProperty } from "../filterFunction";
+import { FieldProperty, Property, ResolvedProperty } from "../property";
 import { parseField } from "./parseField";
 import { parseVariable } from "./parseVariable";
 
-export function parseProperty(stream: TokenStream): FieldProperty | ResolvedProperty {
+export function parseProperty(stream: TokenStream): Property {
     const varName = parseVariable(stream);
     if (varName) {
         stream.assert(Type.dot).advance();
-        const fieldValue = parseField(stream);
-        if ('field' in fieldValue) {
-            return { source: varName, field: fieldValue.field };
+        const field = parseField(stream);
+        if (field instanceof FieldProperty) {
+            field.source = varName;
+            return field
         } else {
-            return fieldValue;
+            return new ResolvedProperty(varName);
         }
     }
 

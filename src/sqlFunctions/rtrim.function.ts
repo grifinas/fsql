@@ -1,18 +1,21 @@
-import { cliAssert } from "../cliAssert";
-import { MeshedRow } from "../meshData";
-import { resolveValue } from "../utils/getMeshedRowValue";
-import { SQLFunction, SQLFunctions } from "./sqlFunction";
+import { SQLFactory } from "./sqlFactory";
+import { SQLFunction, ValidatedArgs } from "./sqlFunction";
+import * as z from "zod";
 
-export class RTrimFunction extends SQLFunction<string> {
-    public resolve(row: MeshedRow): string {
-        cliAssert(this.arguments.length === 1, "RTRIM function requires exactly one argument");
-        const [first] = this.arguments;
+const Validation = z.tuple([
+    z.string()
+]);
 
-        const { value } = resolveValue(first, row);
-        cliAssert(typeof value === "string", "RTRIM function requires a string argument");
-        
-        return value.trimEnd();
+export class RTrimFunction extends SQLFunction<string, typeof Validation> {
+    public validation(): typeof Validation {
+        return Validation;
+    }
+
+    public subResolve(args: ValidatedArgs<this>): string {
+        const [str] = args;
+
+        return str.trimEnd();
     }
 }
 
-SQLFunctions.set("RTRIM", RTrimFunction);
+SQLFactory.register("RTRIM", RTrimFunction);

@@ -1,6 +1,7 @@
 import { sourceData } from "../src/sourceData";
 import { fileUtils } from "../src/utils/file";
 import { FilterFunction } from "../src/filterFunction";
+import { JoinMap } from "../src/ast";
 
 describe("sourceData", () => {
   const mainData = [
@@ -33,7 +34,7 @@ describe("sourceData", () => {
       { value: 10 },
       { value: 20 },
     ];
-    const joins: Record<string, { where?: FilterFunction; alias: string }> = {
+    const joins: JoinMap = {
       "join.json": { where: blankFilter, alias: "@j" }
     };
     jest.spyOn(fileUtils, "readJson")
@@ -48,7 +49,7 @@ describe("sourceData", () => {
   });
 
   it("should not load the same file twice", async () => {
-    const joins: Record<string, { where?: FilterFunction; alias: string }> = {
+    const joins: JoinMap = {
       "main.json": { where: blankFilter, alias: "@j" }
     };
 
@@ -66,7 +67,7 @@ describe("sourceData", () => {
   });
 
   it("should throw error if two aliases are the same", async () => {
-    const joins: Record<string, { where?: FilterFunction; alias: string }> = {
+    const joins: JoinMap = {
       "join.json": { where: blankFilter, alias: "@m" }
     };
     await expect(sourceData({ field: "main.json", alias: "@m" }, joins, {}))
@@ -82,7 +83,7 @@ describe("sourceData", () => {
   //       { value: 20 },
   //     ]
   //   };
-  //   const joins: Record<string, { where?: FilterFunction; alias: string }> = {
+  //   const joins: JoinMap = {
   //     "join.json": { where: blankFilter, alias: "@j" }
   //   };
 
@@ -102,7 +103,7 @@ describe("sourceData", () => {
   //       { value: 20 },
   //     ]
   //   };
-  //   const joins: Record<string, { where?: FilterFunction; alias: string }> = {
+  //   const joins: JoinMap = {
   //     "join.json": {
   //       where: ((row: object) => (row as { value: number }).value > 15) as FilterFunction,
   //       alias: "@j"
@@ -117,7 +118,7 @@ describe("sourceData", () => {
   // });
 
   // it("should join multiple tables", async () => {
-  //   const joins: Record<string, { where?: FilterFunction; alias: string }> = {
+  //   const joins: JoinMap = {
   //     "join1.json": { where: blankFilter, alias: "@j1" },
   //     "join2.json": { where: blankFilter, alias: "@j2" },
   //   };
@@ -129,7 +130,7 @@ describe("sourceData", () => {
   // });
 
   // it("should throw error if join data not found", async () => {
-  //   const joins: Record<string, { where?: FilterFunction; alias: string }> = {
+  //   const joins: JoinMap = {
   //     "missing.json": { where: blankFilter, alias: "@j" }
   //   };
 

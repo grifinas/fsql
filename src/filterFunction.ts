@@ -1,39 +1,23 @@
 import { MeshedRow } from "./meshData";
-import { SQLFunctions } from "./sqlFunctions/sqlFunction";
-import { resolveValue } from './utils/getMeshedRowValue';
+import { Property, ResolvedProperty } from "./property";
+import { resolveValue } from './resolveValue';
 import { logger } from "./utils/logger";
-
-export interface FieldProperty {
-    source: string | null;
-    field: string;
-}
-
-export type Scalar = string | number | boolean;
-
-export interface ResolvedProperty {
-    value: Scalar;
-}
-
-export interface FunctionProperty {
-    name: string;
-    arguments: (FieldProperty | ResolvedProperty | FunctionProperty)[];
-}
 
 export type Operator = '<' | '>' | '=';
 
 export class FilterFunction {
-    private left: FilterFunction | FieldProperty | ResolvedProperty | FunctionProperty;
-    private right: FilterFunction | FieldProperty | ResolvedProperty | FunctionProperty;
+    private left: FilterFunction | Property;
+    private right: FilterFunction | Property;
     private operator: Operator;
 
-    constructor(left: FilterFunction | FieldProperty | ResolvedProperty | FunctionProperty, operator: Operator, right: FilterFunction | FieldProperty | ResolvedProperty | FunctionProperty) {
+    constructor(left: FilterFunction | Property, operator: Operator, right: FilterFunction | Property) {
         this.left = left;
         this.operator = operator;
         this.right = right;
     }
 
     static Empty() {
-        return new FilterFunction({ value: true }, "=", { value: true });
+        return new FilterFunction(new ResolvedProperty(true), "=", new ResolvedProperty(true));
     }
 
     isEmpty(): boolean {
@@ -42,27 +26,10 @@ export class FilterFunction {
 
     resolve(row: MeshedRow): boolean {
         if (this.left instanceof FilterFunction) {
-            this.left = { value: this.left.resolve(row) };
+            this.left = new ResolvedProperty(this.left.resolve(row));
         }
         if (this.right instanceof FilterFunction) {
-            this.right = { value: this.right.resolve(row) };
-        }
-        //TODO functions
-        if ('name' in this.left) {
-            const ctor = SQLFunctions.get(this.left.name);
-            if (!ctor) throw new Error(`Unknown function ${this.left.name}`);
-
-            const fn = new ctor(this.left.name, ...this.left.arguments);
-            
-            this.left = { value: fn.resolve(row) };
-        }
-        if ('name' in this.right) {
-            const ctor = SQLFunctions.get(this.right.name);
-            if (!ctor) throw new Error(`Unknown function ${this.right.name}`);
-
-            const fn = new ctor(this.right.name, ...this.right.arguments);
-            
-            this.right = { value: fn.resolve(row) };
+            this.right = new ResolvedProperty(this.right.resolve(row));
         }
 
         const result = this.compare(

@@ -3,6 +3,7 @@ import { parseProperty } from "../../src/lexer/parseProperty";
 import * as parseVariableDep from "../../src/lexer/parseVariable";
 import * as parseFieldDep from "../../src/lexer/parseField";
 import { Token, Type } from "../../src/token";
+import { FieldProperty } from "../../src/property";
 
 describe("parseProperty", () => {
   const parseVariable = jest.spyOn(parseVariableDep, "parseVariable");
@@ -14,18 +15,17 @@ describe("parseProperty", () => {
 
   it("should parse property with variable and field", () => {
     const stream = new TokenStream([
-      new Token(Type.dot, ".", 2),
+      new Token(Type.dot, "."),
     ]);
 
     parseVariable.mockReturnValue("@table");
-    parseField.mockReturnValue({ source: null, field: "column" });
+    parseField.mockReturnValue(new FieldProperty(null, "column"));
 
     const result = parseProperty(stream);
     
-    expect(result).toEqual({
-      source: "@table",
-      field: "column"
-    });
+    expect(result).toBeInstanceOf(FieldProperty);
+    expect((result as FieldProperty).source).toEqual("@table");
+    expect((result as FieldProperty).field).toEqual("column");
 
     expect(parseVariable).toHaveBeenCalledWith(stream);
     expect(parseField).toHaveBeenCalledWith(stream);
@@ -33,18 +33,17 @@ describe("parseProperty", () => {
 
   it("should parse property without variable", () => {
     const stream = new TokenStream([
-      new Token(Type.word, "column", 0)
+      new Token(Type.word, "column")
     ]);
 
     parseVariable.mockReturnValue(null);
-    parseField.mockReturnValue({ source: null, field: "column" });
+    parseField.mockReturnValue(new FieldProperty(null, "column"));
 
     const result = parseProperty(stream);
     
-    expect(result).toEqual({
-      source: null,
-      field: "column"
-    });
+    expect(result).toBeInstanceOf(FieldProperty);
+    expect((result as FieldProperty).source).toEqual(null);
+    expect((result as FieldProperty).field).toEqual("column");
 
     expect(parseVariable).toHaveBeenCalledWith(stream);
     expect(parseField).toHaveBeenCalledWith(stream);
@@ -52,7 +51,7 @@ describe("parseProperty", () => {
 
   it("should pass through any errors from parseVariable", () => {
     const stream = new TokenStream([
-      new Token(Type.dot, ".", 2),
+      new Token(Type.dot, "."),
     ]);
 
     parseVariable.mockImplementation(() => {
@@ -65,7 +64,7 @@ describe("parseProperty", () => {
 
   it("should pass through any errors from parseField", () => {
     const stream = new TokenStream([
-      new Token(Type.word, "column", 0)
+      new Token(Type.word, "column")
     ]);
 
     parseVariable.mockReturnValue(null);

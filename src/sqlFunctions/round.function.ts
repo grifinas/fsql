@@ -1,26 +1,27 @@
-import { cliAssert } from "../cliAssert";
-import { MeshedRow } from "../meshData";
-import { resolveValue } from "../utils/getMeshedRowValue";
-import { SQLFunction, SQLFunctions } from "./sqlFunction";
+import { SQLFactory } from "./sqlFactory";
+import { SQLFunction, ValidatedArgs } from "./sqlFunction";
+import * as z from "zod";
 
-export class RoundFunction extends SQLFunction<number> {
-    public resolve(row: MeshedRow): number {
-        cliAssert(this.arguments.length === 1 || this.arguments.length === 2, 
-            "ROUND function requires one or two arguments: number, [decimal places]");
-        const [num, decimals] = this.arguments;
+const Validation = z.union([
+    z.tuple([z.number()]),
+    z.tuple([z.number(), z.number()])
+]);
 
-        const { value: numValue } = resolveValue(num, row);
-        cliAssert(typeof numValue === "number", "ROUND function requires a number as first argument");
+export class RoundFunction extends SQLFunction<number, typeof Validation> {
+    public validation(): typeof Validation {
+        return Validation;
+    }
 
-        if (decimals) {
-            const { value: decValue } = resolveValue(decimals, row);
-            cliAssert(typeof decValue === "number", "ROUND function requires a number as second argument");
-            const factor = Math.pow(10, decValue);
-            return Math.round(numValue * factor) / factor;
+    public subResolve(args: ValidatedArgs<this>): number {
+        const [num, decimals] = args;
+
+        if (decimals !== undefined) {
+            const factor = Math.pow(10, decimals);
+            return Math.round(num * factor) / factor;
         }
         
-        return Math.round(numValue);
+        return Math.round(num);
     }
 }
 
-SQLFunctions.set("ROUND", RoundFunction);
+SQLFactory.register("ROUND", RoundFunction);

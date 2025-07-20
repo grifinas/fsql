@@ -1,5 +1,5 @@
+import { FilterFunction } from '../src/filterFunction';
 import { meshData, MeshedRow } from '../src/meshData';
-import { WhereFunction } from '../src/whereFunction';
 describe("meshData", () => {
     it("should return the rows in source data if only one source is provided", () => {
         const sources = [
@@ -57,7 +57,7 @@ describe("meshData", () => {
                 source: "@j",
                 where: {
                     resolve: jest.fn().mockReturnValue(false)
-                } as unknown as WhereFunction,
+                } as unknown as FilterFunction,
                 data: [
                     { id: 1, name: "John" },
                     { id: 2, name: "Jane" },
@@ -124,7 +124,7 @@ describe("meshData", () => {
                         //@ts-ignore
                         return row["@j"].id === 2;
                     })
-                } as unknown as WhereFunction,
+                } as unknown as FilterFunction,
                 data: [
                     { id: 1, name: "John" },
                     { id: 2, name: "Jane" },
@@ -137,7 +137,7 @@ describe("meshData", () => {
                         //@ts-ignore
                         return row["@k"].id === 2;
                     })
-                } as unknown as WhereFunction,
+                } as unknown as FilterFunction,
                 data: [
                     { id: 1, name: "Steve" },
                     { id: 2, name: "Mark" },

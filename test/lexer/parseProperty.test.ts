@@ -1,16 +1,20 @@
 import { TokenStream } from "../../src/tokenStream";
 import { parseProperty } from "../../src/lexer/parseProperty";
 import { Token, Type } from "../../src/token";
+import { FieldProperty } from "../../src/property";
 
 describe("parseProperty Integration tests", () => {
   it("should parse property with variable and field", () => {
     const stream = new TokenStream([
-      new Token(Type.special, "@", 0),
-      new Token(Type.word, "table", 1),
-      new Token(Type.dot, ".", 2),
-      new Token(Type.word, "column", 3)
+      new Token(Type.special, "@"),
+      new Token(Type.word, "table"),
+      new Token(Type.dot, "."),
+      new Token(Type.word, "column")
     ]);
-    expect(parseProperty(stream)).toEqual({ source: "@table", field: "column" });
+    const result = parseProperty(stream);
+    expect(result).toBeInstanceOf(FieldProperty);
+    expect((result as FieldProperty).source).toEqual("@table");
+    expect((result as FieldProperty).field).toEqual("column");
     expect(stream.getIndex()).toBe(stream.length);
   });
 })
