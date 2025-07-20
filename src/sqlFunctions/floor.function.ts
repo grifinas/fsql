@@ -1,7 +1,7 @@
 import { cliAssert } from "../cliAssert";
 import { MeshedRow } from "../meshData";
 import { resolveValue } from "../utils/getMeshedRowValue";
-import { SQLFunction } from "./sqlFunction";
+import { SQLFunction, SQLFunctions } from "./sqlFunction";
 
 export class FloorFunction extends SQLFunction<number> {
     public resolve(row: MeshedRow): number {
@@ -14,3 +14,5 @@ export class FloorFunction extends SQLFunction<number> {
         return Math.floor(value);
     }
 }
+
+SQLFunctions.set("FLOOR", FloorFunction);

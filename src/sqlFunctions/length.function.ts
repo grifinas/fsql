@@ -1,7 +1,7 @@
 import { cliAssert } from "../cliAssert";
 import { MeshedRow } from "../meshData";
 import { resolveValue } from "../utils/getMeshedRowValue";
-import { SQLFunction } from "./sqlFunction";
+import { SQLFunction, SQLFunctions } from "./sqlFunction";
 
 export class LengthFunction extends SQLFunction<number> {
     public resolve(row: MeshedRow): number {
@@ -14,3 +14,5 @@ export class LengthFunction extends SQLFunction<number> {
         return value.length;
     }
 }
+
+SQLFunctions.set("LENGTH", LengthFunction);

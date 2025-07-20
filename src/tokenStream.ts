@@ -50,6 +50,10 @@ export class TokenStream {
     this.index--;
   }
 
+  setIndex(i: number) {
+    this.index = i;
+  }
+
   getIndex(): number {
     return this.index;
   }

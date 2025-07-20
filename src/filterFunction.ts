@@ -1,5 +1,6 @@
 import { MeshedRow } from "./meshData";
-import { resolveValue } from "./utils/getMeshedRowValue";
+import { SQLFunctions } from "./sqlFunctions/sqlFunction";
+import { resolveValue } from './utils/getMeshedRowValue';
 import { logger } from "./utils/logger";
 
 export interface FieldProperty {
@@ -13,14 +14,19 @@ export interface ResolvedProperty {
     value: Scalar;
 }
 
+export interface FunctionProperty {
+    name: string;
+    arguments: (FieldProperty | ResolvedProperty | FunctionProperty)[];
+}
+
 export type Operator = '<' | '>' | '=';
 
 export class FilterFunction {
-    private left: FilterFunction | FieldProperty | ResolvedProperty;
-    private right: FilterFunction | FieldProperty | ResolvedProperty;
+    private left: FilterFunction | FieldProperty | ResolvedProperty | FunctionProperty;
+    private right: FilterFunction | FieldProperty | ResolvedProperty | FunctionProperty;
     private operator: Operator;
 
-    constructor(left: FilterFunction | FieldProperty | ResolvedProperty, operator: Operator, right: FilterFunction | FieldProperty | ResolvedProperty) {
+    constructor(left: FilterFunction | FieldProperty | ResolvedProperty | FunctionProperty, operator: Operator, right: FilterFunction | FieldProperty | ResolvedProperty | FunctionProperty) {
         this.left = left;
         this.operator = operator;
         this.right = right;
@@ -40,6 +46,23 @@ export class FilterFunction {
         }
         if (this.right instanceof FilterFunction) {
             this.right = { value: this.right.resolve(row) };
+        }
+        //TODO functions
+        if ('name' in this.left) {
+            const ctor = SQLFunctions.get(this.left.name);
+            if (!ctor) throw new Error(`Unknown function ${this.left.name}`);
+
+            const fn = new ctor(this.left.name, ...this.left.arguments);
+            
+            this.left = { value: fn.resolve(row) };
+        }
+        if ('name' in this.right) {
+            const ctor = SQLFunctions.get(this.right.name);
+            if (!ctor) throw new Error(`Unknown function ${this.right.name}`);
+
+            const fn = new ctor(this.right.name, ...this.right.arguments);
+            
+            this.right = { value: fn.resolve(row) };
         }
 
         const result = this.compare(

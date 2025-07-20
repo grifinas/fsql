@@ -1,7 +1,7 @@
 import { cliAssert } from "../cliAssert";
 import { MeshedRow } from "../meshData";
 import { resolveValue } from "../utils/getMeshedRowValue";
-import { SQLFunction } from "./sqlFunction";
+import { SQLFunction, SQLFunctions } from "./sqlFunction";
 
 export class UpperFunction extends SQLFunction<string> {
     
@@ -15,3 +15,5 @@ export class UpperFunction extends SQLFunction<string> {
         return value.toUpperCase();
     }
 }
+
+SQLFunctions.set("UPPER", UpperFunction);

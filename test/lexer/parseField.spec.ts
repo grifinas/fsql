@@ -6,7 +6,7 @@ import { Token } from "../../src/token";
 describe("parseField", () => {
   it("should parse a single word field", () => {
     const stream = new TokenStream([
-      new Token(Type.word, "foo", 0)
+      new Token(Type.word, "foo")
     ]);
     expect(parseField(stream)).toEqual({ source: null, field: "foo" });
     expect(stream.getIndex()).toBe(stream.length);
@@ -14,9 +14,9 @@ describe("parseField", () => {
 
   it("should parse dot-separated fields", () => {
     const stream = new TokenStream([
-      new Token(Type.word, "foo", 0),
-      new Token(Type.dot, ".", 1),
-      new Token(Type.word, "bar", 2)
+      new Token(Type.word, "foo"),
+      new Token(Type.dot, "."),
+      new Token(Type.word, "bar")
     ]);
     expect(parseField(stream)).toEqual({ source: null, field: "foo.bar" });
     expect(stream.getIndex()).toBe(stream.length);
@@ -24,47 +24,58 @@ describe("parseField", () => {
 
   it("should parse multiple dot-separated fields", () => {
     const stream = new TokenStream([
-      new Token(Type.word, "foo", 0),
-      new Token(Type.dot, ".", 1),
-      new Token(Type.word, "bar", 2),
-      new Token(Type.dot, ".", 3),
-      new Token(Type.word, "baz", 4)
-    ]); 
+      new Token(Type.word, "foo"),
+      new Token(Type.dot, "."),
+      new Token(Type.word, "bar"),
+      new Token(Type.dot, "."),
+      new Token(Type.word, "baz")
+    ]);
     expect(parseField(stream)).toEqual({ source: null, field: "foo.bar.baz" });
     expect(stream.getIndex()).toBe(stream.length);
   });
 
+  it("should understand that you cant have two words in a row in a field", () => {
+    const stream = new TokenStream([
+      new Token(Type.word, "foo"),
+      new Token(Type.word, "FROM")
+    ]);
+    
+    expect(parseField(stream)).toEqual({ source: null, field: "foo" });
+    expect(stream.get().is(Type.word, 'FROM')).toBe(true);
+  });
+
   it("should throw error if not starting with word", () => {
     const stream = new TokenStream([
-      new Token(Type.dot, ".", 0),
-      new Token(Type.word, "foo", 1)
+      new Token(Type.dot, "."),
+      new Token(Type.word, "foo")
     ]);
     expect(() => parseField(stream)).toThrow();
   });
 
   it("should throw error if dot is not followed by word", () => {
     const stream = new TokenStream([
-      new Token(Type.word, "foo", 0),
-      new Token(Type.dot, ".", 1),
-      new Token(Type.dot, ".", 2)
+      new Token(Type.word, "foo"),
+      new Token(Type.dot, "."),
+      new Token(Type.dot, ".")
     ]);
     expect(() => parseField(stream)).toThrow();
   });
 
   it("should consume all tokens in field", () => {
     const stream = new TokenStream([
-      new Token(Type.word, "foo", 0),
-      new Token(Type.dot, ".", 1),
-      new Token(Type.word, "bar", 2),
-      new Token(Type.comma, ",", 3)
+      new Token(Type.word, "foo"),
+      new Token(Type.dot, "."),
+      new Token(Type.word, "bar"),
+      new Token(Type.comma, ",")
     ]);
-    parseField(stream);
+    const result = parseField(stream);
+    expect(result).toEqual({ source: null, field: "foo.bar" });
     expect(stream.getIndex()).toBe(stream.length - 1);
   });
 
   it("should return number if a number is passed", () => {
     const stream = new TokenStream([
-      new Token(Type.number, '1', 0)
+      new Token(Type.number, '1')
     ]);
     expect(parseField(stream)).toEqual({ value: 1 });
     expect(stream.getIndex()).toBe(stream.length);
@@ -72,7 +83,7 @@ describe("parseField", () => {
 
   it("should return boolean if a boolean is passed", () => {
     const stream = new TokenStream([
-      new Token(Type.word, 'true', 0)
+      new Token(Type.word, 'true')
     ]);
     expect(parseField(stream)).toEqual({ value: true });
     expect(stream.getIndex()).toBe(stream.length);
@@ -80,13 +91,46 @@ describe("parseField", () => {
 
   it("should return stringify booleans and numbers if it is part of the name", () => {
     const stream = new TokenStream([
-      new Token(Type.word, 'foo', 0),
-      new Token(Type.dot, '.', 1),
-      new Token(Type.word, 'true', 2),
-      new Token(Type.dot, '.', 3),
-      new Token(Type.number, '1', 4)
+      new Token(Type.word, 'foo'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'true'),
+      new Token(Type.dot, '.'),
+      new Token(Type.number, '1')
     ]);
     expect(parseField(stream)).toEqual({ source: null, field: 'foo.true.1' });
+    expect(stream.getIndex()).toBe(stream.length);
+  });
+
+  it("should parse function", () => {
+    const stream = new TokenStream([
+      new Token(Type.word, 'fname'),
+      new Token(Type.parenthesis, '('),
+      new Token(Type.word, 'arg1'),
+      new Token(Type.comma, ','),
+      new Token(Type.word, 'arg2'),
+      new Token(Type.parenthesis, ')')
+    ]);
+    const result = parseField(stream);
+    console.log(result);
+    expect(result).toEqual({ name: 'fname', arguments: [{ source: null, field: 'arg1' }, { source: null, field: 'arg2' }] });
+    expect(stream.getIndex()).toBe(stream.length);
+  });
+
+  it("should be able to nest function", () => {
+    const stream = new TokenStream([
+      new Token(Type.word, 'fname'),
+      new Token(Type.parenthesis, '('),
+      new Token(Type.word, 'f2name'),
+      new Token(Type.parenthesis, '('),
+      new Token(Type.word, 'arg1'),
+      new Token(Type.parenthesis, ')'),
+      new Token(Type.comma, ','),
+      new Token(Type.word, 'arg2'),
+      new Token(Type.parenthesis, ')')
+    ]);
+    const result = parseField(stream);
+    console.log(result);
+    expect(result).toEqual({ name: 'fname', arguments: [{ name: 'f2name', arguments: [{ source: null, field: 'arg1' }] }, { source: null, field: 'arg2' }] });
     expect(stream.getIndex()).toBe(stream.length);
   });
 });

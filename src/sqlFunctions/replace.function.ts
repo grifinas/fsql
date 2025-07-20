@@ -1,7 +1,7 @@
 import { cliAssert } from "../cliAssert";
 import { MeshedRow } from "../meshData";
 import { resolveValue } from "../utils/getMeshedRowValue";
-import { SQLFunction } from "./sqlFunction";
+import { SQLFunction, SQLFunctions } from "./sqlFunction";
 
 export class ReplaceFunction extends SQLFunction<string> {
     public resolve(row: MeshedRow): string {
@@ -19,3 +19,5 @@ export class ReplaceFunction extends SQLFunction<string> {
         return strValue.split(searchValue).join(replaceValue);
     }
 }
+
+SQLFunctions.set("REPLACE", ReplaceFunction);

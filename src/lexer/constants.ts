@@ -16,3 +16,17 @@ export const KEYWORD = {
 } as const;
 
 export const RESERVED_WORDS = Object.values(KEYWORD);
+
+export const ANY = {
+    WORD: { type: Type.word },
+    NUMBER: { type: Type.number },
+    BRACKET: { type: Type.bracket },
+    BRACE: { type: Type.brace },
+    PARENTHESIS: { type: Type.parenthesis },
+    SPECIAL: { type: Type.special },
+    DOT: { type: Type.dot },
+    COMMA: { type: Type.comma },
+    SEMICOLON: { type: Type.semicolon },
+    EQUALS: { type: Type.equals },
+    COMP: { type: Type.comp },
+} as const;

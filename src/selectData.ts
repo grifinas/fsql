@@ -25,7 +25,7 @@ function colapse(row: MeshedRow, fields: AliasedPropperty[]): object {
         const [first, ...rest] = field.split('.');
         const source = first.startsWith('@') ? first : null;
 
-        m[alias] = getMeshedRowValue(row, source, source ? rest.join('.') : field);
+        m[alias || field] = getMeshedRowValue(row, source, source ? rest.join('.') : field);
     }
     return m;
 }

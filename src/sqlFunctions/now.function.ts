@@ -1,6 +1,6 @@
 import { cliAssert } from "../cliAssert";
 import { MeshedRow } from "../meshData";
-import { SQLFunction } from "./sqlFunction";
+import { SQLFunction, SQLFunctions } from "./sqlFunction";
 
 export class NowFunction extends SQLFunction<Date> {
     public resolve(_row: MeshedRow): Date {
@@ -8,3 +8,5 @@ export class NowFunction extends SQLFunction<Date> {
         return new Date();
     }
 }
+
+SQLFunctions.set("NOW", NowFunction);

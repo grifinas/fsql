@@ -1,7 +1,7 @@
 import { cliAssert } from "../cliAssert";
 import { MeshedRow } from "../meshData";
 import { resolveValue } from "../utils/getMeshedRowValue";
-import { SQLFunction } from "./sqlFunction";
+import { SQLFunction, SQLFunctions } from "./sqlFunction";
 
 export class TrimFunction extends SQLFunction<string> {
     public resolve(row: MeshedRow): string {
@@ -14,3 +14,5 @@ export class TrimFunction extends SQLFunction<string> {
         return value.trim();
     }
 }
+
+SQLFunctions.set("TRIM", TrimFunction);

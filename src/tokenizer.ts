@@ -17,7 +17,6 @@ export function tokenize(input: string): TokenStream {
   let current = 0;
 
   while (current < input.length) {
-    const position = current;
     let char = input[current];
 
     if (isWord(char)) {
@@ -26,7 +25,7 @@ export function tokenize(input: string): TokenStream {
         value += input[current];
         current++;
       }
-      tokens.push(new Token(Type.word, value, position));
+      tokens.push(new Token(Type.word, value));
       continue;
     }
 
@@ -36,60 +35,60 @@ export function tokenize(input: string): TokenStream {
         value += input[current];
         current++;
       }
-      tokens.push(new Token(Type.number, value, position));
+      tokens.push(new Token(Type.number, value));
       continue;
     }
 
     if (char === "[" || char === "]") {
-      tokens.push(new Token(Type.bracket, char, position));
+      tokens.push(new Token(Type.bracket, char));
       current++;
       continue;
     }
 
     if (char === "{" || char === "}") {
-      tokens.push(new Token(Type.brace, char, position));
+      tokens.push(new Token(Type.brace, char));
       current++;
       continue;
     }
 
     if (char === "(" || char === ")") {
-      tokens.push(new Token(Type.paren, char, position));
+      tokens.push(new Token(Type.parenthesis, char));
       current++;
       continue;
     }
 
     if (char === ".") {
-      tokens.push(new Token(Type.dot, char, position));
+      tokens.push(new Token(Type.dot, char));
       current++;
       continue;
     }
 
     if (char === ";") {
-      tokens.push(new Token(Type.semicolon, char, position));
+      tokens.push(new Token(Type.semicolon, char));
       current++;
       continue;
     }
 
     if (char === ",") {
-      tokens.push(new Token(Type.comma, char, position));
+      tokens.push(new Token(Type.comma, char));
       current++;
       continue;
     }
 
     if (char === "=") {
-      tokens.push(new Token(Type.equals, char, position));
+      tokens.push(new Token(Type.equals, char));
       current++;
       continue;
     }
 
     if (char === ">" || char === "<") {
-      tokens.push(new Token(Type.comp, char, position));
+      tokens.push(new Token(Type.comp, char));
       current++;
       continue;
     }
 
     if (["@", "$", "%", "^", "&", "*", "/"].includes(char)) {
-      tokens.push(new Token(Type.special, char, position));
+      tokens.push(new Token(Type.special, char));
       current++;
       continue;
     }

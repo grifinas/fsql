@@ -1,13 +1,18 @@
-export class Token {
+interface TokenMatcher {
+  type: Type;
+  value?: string;
+}
+
+export class Token implements TokenMatcher {
   constructor(
     public readonly type: Type,
     public readonly value: string,
   ) {}
 
-  is(token: Token): boolean;
+  is(token: TokenMatcher): boolean;
   is(type: Type, value?: string): boolean;
-  is(type: Type | Token, value?: string): boolean {
-    if (type instanceof Token) {
+  is(type: Type | TokenMatcher, value?: string): boolean {
+    if (typeof type === 'object') {
       return this.isRawEqual(type.type, type.value);
     } else {
       return this.isRawEqual(type, value);
@@ -15,16 +20,16 @@ export class Token {
     
   }
 
-  isIn(tokens: Token[] | readonly Token[]): boolean {
-    return tokens.some(token => this.is(token.type, token.value));
+  isIn(tokens: TokenMatcher[] | readonly TokenMatcher[]): boolean {
+    return tokens.some(token => this.is(token));
   }
 
-  isNot(token: Token): boolean {
-    return !this.is(token.type, token.value);
+  isNot(token: TokenMatcher): boolean {
+    return !this.is(token);
   }
 
-  isNotIn(tokens: Token[] | readonly Token[]): boolean {
-    return !tokens.some(token => this.is(token.type, token.value));
+  isNotIn(tokens: TokenMatcher[] | readonly TokenMatcher[]): boolean {
+    return !tokens.some(token => this.is(token));
   }
 
   private isRawEqual(type: Type , value?: string): boolean {
@@ -42,7 +47,7 @@ export enum Type {
   number = "number",
   bracket = "bracket",
   brace = "brace",
-  paren = "paren",
+  parenthesis = "parenthesis",
   special = "special",
   dot = "dot",
   comma = "comma",

@@ -13,9 +13,9 @@ describe('parseSelectArgs - Integration Tests', () => {
 
   it('should handle SELECT *', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.special, '*', 1),
-      new Token(Type.word, 'FROM', 2),
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.special, '*'),
+      new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([]); // Or expect(ast.all).toBe(true) if AST has such a flag
@@ -25,9 +25,9 @@ describe('parseSelectArgs - Integration Tests', () => {
 
   it('should parse a single field: SELECT fieldA', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.word, 'fieldA', 1),
-      new Token(Type.word, 'FROM', 2),
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.word, 'fieldA'),
+      new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([{ field: 'fieldA', alias: 'fieldA' }]);
@@ -36,11 +36,11 @@ describe('parseSelectArgs - Integration Tests', () => {
 
   it('should parse a single field with alias: SELECT fieldA AS aliasA', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.word, 'fieldA', 1),
-      new Token(Type.word, 'AS', 2),
-      new Token(Type.word, 'aliasA', 3),
-      new Token(Type.word, 'FROM', 4),
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.word, 'fieldA'),
+      new Token(Type.word, 'AS'),
+      new Token(Type.word, 'aliasA'),
+      new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([{ field: 'fieldA', alias: 'aliasA' }]);
@@ -49,11 +49,11 @@ describe('parseSelectArgs - Integration Tests', () => {
 
   it('should parse a single field with case-insensitive alias: SELECT fieldA as aliasA', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.word, 'fieldA', 1),
-      new Token(Type.word, 'as', 2),
-      new Token(Type.word, 'aliasA', 3),
-      new Token(Type.word, 'FROM', 4),
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.word, 'fieldA'),
+      new Token(Type.word, 'as'),
+      new Token(Type.word, 'aliasA'),
+      new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([{ field: 'fieldA', alias: 'aliasA' }]);
@@ -62,11 +62,11 @@ describe('parseSelectArgs - Integration Tests', () => {
 
   it('should parse multiple fields: SELECT fieldA, fieldB', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.word, 'fieldA', 1),
-      new Token(Type.comma, ',', 2),
-      new Token(Type.word, 'fieldB', 3),
-      new Token(Type.word, 'FROM', 4),
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.word, 'fieldA'),
+      new Token(Type.comma, ','),
+      new Token(Type.word, 'fieldB'),
+      new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([
@@ -78,15 +78,15 @@ describe('parseSelectArgs - Integration Tests', () => {
 
   it('should parse multiple fields with aliases: SELECT fieldA AS aliasA, fieldB as aliasB', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.word, 'fieldA', 1),
-      new Token(Type.word, 'AS', 2),
-      new Token(Type.word, 'aliasA', 3),
-      new Token(Type.comma, ',', 4),
-      new Token(Type.word, 'fieldB', 5),
-      new Token(Type.word, 'as', 6),
-      new Token(Type.word, 'aliasB', 7),
-      new Token(Type.word, 'FROM', 8),
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.word, 'fieldA'),
+      new Token(Type.word, 'AS'),
+      new Token(Type.word, 'aliasA'),
+      new Token(Type.comma, ','),
+      new Token(Type.word, 'fieldB'),
+      new Token(Type.word, 'as'),
+      new Token(Type.word, 'aliasB'),
+      new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([
@@ -98,15 +98,15 @@ describe('parseSelectArgs - Integration Tests', () => {
 
   it('should parse mixed fields (with and without alias): SELECT fieldA, fieldB AS aliasB, fieldC', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.word, 'fieldA', 1),
-      new Token(Type.comma, ',', 2),
-      new Token(Type.word, 'fieldB', 3),
-      new Token(Type.word, 'AS', 4),
-      new Token(Type.word, 'aliasB', 5),
-      new Token(Type.comma, ',', 6),
-      new Token(Type.word, 'fieldC', 7),
-      new Token(Type.word, 'FROM', 8),
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.word, 'fieldA'),
+      new Token(Type.comma, ','),
+      new Token(Type.word, 'fieldB'),
+      new Token(Type.word, 'AS'),
+      new Token(Type.word, 'aliasB'),
+      new Token(Type.comma, ','),
+      new Token(Type.word, 'fieldC'),
+      new Token(Type.word, 'FROM'),
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([
@@ -118,28 +118,28 @@ describe('parseSelectArgs - Integration Tests', () => {
   });
 
   it('should throw if SELECT is followed immediately by end of stream', () => {
-    stream = new TokenStream([new Token(Type.word, 'SELECT', 0)]);
+    stream = new TokenStream([new Token(Type.word, 'SELECT')]);
     // popNextIf('*') fails, then assertNext(Type.word) fails.
-    expect(() => parseSelectArgs(ast, stream)).toThrow(); 
+    expect(() => parseSelectArgs(ast, stream)).toThrow();
   });
 
   it('should throw with trailing comma: SELECT fieldA,', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.word, 'fieldA', 1),
-      new Token(Type.comma, ',', 2),
-      new Token(Type.word, 'FROM', 3), // FROM is here to avoid end-of-stream error
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.word, 'fieldA'),
+      new Token(Type.comma, ','),
+      new Token(Type.word, 'FROM'), // FROM is here to avoid end-of-stream error
     ]);
     // After comma, assertNext(Type.word) will fail because next is FROM.
-    expect(() => parseSelectArgs(ast, stream)).toThrow(); 
+    expect(() => parseSelectArgs(ast, stream)).toThrow();
   });
 
   it('should throw with alias keyword but no alias name: SELECT fieldA AS', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.word, 'fieldA', 1),
-      new Token(Type.word, 'AS', 2),
-      new Token(Type.word, 'FROM', 3), // FROM is here to avoid end-of-stream error
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.word, 'fieldA'),
+      new Token(Type.word, 'AS'),
+      new Token(Type.word, 'FROM'), // FROM is here to avoid end-of-stream error
     ]);
     // After AS, assertNext(Type.word) will fail.
     expect(() => parseSelectArgs(ast, stream)).toThrow();
@@ -147,9 +147,9 @@ describe('parseSelectArgs - Integration Tests', () => {
 
   it('should throw with leading comma: SELECT ,fieldA', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.comma, ',', 1),
-      new Token(Type.word, 'fieldA', 2),
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.comma, ','),
+      new Token(Type.word, 'fieldA'),
     ]);
     // assertNext(Type.word) for field name will fail as it finds a comma.
     expect(() => parseSelectArgs(ast, stream)).toThrow();
@@ -157,16 +157,16 @@ describe('parseSelectArgs - Integration Tests', () => {
 
   it('should consume the next token (e.g. FROM) if no comma after last field due to final stream.advance()', () => {
     stream = new TokenStream([
-      new Token(Type.word, 'SELECT', 0),
-      new Token(Type.word, 'fieldA', 1),
-      new Token(Type.word, 'fieldB', 2), // No comma, followed by fieldB (which is like FROM)
-      new Token(Type.word, 'fieldC', 3),
+      new Token(Type.word, 'SELECT'),
+      new Token(Type.word, 'fieldA'),
+      new Token(Type.word, 'fieldB'), // No comma, followed by fieldB (which is like FROM)
+      new Token(Type.word, 'fieldC'),
     ]);
     parseSelectArgs(ast, stream);
     expect(ast.fields).toEqual([{ field: 'fieldA', alias: 'fieldA' }]);
     // The loop for 'fieldA' finishes. popNextIf(',') fails.
     // Then stream.advance() is called, consuming 'fieldB'.
-    expect(stream.get().value).toBe('fieldB'); 
+    expect(stream.get().value).toBe('fieldB');
   });
 
 });

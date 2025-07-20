@@ -1,9 +1,10 @@
 import { TokenStream } from "../tokenStream";
 import { Type } from "../token";
-import { ResolvedProperty, FieldProperty } from '../filterFunction';
+import { ResolvedProperty, FieldProperty, FunctionProperty } from '../filterFunction';
 
-export function parseField(stream: TokenStream): FieldProperty | ResolvedProperty {
+export function parseField(stream: TokenStream): FieldProperty | ResolvedProperty | FunctionProperty {
     const parts: string[] = [];
+    let start = stream.getIndex();
 
     while (true) {
         const value = getValueFromStream(stream);
@@ -24,6 +25,11 @@ export function parseField(stream: TokenStream): FieldProperty | ResolvedPropert
 
     stream.advance();
 
+    if (stream.advanceIf(Type.parenthesis, '(')) {
+        stream.setIndex(start);
+        return parseFunction(stream);
+    }
+
     return { source: null, field: parts.join('.') };
 }
 
@@ -36,4 +42,24 @@ function getValueFromStream(stream: TokenStream): string | number | boolean {
     } else {
         stream.unexpectedToken();
     }
+}
+
+function parseFunction(stream: TokenStream): FunctionProperty {
+    stream.assert(Type.word);
+    const name = stream.get().value;
+    stream.advance();
+    if (!stream.advanceIf(Type.parenthesis, '(')) {
+        stream.unexpectedToken();
+    }
+
+    const args: (FieldProperty | ResolvedProperty | FunctionProperty)[] = [];
+    do {
+        args.push(parseField(stream));
+    } while (stream.advanceIf(Type.comma));
+
+    if (!stream.advanceIf(Type.parenthesis, ')')) {
+        stream.unexpectedToken();
+    }
+
+    return { name, arguments: args };
 }

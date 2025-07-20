@@ -1,7 +1,7 @@
 import { cliAssert } from "../cliAssert";
 import { MeshedRow } from "../meshData";
 import { resolveValue } from "../utils/getMeshedRowValue";
-import { SQLFunction } from "./sqlFunction";
+import { SQLFunction, SQLFunctions } from "./sqlFunction";
 
 export class RoundFunction extends SQLFunction<number> {
     public resolve(row: MeshedRow): number {
@@ -22,3 +22,5 @@ export class RoundFunction extends SQLFunction<number> {
         return Math.round(numValue);
     }
 }
+
+SQLFunctions.set("ROUND", RoundFunction);

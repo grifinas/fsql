@@ -32,11 +32,11 @@ describe("tokenizer", () => {
     expect(stream.length).toBe(input.length);
     expect(stream.next().type).toBe(Type.brace);
     expect(stream.next().type).toBe(Type.bracket);
-    expect(stream.next().type).toBe(Type.paren);
-    expect(stream.next().type).toBe(Type.paren);
+    expect(stream.next().type).toBe(Type.parenthesis);
+    expect(stream.next().type).toBe(Type.parenthesis);
     expect(stream.next().type).toBe(Type.bracket);
-    expect(stream.next().type).toBe(Type.paren);
-    expect(stream.next().type).toBe(Type.paren);
+    expect(stream.next().type).toBe(Type.parenthesis);
+    expect(stream.next().type).toBe(Type.parenthesis);
     expect(stream.next().type).toBe(Type.brace);
     expect(stream.next().type).toBe(Type.bracket);
     expect(stream.next().type).toBe(Type.bracket);
