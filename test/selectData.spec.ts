@@ -1,0 +1,118 @@
+import { selectData } from '../src/selectData';
+import { MeshedRow } from '../src/meshData';
+import { AliasedPropperty } from '../src/ast';
+
+describe('selectData', () => {
+  describe('when fields array is empty (SELECT *)', () => {
+    const emptyFields: AliasedPropperty[] = [];
+
+    it('should return an empty array if rows are empty', () => {
+      const rows: MeshedRow[] = [];
+      expect(selectData(rows, emptyFields)).toEqual([]);
+    });
+
+    it('should collapse a single row with a single source', () => {
+      const rows: MeshedRow[] = [
+        { '@sourceA': { id: 1, name: 'Alice' } },
+      ];
+      expect(selectData(rows, emptyFields)).toEqual([
+        { id: 1, name: 'Alice' },
+      ]);
+    });
+
+    it('should collapse a single row with multiple sources', () => {
+      const rows: MeshedRow[] = [
+        {
+          '@sourceA': { id: 1, name: 'Alice' },
+          '@sourceB': { age: 30, city: 'New York' },
+        },
+      ];
+      expect(selectData(rows, emptyFields)).toEqual([
+        { id: 1, name: 'Alice', age: 30, city: 'New York' },
+      ]);
+    });
+
+    it('should collapse multiple rows with multiple sources', () => {
+      const rows: MeshedRow[] = [
+        {
+          '@sourceA': { id: 1, name: 'Alice' },
+          '@sourceB': { age: 30 },
+        },
+        {
+          '@sourceA': { id: 2, name: 'Bob' },
+          '@sourceB': { age: 25 },
+        },
+      ];
+      expect(selectData(rows, emptyFields)).toEqual([
+        { id: 1, name: 'Alice', age: 30 },
+        { id: 2, name: 'Bob', age: 25 },
+      ]);
+    });
+
+    it('should handle sources with empty data objects', () => {
+      const rows: MeshedRow[] = [
+        {
+          '@sourceA': { id: 1, name: 'Alice' },
+          '@sourceB': {},
+        },
+      ];
+      expect(selectData(rows, emptyFields)).toEqual([
+        { id: 1, name: 'Alice' },
+      ]);
+    });
+
+    it('should handle field name collisions by last source iterated (implementation detail)', () => {
+      // The current implementation iterates sources; if field names collide, the last one wins.
+      const rows: MeshedRow[] = [
+        {
+          '@sourceA': { id: 1, status: 'active' }, // This status will be overwritten
+          '@sourceB': { id: 101, status: 'inactive' },
+        },
+      ];
+      // Depending on object key order (not guaranteed) or iteration order in selectData
+      // This test assumes sourceB's status will overwrite sourceA's if 'id' is the same
+      // Or rather, it just merges all properties. Let's assume simple merge.
+      expect(selectData(rows, emptyFields)).toEqual([
+        { id: 101, status: 'inactive' }, // If sourceB properties are processed after sourceA for the same output object
+      ]);
+    });
+  });
+
+  describe('when fields array is NOT empty (specific fields selected)', () => {
+    it('should return only aliased fields', () => {
+      const rows: MeshedRow[] = [
+        { '@sourceA': { id: 1, name: 'Alice' } },
+      ];
+      const fields: AliasedPropperty[] = [
+        { field: 'name', alias: 'firstname' },
+      ];
+      expect(selectData(rows, fields)).toEqual([
+        { firstname: 'Alice' },
+      ]);
+    });
+
+    it('should take fields from the right source', () => {
+      const rows: MeshedRow[] = [
+        { '@sourceA': { id: 1, name: 'Alice' }, '@sourceB': { id: 2, name: 'Bob' } },
+      ];
+      const fields: AliasedPropperty[] = [
+        { field: '@sourceA.name', alias: 'firstname' },
+      ];
+      expect(selectData(rows, fields)).toEqual([
+        { firstname: 'Alice' },
+      ]);
+    });
+
+    it('should be able to access deep properties', () => {
+      const rows: MeshedRow[] = [
+        { '@sourceA': { id: 1, name: 'Alice', address: { city: 'New York' } } },
+      ];
+      const fields: AliasedPropperty[] = [
+        { field: '@sourceA.address.city', alias: 'city' },
+      ];
+      expect(selectData(rows, fields)).toEqual([
+        { city: 'New York' },
+      ]);
+    });
+  });
+});

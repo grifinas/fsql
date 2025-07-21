@@ -33,6 +33,27 @@ export class TokenStream {
     return token;
   }
 
+  advanceIf(type: Type, value?: string) {
+    if (this.done()) return false;
+    if (this.get().is(type, value)) {
+      this.advance();
+      return true;
+    }
+    return false;
+  }
+
+  advance() {
+    this.index++;
+  }
+  
+  regress() {
+    this.index--;
+  }
+
+  getIndex(): number {
+    return this.index;
+  }
+
   next(): Token {
     this.index++;
     return this.get();
@@ -43,6 +64,10 @@ export class TokenStream {
     return this.get();
   }
 
+  done(): boolean {
+    return this.index >= this.tokens.length;
+  }
+
   hasNext(): boolean {
     return this.tokens.length > this.index + 1;
   }
@@ -51,13 +76,14 @@ export class TokenStream {
     return this.getIndexed(this.index + offset);
   }
 
-  popNextIf(type: Type, value?: string, caseSensitive = true): boolean {
-    if (!this.hasNext()) return false;
-    if (this.peek().is(type, value, caseSensitive)) {
+  popNextIf(type: Type, value?: string): boolean {
+    if (!this.hasNext()) {
+      return false;
+    };
+    if (this.peek().is(type, value)) {
       this.next();
       return true;
     }
-
     return false;
   }
 
@@ -74,6 +100,8 @@ export class TokenStream {
   }
 
   toStringFromCurrent(): string {
+    //TODO feels very off
+    if (this.index < 0) this.index = 0;
     return [...this.tokens].splice(this.index).map(stringifyToken).join("");
   }
 
@@ -111,24 +139,28 @@ export class TokenStream {
     ].join('\n');
   }
 
-  assert(type: Type, value?: string, caseSensitive = true) {
+  assert(type: Type, value?: string): this {
     const token = this.get();
     cliAssert(
-      token.is(type, value, caseSensitive),
+      token.is(type, value),
       () =>
         `Expected token to be ${type}${value ? `::${value}` : ""
         }, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
     );
+
+    return this;
   }
 
-  assertNext(type: Token["type"], value?: string, caseSensitive = true) {
+  assertNext(type: Token["type"], value?: string): this {
     const token = this.next();
     cliAssert(
-      token.is(type, value, caseSensitive),
+      token.is(type, value),
       () =>
         `Expected token to be ${type}${value ? `::${value}` : ""
         }, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
     );
+
+    return this;
   }
 
   unexpectedToken(where?: string, expected?: string): never {

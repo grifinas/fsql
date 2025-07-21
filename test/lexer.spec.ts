@@ -1,5 +1,5 @@
 import { tokenize } from "../src/tokenizer";
-import { lex } from "../src/lexer";
+import { lex } from "../src/lexer/lexer";
 import { AST } from "../src/ast";
 
 /*
@@ -14,19 +14,20 @@ describe("lexer", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere"));
     expect(ast.all).toBe(true);
     expect(ast.fields).toEqual([]);
-    expect(ast.mainfile).toBe("fileNameGoesHere");
+    expect(ast.mainfile?.field).toBe("fileNameGoesHere");
     expect(Object.keys(ast.joinFiles)).toEqual([]);
     expect(ast.order).toBe(undefined);
+    expect(ast.next).toBeNull();
   });
 
   it("should lex file with hyphens", () => {
     const ast = lex(tokenize("SELECT * from file-name-goes-here"));
-    expect(ast.mainfile).toBe("file-name-goes-here");
+    expect(ast.mainfile?.field).toBe("file-name-goes-here");
   });
 
   it("should lex file with underscores", () => {
     const ast = lex(tokenize("SELECT * from file_name_goes_here"));
-    expect(ast.mainfile).toBe("file_name_goes_here");
+    expect(ast.mainfile?.field).toBe("file_name_goes_here");
   });
 
   it("should lex JOIN clause", () => {
@@ -51,7 +52,7 @@ describe("lexer", () => {
 
   it("should lex WHERE clause", () => {
     const ast = lex(tokenize("SELECT * from file_name_goes_here where a=b"));
-    expect(ast.where).toBeInstanceOf(Function);
+    expect(ast.where?.isEmpty()).toBe(false);
   });
 
   it("WHERE clauses should be chainable with AND", () => {
@@ -67,7 +68,7 @@ describe("lexer", () => {
 
   it("should lex JOIN and WHERE clauses together", () => {
     const ast = lex(tokenize("SELECT * from file_name_goes_here JOIN foo where q=b"));
-    expect(ast.where).toBeInstanceOf(Function);
+    expect(ast.where?.isEmpty()).toBe(false);
     expect(Object.keys(ast.joinFiles)).toEqual(["foo"]);
   });
 
@@ -90,7 +91,7 @@ describe("lexer", () => {
         "SELECT * from file_name_goes_here WHERE foo>1 ORDER BY date DESC"
       )
     );
-    expect(ast.where).toBeInstanceOf(Function);
+    expect(ast.where?.isEmpty()).toBe(false);
     expect(ast.order).toEqual(["date", -1]);
   });
 
@@ -114,7 +115,7 @@ describe("lexer", () => {
 
   it("should set 'mainfile' to whatever is in FROM", () => {
     const ast = lex(tokenize("SELECT foo, bar from fileNameGoesHere"));
-    expect(ast.mainfile).toBe("fileNameGoesHere");
+    expect(ast.mainfile?.field).toBe("fileNameGoesHere");
   });
 
   it("should set 'joinFiles' to whatever is in JOIN", () => {
@@ -131,7 +132,7 @@ describe("lexer", () => {
     expect(ast.order).toEqual(["foo", 1]);
   });
 
-  it("should set set next when semicolon is specified and more tokens exist after semicolon", () => {
+  it("should set next when semicolon is specified and more tokens exist after semicolon", () => {
     const ast = lex(
       tokenize("SELECT * from fileNameGoesHere; SELECT * from fileNameGoesThere")
     );
@@ -150,12 +151,13 @@ describe("lexer", () => {
 
   it("should allow setting variables with INTO keyword", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere INTO @var"));
-    expect(ast.intoName).toBe("var");
+    expect(ast.intoName).toBe("@var");
   })
 
   it("should allow selecting from variables", () => {
     const ast = lex(tokenize("SELECT * from @var"));
-    expect(ast.mainfile).toBe("@var");
+    expect(ast.mainfile?.field).toBe("@var");
+    expect(ast.mainfile?.alias).toBe("@var");
   });
 
   it("should allow joining from variables", () => {

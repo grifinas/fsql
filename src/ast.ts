@@ -1,60 +1,45 @@
-import { fileUtils } from "./utils/file";
-export type WhereFunction = (row: object) => boolean;
+import { meshData, MeshedRow } from "./meshData";
+import { sourceData } from "./sourceData";
+import { FilterFunction } from "./filterFunction";
+import { selectData } from "./selectData";
+import { logger } from "./utils/logger";
 
-interface FieldAlias {
+export interface AliasedPropperty {
   field: string;
-  alias: string;
+  alias: string | null;
 }
+
+export type JoinMap = Record<string, { where: FilterFunction; alias: string | null }>;
 
 export class AST {
   public all: boolean = true;
-  public fields: FieldAlias[] = [];
-  public mainfile: string = "";
-  public joinFiles: Record<string, WhereFunction> = {};
-  public where: WhereFunction = () => true;
+  public fields: AliasedPropperty[] = [];
+  public mainfile: AliasedPropperty | undefined;
+  public joinFiles: JoinMap = {};
+  public where: FilterFunction | undefined;
   public order: [string, number] | undefined = undefined;
   public readonly variables: Record<string, object[]> = {};
   public intoName: string | undefined = undefined;
   public next: AST | null = null;
 
   async execute(): Promise<object[]> {
-    const data: object[] = await this.getMainData();
-
-    for (const [filePath, whereFn] of Object.entries(this.joinFiles)) {
-      const joinData = await this.getJoinData(filePath);
-      const filteredJoin = joinData.filter(whereFn);
-
-      const oldData: object[] = data.splice(0, data.length);
-      for (const joinRow of filteredJoin) {
-        for (const row of oldData) {
-          data.push({ ...row, ...joinRow });
-        }
-      }
+    logger.info("Executing", this);
+    if (!this.mainfile) {
+      throw new Error("No main file specified");
     }
 
-    const mapped = data.map((row) => {
-      if (this.all) return row;
-
-      const m: Record<string, any> = {};
-      this.fields.forEach(({ field, alias }) => {
-        const parts = field.split(".");
-        let value: any = row;
-        for (const part of parts) {
-          value = value[part];
-        }
-        m[alias] = value;
-      });
-
-      return m;
-    });
-    const filtered = mapped.filter(row => {
-      const result = this.where(row);
-      return result;
-    });
+    const sources = await sourceData(this.mainfile, this.joinFiles, this.variables);
+    logger.info("Sources", sources);
+    const meshed = meshData(sources);
+    logger.info("Meshed", meshed);
+    const filtered = this.filter(meshed);
+    logger.info("Filtered", filtered);
+    const mapped: object[] = selectData(filtered, this.fields);
+    logger.info("Mapped", mapped);
 
     if (this.order) {
       const [key, value] = this.order;
-      return filtered.sort((a, b) => {
+      return mapped.sort((a: object, b: object) => {
         if (!(key in a) || !(key in b))
           throw new Error(`No ${key} in some rows`);
         const v1 = a[key as keyof typeof a];
@@ -70,7 +55,7 @@ export class AST {
     }
 
     if (this.intoName) {
-      this.assignVariable(this.intoName, filtered);
+      this.assignVariable(this.intoName, mapped);
     }
 
     if (this.next) {
@@ -78,43 +63,59 @@ export class AST {
         (this.next as AST).assignVariable(key, value);
       });
       return this.next.execute();
+    } else {
+      return mapped;
     }
-
-    return filtered;
   }
 
-  addAnd(fn: WhereFunction) {
-    const before = this.where;
-    this.where = (row: object) => {
-      const already = before(row);
-      if (!already) return false;
-      return fn(row);
-    };
+  addAnd(fn: FilterFunction) {
+    if (!this.where) {
+      this.where = fn;
+      return;
+    }
+
+    this.where = this.where.and(fn);
+  }
+
+  filter(mapped: MeshedRow[]): MeshedRow[] {
+    const where = this.where!;
+    if (!where) return mapped;
+
+    return mapped.filter((row: MeshedRow) => where.resolve(row));
   }
 
   assignVariable(name: string, data: object[]) {
     this.variables[name] = data;
   }
 
+  setMain(prop: AliasedPropperty) {
+    if (prop.alias && !prop.alias.startsWith("@")) {
+      throw new Error(`Invalid alias: ${prop.alias}. Table aliases must start with @`);
+    }
+    this.mainfile = prop;
+  }
+
+  addJoin(prop: AliasedPropperty, where?: FilterFunction) {
+    if (prop.alias && !prop.alias.startsWith("@")) {
+      throw new Error(`Invalid alias: ${prop.alias}. Table aliases must start with @`);
+    }
+    this.joinFiles[prop.field] = { where: where || FilterFunction.Empty(), alias: prop.alias };
+  }
+
   addField(field: string, alias?: string) {
+    const effectiveAlias = alias || field.split('.').pop()!;
+
+    // Check for duplicate fields when no alias is provided
+    if (!alias && this.fields.some(f => f.field === field && !f.alias)) {
+      throw new Error(`Field '${field}' has already been added`);
+    }
+
+    // Check for duplicate aliases
+    if (this.fields.some(f => f.alias === effectiveAlias)) {
+      throw new Error(`Alias '${effectiveAlias}' has already been used`);
+    }
+
     this.all = false;
-    this.fields.push({ field, alias: alias || field });
-  }
-
-  private async getMainData(): Promise<object[]> {
-    if (this.mainfile.startsWith("@")) {
-      return this.variables[this.mainfile.slice(1)];
-    } else {
-      const unknown: unknown = await fileUtils.readJson(this.mainfile);
-      return Array.isArray(unknown) ? unknown : [unknown as object];
-    }
-  }
-
-  private async getJoinData(filePath: string): Promise<object[]> {
-    if (filePath.startsWith('@')) {
-      return this.variables[filePath.slice(1)];
-    }
-    const unknown: unknown = await fileUtils.readJson(filePath);
-    return Array.isArray(unknown) ? unknown : [unknown as object];
+    this.fields.push({ field, alias: effectiveAlias });
   }
 }

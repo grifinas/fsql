@@ -12,7 +12,7 @@ if [ -d "$HOME/.nvm" ]; then
 fi
 
 # Get the project root directory from the test file path
-PROJECT_ROOT=$(wslpath "$(dirname "$1")/..")
+PROJECT_ROOT="/mnt/d/backup/projects/monorepo/typescript/sqlparse"
 
 # Convert paths to WSL format
 TEST_FILE=$(wslpath "$1")
@@ -25,4 +25,6 @@ echo "Running jest with:"
 echo "Test file: $TEST_FILE"
 echo "Project root: $PROJECT_ROOT"
 
-node "$PROJECT_ROOT/node_modules/jest/bin/jest.js" "$TEST_FILE" --config="$PROJECT_ROOT/jest.config.ts" "${@:3}"
+node "$PROJECT_ROOT/node_modules/jest/bin/jest.js" "$TEST_FILE" \
+    --config="$PROJECT_ROOT/jest.config.ts" "${@:3}"
+    # | tee "$PROJECT_ROOT/jest_output.log"

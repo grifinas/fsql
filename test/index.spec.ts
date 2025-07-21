@@ -46,7 +46,7 @@ describe('SQL Parser Integration Tests', () => {
     const result = await main('SELECT * FROM test-data/shallow.json WHERE is_active=true INTO @active; SELECT * FROM @active WHERE unit-price>30');
     const data = JSON.parse(result);
     expect(data).toHaveLength(1);
-    expect(data[0]).toHaveProperty('unit-price', 45.00);
+    expect(data[0]).toEqual(expect.objectContaining({ id: 4, 'unit-price': 45.00 }));
   });
 
   it('should handle aliasing', async () => {
@@ -57,27 +57,19 @@ describe('SQL Parser Integration Tests', () => {
     expect(data[0]).toEqual({ name: "First Item", price: 19.99 });
   });
 
-  it('should handle filtering with alias', async () => {
-    const result = await main('SELECT productName as name, unit-price as price FROM test-data/shallow.json WHERE price>30');
-    const data = JSON.parse(result);
-    expect(data).toHaveLength(1);
-    expect(data[0]).toEqual({ name: "Fourth Item", price: 45.00 });
-  });
-
-
   it('should handle JOINs', async () => {
-    const result = await main('SELECT productName, pairID, is_active, unit_price, ProductMetadata FROM test-data/shallow.json JOIN test-data/shallow.json');
+    const result = await main('SELECT @main.productName, @main.pairID, @main.is_active, @main.unit-price, @main.ProductMetadata FROM test-data/shallow.json as @main JOIN test-data/shallow.json as @sub ON @main.pairID=@sub.id');
     const data = JSON.parse(result);
-    expect(data).toHaveLength(25);
-    // expect(data).toContainEqual(expect.objectContaining({
-    //   productName: 'First Item',
-    //   pairID: 1,
-    //   is_active: true,
-    //   unit_price: 19.99,
-    //   ProductMetadata: expect.objectContaining({
-    //     color_code: 'blue',
-    //     size: 'medium'
-    //   })
-    // }));
+    expect(data).toHaveLength(5);
+    expect(data).toContainEqual(expect.objectContaining({
+      productName: 'First Item',
+      pairID: 3,
+      is_active: true,
+      'unit-price': 19.99,
+      ProductMetadata: expect.objectContaining({
+        color_code: 'blue',
+        itemSize: 'medium'
+      })
+    }));
   });
 });

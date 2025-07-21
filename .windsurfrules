@@ -1,7 +1,18 @@
----
-trigger: model_decision
-description: when trying to run tests, when trying to debug tests
----
+# Context
+This project is a CLI tool. Goal is to help parse JSON files in a well known SQL format. Goal is NOT to create a fully functional SQL parser, but a simple subset of `SELECT` keyword functionalities.
+
+# Coding style guide
+
+## Source
+* Files are held in `src/` directory
+
+## Tests
+* Test files are held in `test/` directory
+* Unit test files end in `.spec.ts`
+* Integration test files end in `.test.ts`
+* Preffer jest.spyOn over jest.mock
+
+# Testing
 
 I am running most of my developement environment via WSL. Therefore to run tests you have to run WSL commands.
 
