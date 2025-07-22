@@ -1,15 +1,42 @@
-export class Token {
+interface TokenMatcher {
+  type: Type;
+  value?: string;
+}
+
+export class Token implements TokenMatcher {
   constructor(
     public readonly type: Type,
     public readonly value: string,
-    public readonly position: number
   ) {}
 
-  is(type: Type, value?: string, caseSensitive = true): boolean {
+  is(token: TokenMatcher): boolean;
+  is(type: Type, value?: string): boolean;
+  is(type: Type | TokenMatcher, value?: string): boolean {
+    if (typeof type === 'object') {
+      return this.isRawEqual(type.type, type.value);
+    } else {
+      return this.isRawEqual(type, value);
+    }
+    
+  }
+
+  isIn(tokens: TokenMatcher[] | readonly TokenMatcher[]): boolean {
+    return tokens.some(token => this.is(token));
+  }
+
+  isNot(token: TokenMatcher): boolean {
+    return !this.is(token);
+  }
+
+  isNotIn(tokens: TokenMatcher[] | readonly TokenMatcher[]): boolean {
+    return !tokens.some(token => this.is(token));
+  }
+
+  private isRawEqual(type: Type , value?: string): boolean {
     const typesEqual = this.type === type;
     let valuesEqual = true;
     if (value) {
-        valuesEqual = caseSensitive ? this.value === value : this.value.toLocaleLowerCase() === value.toLocaleLowerCase();
+        valuesEqual = this.value.toLocaleLowerCase() === value.toLocaleLowerCase();
     }
     return typesEqual && valuesEqual;
   }
@@ -17,10 +44,11 @@ export class Token {
 
 export enum Type {
   word = "word",
+  string = "string",
   number = "number",
   bracket = "bracket",
   brace = "brace",
-  paren = "paren",
+  parenthesis = "parenthesis",
   special = "special",
   dot = "dot",
   comma = "comma",

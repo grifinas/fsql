@@ -2,6 +2,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { Arguments, CommandModule } from "yargs";
 import { main } from ".";
+import { logger } from "./utils/logger";
 
 interface SqlArgs extends Arguments {
     sql: string;
@@ -20,10 +21,10 @@ const parseCommand: CommandModule<{}, SqlArgs> = {
     },
     handler: async (argv: { sql: string }) => {
         try {
-            console.log(main(argv.sql));
+            logger.info(main(argv.sql));
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error("Error:", errorMessage);
+            logger.error("Error:", errorMessage);
             process.exit(1);
         }
     }

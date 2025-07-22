@@ -1,4 +1,5 @@
-import { lex } from "./lexer";
+import "./sqlFunctions";
+import { lex } from "./lexer/lexer";
 import { tokenize } from "./tokenizer";
 import { TokenStream } from "./tokenStream";
 

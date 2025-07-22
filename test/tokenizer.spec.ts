@@ -21,7 +21,7 @@ describe("tokenizer", () => {
     const stream = tokenize('1 21 357 654813258821');
     expect(stream.length).toBe(4);
 
-    while(stream.hasNext()) {
+    while (stream.hasNext()) {
       expect(stream.next().type).toBe(Type.number);
     }
   });
@@ -32,11 +32,11 @@ describe("tokenizer", () => {
     expect(stream.length).toBe(input.length);
     expect(stream.next().type).toBe(Type.brace);
     expect(stream.next().type).toBe(Type.bracket);
-    expect(stream.next().type).toBe(Type.paren);
-    expect(stream.next().type).toBe(Type.paren);
+    expect(stream.next().type).toBe(Type.parenthesis);
+    expect(stream.next().type).toBe(Type.parenthesis);
     expect(stream.next().type).toBe(Type.bracket);
-    expect(stream.next().type).toBe(Type.paren);
-    expect(stream.next().type).toBe(Type.paren);
+    expect(stream.next().type).toBe(Type.parenthesis);
+    expect(stream.next().type).toBe(Type.parenthesis);
     expect(stream.next().type).toBe(Type.brace);
     expect(stream.next().type).toBe(Type.bracket);
     expect(stream.next().type).toBe(Type.bracket);
@@ -83,4 +83,37 @@ describe("tokenizer", () => {
     expect(stream.next().type).toBe(Type.word);
     expect(stream.next().type).toBe(Type.word);
   });
-})
+
+  it("should parse quotes", () => {
+    const input = '"foo"';
+    const stream = tokenize(input);
+  
+    expect(stream.length).toBe(1);
+    expect(stream.get().type).toBe(Type.string);
+    expect(stream.get().value).toBe('foo');
+  });
+
+  it("should parse quotes with single quotes", () => {
+    const input = "'foo'";
+    const stream = tokenize(input);
+    expect(stream.length).toBe(1);
+    expect(stream.get().type).toBe(Type.string);
+    expect(stream.get().value).toBe('foo');
+  });
+
+  it("should parse quotes with backticks", () => {
+    const input = "`foo`";
+    const stream = tokenize(input);
+    expect(stream.length).toBe(1);
+    expect(stream.get().type).toBe(Type.string);
+    expect(stream.get().value).toBe('foo');
+  });
+
+  it("should parse empty string", () => {
+    const input = '""';
+    const stream = tokenize(input);
+    expect(stream.length).toBe(1);
+    expect(stream.get().type).toBe(Type.string);
+    expect(stream.get().value).toBe('');
+  });
+})  

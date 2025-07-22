@@ -8,12 +8,12 @@
       "moduleResolution": "node16",
       "resolveJsonModule": true,
       "outDir": "dist",
-      "rootDir": "src",
+      "rootDir": "./",
       "forceConsistentCasingInFileNames": true,
       "skipLibCheck": true,
       "sourceMap": true
     },
-    "include": ["src"],
+    "include": ["src", "jestSetup.ts", "test"],
     "exclude": ["node_modules", "dist"]
   }
   

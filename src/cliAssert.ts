@@ -1,3 +1,5 @@
+import { logger } from "./utils/logger";
+
 export function cliAssert(
   value: unknown,
   message?: string | Function
@@ -6,10 +8,14 @@ export function cliAssert(
 
   if (message) {
     if (typeof message === "string") {
-      console.error(message);
+      logger.error(message);
+      throw new Error(message);
     } else {
-      console.error(message());
+      const msg = message();
+      logger.error(msg);
+      throw new Error(msg);
     }
+  } else {
+    throw new Error("Assertion failed");
   }
-  throw new Error();
 }

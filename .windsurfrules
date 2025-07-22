@@ -1,0 +1,35 @@
+# Context
+This project is a CLI tool. Goal is to help parse JSON files in a well known SQL format. Goal is NOT to create a fully functional SQL parser, but a simple subset of `SELECT` keyword functionalities.
+
+# Coding style guide
+
+## Source
+* Files are held in `src/` directory
+
+## Tests
+* Test files are held in `test/` directory
+* Unit test files end in `.spec.ts`
+* Integration test files end in `.test.ts`
+* Preffer jest.spyOn over jest.mock
+
+# Testing
+
+I am running most of my developement environment via WSL. Therefore to run tests you have to run WSL commands.
+
+# Running all tests
+
+All tests can be ran with:
+```
+wsl -e bash -ic "cd /mnt/d/backup/projects/monorepo/typescript/sqlparse && npm run test"
+```
+
+# Runnin subset of all tests
+
+Some part of tests can be ran with:
+```
+wsl -e /mnt/d/backup/projects/monorepo/typescript/sqlparse/test-compat.sh "d:/backup/projects/monorepo/typescript/sqlparse/test/<PATH_TO_TEST>" -c "d:/mnt/d/backup/projects/monorepo/typescript/sqlparse/jest.config.ts" -t "<NAME_PATTERN>"
+```
+Example:
+```
+wsl -e /mnt/d/backup/projects/monorepo/typescript/sqlparse/test-compat.sh "d:/backup/projects/monorepo/typescript/sqlparse/test/lexer.spec.ts" -c "d:/mnt/d/backup/projects/monorepo/typescript/sqlparse/jest.config.ts" -t "lexer should lex simple select statement"
+```
