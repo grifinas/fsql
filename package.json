@@ -12,7 +12,7 @@
   "scripts": {
     "cli": "node ./dist/src/cli.js --repl",
     "test": "jest",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "run": "node ./dist/index.js",
     "cc": "npm run build && npm run cli",
     "lint": "eslint src/**/*.ts",
