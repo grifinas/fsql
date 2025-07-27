@@ -4,6 +4,7 @@ import { logger } from "@utils";
 import { mesh } from "./mesh";
 import { select } from "./select";
 import { order } from "./order";
+import { limit } from "./limit";
 import { filter } from "./filter";
 import { write } from "./write";
 
@@ -16,6 +17,8 @@ export class AST {
   public order: [string, number] | undefined = undefined;
   public readonly variables: Record<string, object[]> = {};
   public into: DataSource | undefined = undefined;
+  public limit: number | undefined = undefined;
+  public offset: number = 0;
   public next: AST | null = null;
 
   async execute(): Promise<object[]> {
@@ -26,6 +29,7 @@ export class AST {
       filter,
       select,
       order,
+      limit,
       write
     ]);
 
@@ -75,6 +79,14 @@ export class AST {
 
     this.all = false;
     this.fields.push(property);
+  }
+
+  setLimit(limit: number) {
+    this.limit = limit;
+  }
+
+  setOffset(offset: number) {
+    this.offset = offset;
   }
 
   // eslint-disable-next-line

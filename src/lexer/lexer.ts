@@ -19,7 +19,11 @@ export function lex(_stream: TokenStream): AST {
   parseFrom(ast, stream);
   chainable(KEYWORD.JOIN, parseJoin);
   optional(KEYWORD.WHERE, parseWhere);
+  //TODO group by
+  // optional(KEYWORD.GROUP, parseGroup);
   optional(KEYWORD.ORDER, parseOrderBy);
+  optional(KEYWORD.LIMIT, parseLimit);
+  optional(KEYWORD.OFFSET, parseOffset);
   optional(KEYWORD.INTO, parseInto);
   optional(ANY.SEMICOLON, parseSemicolon);
 
@@ -43,7 +47,7 @@ export function optional(
   if (stream.advanceIf(token)) {
     fn(ast, stream);
   } else {
-    logger.debug("Optional token not found", token);
+    logger.debug("Optional token not found", token, stream.toStringFromCurrent());
   }
 }
 
@@ -78,6 +82,8 @@ function parseOrderBy(ast: AST, stream: TokenStream): void {
   } else {
     ast.order = [parameter.value, -1];
   }
+
+  stream.advance();
 }
 
 function parseSemicolon(ast: AST, stream: TokenStream): void {
@@ -90,4 +96,28 @@ function parseSemicolon(ast: AST, stream: TokenStream): void {
 
 function parseInto(ast: AST, stream: TokenStream): void {
   ast.into = parseDataSource(stream);
+}
+
+function parseLimit(ast: AST, stream: TokenStream): void {
+  const limitToken = stream.get(ANY.NUMBER);
+  const limitValue = parseInt(limitToken.value, 10);
+  stream.advance();
+  
+  if (isNaN(limitValue) || limitValue < 0) {
+    stream.unexpectedToken("Number >= 0");
+  }
+  
+  ast.setLimit(limitValue);
+}
+
+function parseOffset(ast: AST, stream: TokenStream): void {
+  const offsetToken = stream.get(ANY.NUMBER);
+  const offsetValue = parseInt(offsetToken.value, 10);
+  stream.advance();
+  
+  if (isNaN(offsetValue) || offsetValue < 0) {
+    stream.unexpectedToken("Number >= 0");
+  }
+  
+  ast.setOffset(offsetValue);
 }

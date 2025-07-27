@@ -186,4 +186,22 @@ describe("lexer", () => {
     expect(ast.where?.getRight()).toBeInstanceOf(FieldProperty);
     expect(ast.where?.getOperator()).toBe("=");
   });
+
+  it("should lex LIMIT clause", () => {
+    const ast = lex(tokenize("SELECT * from fileNameGoesHere LIMIT 10"));
+    expect(ast.limit).toBe(10);
+    expect(ast.offset).toBe(0);
+  });
+
+  it("should lex OFFSET clause", () => {
+    const ast = lex(tokenize("SELECT * from fileNameGoesHere OFFSET 5"));
+    expect(ast.limit).toBe(undefined);
+    expect(ast.offset).toBe(5);
+  });
+
+  it("should lex LIMIT and OFFSET together", () => {
+    const ast = lex(tokenize("SELECT * from fileNameGoesHere LIMIT 10 OFFSET 5"));
+    expect(ast.limit).toBe(10);
+    expect(ast.offset).toBe(5);
+  });
 });

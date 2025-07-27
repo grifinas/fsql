@@ -14,6 +14,8 @@ export const KEYWORD = {
     DESC: new TokenMatcher(Type.word, "DESC"),
     AS: new TokenMatcher(Type.word, "AS"),
     AND: new TokenMatcher(Type.word, "AND"),
+    LIMIT: new TokenMatcher(Type.word, "LIMIT"),
+    OFFSET: new TokenMatcher(Type.word, "OFFSET"),
 } as const;
 
 export const RESERVED_WORDS = Object.values(KEYWORD);
