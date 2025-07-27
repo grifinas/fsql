@@ -1,5 +1,5 @@
-import { AST, JoinMap } from "./ast";
-import { DataSource, FileDataSource, FilterFunction } from "@entities";
+import { AST } from "./ast";
+import { FileDataSource, FilterFunction } from "@entities";
 import { fileUtils } from "@utils";
 
 export interface SourceData {
@@ -12,13 +12,11 @@ export async function source(tree: AST): Promise<SourceData[]> {
   if (!tree.mainfile) {
     throw new Error("No main file specified");
   }
-  const main: DataSource = tree.mainfile;
-  const joins: JoinMap = tree.joinFiles;
-  const variables: Record<string, object[]> = tree.variables;
+  const { mainfile: main, joinFiles: joins, variables } = tree;
 
   const refMap = new Map<string, Promise<object[]>>();
   const fileMap = new Map<string, Promise<object[]>>();
-  const sources = [main, ...Object.values(joins).map(j => j.source)];
+  const sources = [main, ...Object.values(joins)];
   const aliases = new Set();
 
   for (const source of sources) {
@@ -47,10 +45,10 @@ export async function source(tree: AST): Promise<SourceData[]> {
     data: await refMap.get(main.ref())!
   }];
 
-  for (const [joinFile, joinConfig] of Object.entries(joins)) {
+  for (const [joinFile, source] of Object.entries(joins)) {
     result.push({
-      source: joinConfig.source.ref(),
-      where: joinConfig.where,
+      source: source.ref(),
+      where: source.filter,
       data: await refMap.get(joinFile)!
     });
   }

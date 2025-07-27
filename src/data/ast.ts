@@ -7,13 +7,11 @@ import { order } from "./order";
 import { filter } from "./filter";
 import { write } from "./write";
 
-export type JoinMap = Record<string, { where: FilterFunction; source: DataSource }>;
-
 export class AST {
   public all: boolean = true;
   public fields: Property[] = [];
   public mainfile: DataSource | undefined;
-  public joinFiles: JoinMap = {};
+  public joinFiles: Record<string, DataSource> = {};
   public where: FilterFunction = FilterFunction.Empty();
   public order: [string, number] | undefined = undefined;
   public readonly variables: Record<string, object[]> = {};
@@ -61,8 +59,12 @@ export class AST {
     this.mainfile = dataSource;
   }
 
-  addJoin(source: DataSource, where?: FilterFunction) {
-    this.joinFiles[source.ref()] = { where: where || FilterFunction.Empty(), source };
+  addJoin(source: DataSource) {
+    //TODO feels a bit off, should we check for duplicate joins?
+    if (this.joinFiles[source.ref()]) {
+      throw new Error(`Join file '${source.ref()}' has already been added`);
+    }
+    this.joinFiles[source.ref()] = source;
   }
 
   addField(property: Property) {

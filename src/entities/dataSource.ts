@@ -1,9 +1,16 @@
 import { IAlias } from "@types";
+import { FilterFunction } from "./filterFunction";
 
 export abstract class DataSource {
     public __type: string = 'DataSource';
+    public filter: FilterFunction = FilterFunction.Empty();
 
     abstract ref(): string;
+
+    setFilter(filter: FilterFunction): this {
+        this.filter = filter;
+        return this;
+    }
 }
 
 export class FileDataSource extends DataSource implements IAlias {
@@ -28,6 +35,8 @@ export class FileDataSource extends DataSource implements IAlias {
     ref(): string {
         return this.alias || this.filePath;
     }
+
+
 }
 
 export class VariableDataSource extends DataSource {

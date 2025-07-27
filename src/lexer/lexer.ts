@@ -56,10 +56,9 @@ export function chainable(token: TokenMatcher, fn: (ast: AST, stream: TokenStrea
 function parseJoin(ast: AST, stream: TokenStream): void {
   const file = parseDataSource(stream);
   if (stream.advanceIf(KEYWORD.ON)) {
-    ast.addJoin(file, parseFilterFunction(stream));
-  } else {
-    ast.addJoin(file);
+    file.setFilter(parseFilterFunction(stream));
   }
+  ast.addJoin(file);
 }
 
 function parseWhere(ast: AST, stream: TokenStream): void {

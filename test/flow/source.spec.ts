@@ -1,8 +1,7 @@
 import { source } from "@src/data/source";
 import { fileUtils } from "@src/utils/file";
-import { FilterFunction } from "@src/entities/filterFunction";
-import { AST, JoinMap } from "@src/data/ast";
-import { FileDataSource } from "@src/entities/dataSource";
+import { AST } from "@src/data/ast";
+import { DataSource, FileDataSource } from "@src/entities/dataSource";
 import { mock } from 'jest-mock-extended';
 
 describe("sourceData", () => {
@@ -18,10 +17,6 @@ describe("sourceData", () => {
     { foo: 5, bar: "bar5" },
     { foo: 6, bar: "bar6" },
   ];
-
-  const blankFilter = {
-    resolve: () => true
-  } as unknown as FilterFunction;
 
   afterEach(() => {
     jest.resetAllMocks();
@@ -47,9 +42,6 @@ describe("sourceData", () => {
       { value: 10 },
       { value: 20 },
     ];
-    const joins: JoinMap = {
-      "@j": { where: blankFilter, source: new FileDataSource("join.json").setAlias("@j") }
-    };
     jest.spyOn(fileUtils, "readJson")
       .mockResolvedValueOnce(mainData)
       .mockResolvedValueOnce(joinData);
@@ -58,7 +50,7 @@ describe("sourceData", () => {
       {
         mainfile: new FileDataSource("main.json").setAlias("@m"),
         joinFiles: {
-          "@j": { where: blankFilter, source: new FileDataSource("join.json").setAlias("@j") }
+          "@j": new FileDataSource("join.json").setAlias("@j")
         },
         variables: {}
       }
@@ -66,13 +58,13 @@ describe("sourceData", () => {
     const result = await source(ast);
     expect(result).toEqual([
       { source: "@m", data: mainData },
-      { source: "@j", where: blankFilter, data: joinData }
+      { source: "@j", data: joinData, where: ast.joinFiles["@j"].filter }
     ]);
   });
 
   it("should not load the same file twice", async () => {
-    const joins: JoinMap = {
-      "@j": { where: blankFilter, source: new FileDataSource("main.json").setAlias("@j") }
+    const joins: Record<string, DataSource> = {
+      "@j": new FileDataSource("main.json").setAlias("@j")
     };
 
     jest.spyOn(fileUtils, "readJson")
@@ -85,11 +77,9 @@ describe("sourceData", () => {
         variables: {}
       }
     );
-    const result = await source(ast);
-    expect(result).toEqual([
-      { source: "@m", data: mainData },
-      { source: "@j", where: blankFilter, data: mainData }
-    ]);
+    const [main, join] = await source(ast);
+    expect(main).toEqual({ source: "@m", data: mainData });
+    expect(join).toEqual({ source: "@j", data: mainData, where: joins["@j"].filter });
 
     // Verify readJson was only called once
     expect(fileUtils.readJson).toHaveBeenCalledTimes(1);
@@ -100,7 +90,7 @@ describe("sourceData", () => {
       {
         mainfile: new FileDataSource("main.json").setAlias("@j"),
         joinFiles: {
-          "@j": { where: blankFilter, source: new FileDataSource("join.json").setAlias("@j") }
+          "@j": new FileDataSource("join.json").setAlias("@j")
         },
         variables: {}
       }

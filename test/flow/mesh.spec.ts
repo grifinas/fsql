@@ -3,7 +3,7 @@ import { mesh } from "@src/data/mesh";
 import { MeshedRow } from "@src/types";
 import { mock } from 'jest-mock-extended';
 
-describe("meshData", () => {
+describe("mesh", () => {
     it("should return the rows in source data if only one source is provided", () => {
         const sources = [
             {

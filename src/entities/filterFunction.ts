@@ -39,7 +39,7 @@ export class FilterFunction {
             rright
         );
 
-        logger.info("Filter result", row, rleft, this.operator, rright, result);
+        logger.debug("Filter result", row, rleft, this.operator, rright, result);
 
         return result;
     }

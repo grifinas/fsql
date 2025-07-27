@@ -4,7 +4,7 @@ import { Token } from '@src/tokenizer/token';
 import { Type } from '@src/types';
 import { FileDataSource, VariableDataSource } from '@src/entities/dataSource';
 
-describe('parseFile - Integration Tests', () => {
+describe('parseDataSource - Integration Tests', () => {
   let stream: TokenStream;
 
   it('should parse a variable like @myVar', () => {
