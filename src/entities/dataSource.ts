@@ -1,4 +1,4 @@
-import { IAlias } from "./types";
+import { IAlias } from "../types";
 
 export abstract class DataSource {
     public __type: string = 'DataSource';

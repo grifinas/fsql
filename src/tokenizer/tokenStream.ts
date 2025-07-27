@@ -1,7 +1,7 @@
-import { cliAssert } from "./cliAssert";
+import { cliAssert } from "../utils/cliAssert";
 import { Token } from "./token";
 import { TokenMatcher } from "./tokenMatcher";
-import { Type } from "./types";
+import { Type } from "../types";
 
 type TokenExpectations = (Token | TokenMatcher)[];
 type Expectations = TokenExpectations | string;

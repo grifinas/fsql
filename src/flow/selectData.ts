@@ -1,7 +1,7 @@
-import { MeshedRow } from "./meshData";
-import { Property } from "./property";
-import { resolveValue } from './resolveValue';
-import { logger } from "./utils/logger";
+import { Property } from "../entities/property";
+import { resolveValue } from "../resolveValue";
+import { MeshedRow } from "../types";
+import { logger } from "../utils/logger";
 
 export function selectData(rows: MeshedRow[], fields: Property[]): object[] {
     logger.debug("Selecting data", { rows, fields });

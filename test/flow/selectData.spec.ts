@@ -1,6 +1,6 @@
-import { selectData } from '../src/selectData';
-import { MeshedRow } from '../src/meshData';
-import { FieldProperty, Property } from '../src/property';
+import { FieldProperty, Property } from '../../src/entities/property';
+import { selectData } from '../../src/flow/selectData';
+import { MeshedRow } from '../../src/types';
 
 describe('selectData', () => {
   describe('when fields array is empty (SELECT *)', () => {

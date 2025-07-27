@@ -1,11 +1,13 @@
-import { meshData, MeshedRow } from "./meshData";
-import { sourceData } from "./sourceData";
+import { sourceData } from "../flow/sourceData";
 import { FilterFunction } from "./filterFunction";
-import { selectData } from "./selectData";
-import { logger } from "./utils/logger";
+import { logger } from "../utils/logger";
 import { Property } from "./property";
 import { DataSource, FileDataSource, VariableDataSource } from "./dataSource";
-import { fileUtils } from "./utils/file";
+import { fileUtils } from "../utils/file";
+import { meshData } from "../flow/meshData";
+import { selectData } from "../flow/selectData";
+import { orderData } from "../flow/orderData";
+import { filterData } from "../flow/filterData";
 
 export type JoinMap = Record<string, { where: FilterFunction; source: DataSource }>;
 
@@ -14,7 +16,7 @@ export class AST {
   public fields: Property[] = [];
   public mainfile: DataSource | undefined;
   public joinFiles: JoinMap = {};
-  public where: FilterFunction | undefined;
+  public where: FilterFunction = FilterFunction.Empty();
   public order: [string, number] | undefined = undefined;
   public readonly variables: Record<string, object[]> = {};
   public into: DataSource | undefined = undefined;
@@ -22,41 +24,23 @@ export class AST {
 
   async execute(): Promise<object[]> {
     logger.info("Executing", this);
-    if (!this.mainfile) {
-      throw new Error("No main file specified");
-    }
 
-    const sources = await sourceData(this.mainfile, this.joinFiles, this.variables);
+    const sources = await sourceData(this);
     logger.info("Sources", sources);
     const meshed = meshData(sources);
     logger.info("Meshed", meshed);
-    const filtered = this.filter(meshed);
+    const filtered = filterData(meshed, this.where);
     logger.info("Filtered", filtered);
-    const mapped: object[] = selectData(filtered, this.fields);
-    logger.info("Mapped", mapped);
-
-    if (this.order) {
-      const [key, value] = this.order;
-      return mapped.sort((a: object, b: object) => {
-        if (!(key in a) || !(key in b))
-          throw new Error(`No ${key} in some rows`);
-        const v1 = a[key as keyof typeof a];
-        const v2 = b[key as keyof typeof b];
-        if (typeof v1 === "string") {
-          return value * (v1 as string).localeCompare(v2);
-        } else if (typeof v1 === "number") {
-          return value * (v1 - v2);
-        } else {
-          throw new Error(`Can not compare values of type: ${typeof v1}`);
-        }
-      });
-    }
+    const selected: object[] = selectData(filtered, this.fields);
+    logger.info("Selected", selected);
+    const ordered = orderData(selected, this.order);
+    logger.info("Ordered", ordered);
 
     if (this.into) {
       if (this.into instanceof VariableDataSource) {
-        this.assignVariable(this.into.variableName, mapped);
+        this.assignVariable(this.into.variableName, ordered);
       } else if (this.into instanceof FileDataSource) {
-        fileUtils.writeJson(this.into.filePath, mapped);
+        fileUtils.writeJson(this.into.filePath, ordered);
       }
     }
 
@@ -66,24 +50,17 @@ export class AST {
       }
       return this.next.execute();
     } else {
-      return mapped;
+      return ordered;
     }
   }
 
   addAnd(fn: FilterFunction) {
-    if (!this.where) {
+    if (this.where.isEmpty()) {
       this.where = fn;
       return;
     }
 
     this.where = this.where.and(fn);
-  }
-
-  filter(mapped: MeshedRow[]): MeshedRow[] {
-    const where = this.where!;
-    if (!where) return mapped;
-
-    return mapped.filter((row: MeshedRow) => where.resolve(row));
   }
 
   assignVariable(name: string, data: object[]) {

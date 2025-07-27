@@ -1,5 +1,5 @@
+import { Type } from "../types";
 import { TokenMatcher } from "./tokenMatcher";
-import { Type } from "./types";
 
 export class Token {
   constructor(

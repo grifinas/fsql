@@ -1,6 +1,6 @@
-import { FilterFunction, Operator } from "../src/filterFunction";
-import { MeshedRow } from "../src/meshData";
-import { FieldProperty, ResolvedProperty, Property } from "../src/property";
+import { FilterFunction, Operator } from "../../src/entities/filterFunction";
+import { ResolvedProperty, FieldProperty } from "../../src/entities/property";
+import { MeshedRow } from "../../src/types";
 
 describe("FilterFunction", () => {
     describe("Empty", () => {

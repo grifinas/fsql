@@ -1,9 +1,9 @@
-import { TokenStream } from "../tokenStream";
+import { TokenStream } from "../tokenizer/tokenStream";
 import { parseVariable } from "./parseVariable";
 import { logger } from "../utils/logger";
-import { DataSource, FileDataSource, VariableDataSource } from "../dataSource";
 import { withVarAlias } from './parseAlias';
 import { ANY, Symbols } from "./constants";
+import { DataSource, VariableDataSource, FileDataSource } from "../entities/dataSource";
 
 export function parseDataSource(stream: TokenStream): DataSource {
     const variable = parseVariable(stream);

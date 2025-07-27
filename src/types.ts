@@ -22,5 +22,8 @@ export enum Type {
     semicolon = "semicolon",
     equals = "equals",
     comp = "comp",
-  }
-  
+}
+
+export interface MeshedRow {
+    [sourceRef: string]: object;
+};

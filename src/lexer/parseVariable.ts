@@ -1,4 +1,4 @@
-import { TokenStream } from "../tokenStream";
+import { TokenStream } from "../tokenizer/tokenStream";
 import { ANY, Symbols } from "./constants";
 
 export function parseVariable(stream: TokenStream): string | null {

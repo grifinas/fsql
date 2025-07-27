@@ -1,7 +1,7 @@
-import { JoinMap } from "./ast";
-import { fileUtils } from "./utils/file";
-import { FilterFunction } from "./filterFunction";
-import { DataSource, FileDataSource } from "./dataSource";
+import { AST, JoinMap } from "../entities/ast";
+import { DataSource, FileDataSource } from "../entities/dataSource";
+import { FilterFunction } from "../entities/filterFunction";
+import { fileUtils } from "../utils/file";
 
 export interface SourceData {
   source: string;
@@ -9,7 +9,14 @@ export interface SourceData {
   data: object[];
 }
 
-export async function sourceData(main: DataSource, joins: JoinMap, variables: Record<string, object[]>): Promise<SourceData[]> {
+export async function sourceData(tree: AST): Promise<SourceData[]> {
+  if (!tree.mainfile) {
+    throw new Error("No main file specified");
+  }
+  const main: DataSource = tree.mainfile;
+  const joins: JoinMap = tree.joinFiles;
+  const variables: Record<string, object[]> = tree.variables;
+
   const refMap = new Map<string, Promise<object[]>>();
   const fileMap = new Map<string, Promise<object[]>>();
   const sources = [main, ...Object.values(joins).map(j => j.source)];

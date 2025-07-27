@@ -1,5 +1,5 @@
-import { TokenStream } from "../tokenStream";
-import { FieldProperty, FunctionProperty, Property, ResolvedProperty } from "../property";
+import { TokenStream } from "../tokenizer/tokenStream";
+import { FieldProperty, FunctionProperty, Property, ResolvedProperty } from "../entities/property";
 import { ANY, RESERVED_WORDS, Symbols } from "./constants";
 import { logger } from "../utils/logger";
 

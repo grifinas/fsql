@@ -1,8 +1,5 @@
+import { MeshedRow } from "../types";
 import { SourceData } from "./sourceData";
-
-export interface MeshedRow {
-  [sourceRef: string]: object;
-};
 
 export function meshData(sources: SourceData[]): MeshedRow[] {
   if (sources.length === 0) {
@@ -10,10 +7,10 @@ export function meshData(sources: SourceData[]): MeshedRow[] {
   }
 
   if (sources.length === 1) {
-    return somethingRecursive(sources);
+    return buildRecursively(sources);
   }
 
-  const rows = somethingRecursive(sources);
+  const rows = buildRecursively(sources);
   return rows.filter(row => {
     for (const source of sources) {
       if (source.where && !source.where.resolve(row)) {
@@ -25,7 +22,7 @@ export function meshData(sources: SourceData[]): MeshedRow[] {
 }
 
 
-function somethingRecursive(sources: SourceData[], rows: MeshedRow[] = []) {
+function buildRecursively(sources: SourceData[], rows: MeshedRow[] = []) {
   const [source, ...rest] = sources;
   const newRows: MeshedRow[] = [];
   if (rows.length) {
@@ -41,7 +38,7 @@ function somethingRecursive(sources: SourceData[], rows: MeshedRow[] = []) {
   }
 
   if (rest.length > 0) {
-    return somethingRecursive(rest, newRows);
+    return buildRecursively(rest, newRows);
   }
 
   return newRows;

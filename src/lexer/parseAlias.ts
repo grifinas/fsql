@@ -1,4 +1,4 @@
-import { TokenStream } from "../tokenStream";
+import { TokenStream } from "../tokenizer/tokenStream";
 import { KEYWORD, RESERVED_WORDS, Symbols } from "./constants";
 import { IAlias } from '../types';
 import { logger } from "../utils/logger";

@@ -1,5 +1,5 @@
-import { AST } from "../ast";
-import { TokenStream } from "../tokenStream";
+import { AST } from "../entities/ast";
+import { TokenStream } from "../tokenizer/tokenStream";
 import { parseProperty } from "./parseProperty";
 import { logger } from "../utils/logger";
 import { withAlias } from './parseAlias';

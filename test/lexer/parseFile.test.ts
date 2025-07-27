@@ -1,8 +1,8 @@
 import { parseDataSource } from '../../src/lexer/parseDataSource';
-import { TokenStream } from '../../src/tokenStream';
-import { Token } from '../../src/token';
+import { TokenStream } from '../../src/tokenizer/tokenStream';
+import { Token } from '../../src/tokenizer/token';
 import { Type } from '../../src/types';
-import { FileDataSource, VariableDataSource } from '../../src/dataSource';
+import { FileDataSource, VariableDataSource } from '../../src/entities/dataSource';
 
 describe('parseFile - Integration Tests', () => {
   let stream: TokenStream;

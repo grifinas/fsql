@@ -1,9 +1,8 @@
+import { Type } from "../types";
+import { cliAssert } from "../utils/cliAssert";
+import { logger } from "../utils/logger";
 import { Token } from "./token";
-import { Type } from "./types";
 import { TokenStream } from "./tokenStream";
-import { cliAssert } from "./cliAssert";
-import { TypeError } from "./errors";
-import { logger } from "./utils/logger";
 
 function isWord(char: string): boolean {
   return /[a-zA-Z\-\_]/.test(char);

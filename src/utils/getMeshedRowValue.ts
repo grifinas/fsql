@@ -1,5 +1,4 @@
-import { MeshedRow } from "../meshData";
-import { Scalar } from "../types";
+import { MeshedRow, Scalar } from "../types";
 import { logger } from "./logger";
 import { pathValue } from "./pathValue";
 

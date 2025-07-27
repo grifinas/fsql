@@ -1,8 +1,8 @@
-import { TokenStream } from "../../src/tokenStream";
+import { TokenStream } from "../../src/tokenizer/tokenStream";
 import { parseField } from "../../src/lexer/parseField";
 import { KEYWORD } from "../../src/lexer/constants";
-import { FieldProperty, FunctionProperty, ResolvedProperty } from "../../src/property";
-import { Token } from "../../src/token";
+import { FieldProperty, FunctionProperty, ResolvedProperty } from "../../src/entities/property";
+import { Token } from "../../src/tokenizer/token";
 import { Type } from "../../src/types";
 
 describe("parseField", () => {

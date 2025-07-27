@@ -1,5 +1,6 @@
-import { FilterFunction } from '../src/filterFunction';
-import { meshData, MeshedRow } from '../src/meshData';
+import { FilterFunction } from "../../src/entities/filterFunction";
+import { meshData } from "../../src/flow/meshData";
+import { MeshedRow } from "../../src/types";
 import { mock } from 'jest-mock-extended';
 
 describe("meshData", () => {

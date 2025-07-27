@@ -1,6 +1,6 @@
-import { FieldProperty, ResolvedProperty } from "../../src/property";
-import { MeshedRow } from "../../src/meshData";
+import { FieldProperty, ResolvedProperty } from "../../src/entities/property";
 import { LowerFunction } from "../../src/sqlFunctions/lower.function";
+import { MeshedRow } from "../../src/types";
 
 describe("LOWER function", () => {
     const testRow: MeshedRow = {

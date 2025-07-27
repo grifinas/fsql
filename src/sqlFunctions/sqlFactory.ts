@@ -1,5 +1,5 @@
-import { MeshedRow } from "../meshData";
-import { FunctionProperty, Property } from "../property";
+import { FunctionProperty, Property } from "../entities/property";
+import { MeshedRow } from "../types";
 
 type Constructor = new (name: string, fnArguments: Property[]) => Resolvable;
 export interface Resolvable<T = unknown> {

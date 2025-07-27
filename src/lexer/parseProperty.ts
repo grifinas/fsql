@@ -1,5 +1,5 @@
-import { TokenStream } from "../tokenStream";
-import { FieldProperty, Property, ResolvedProperty } from "../property";
+import { TokenStream } from "../tokenizer/tokenStream";
+import { FieldProperty, Property, ResolvedProperty } from "../entities/property";
 import { parseField } from "./parseField";
 import { parseVariable } from "./parseVariable";
 import { ANY } from "./constants";

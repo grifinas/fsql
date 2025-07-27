@@ -1,9 +1,9 @@
 import { parseSelectArgs } from '../../src/lexer/parseSelectArgs';
-import { AST } from '../../src/ast';
-import { TokenStream } from '../../src/tokenStream';
-import { Token } from '../../src/token';
+import { AST } from '../../src/entities/ast';
+import { TokenStream } from '../../src/tokenizer/tokenStream';
+import { Token } from '../../src/tokenizer/token';
 import { Type } from '../../src/types';
-import { FieldProperty } from '../../src/property';
+import { FieldProperty } from '../../src/entities/property';
 
 describe('parseSelectArgs - Integration Tests', () => {
   let ast: AST;

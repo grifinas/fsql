@@ -1,7 +1,7 @@
-import { MeshedRow } from "./meshData";
 import { Property, ResolvedProperty } from "./property";
-import { resolveValue } from './resolveValue';
-import { logger } from "./utils/logger";
+import { resolveValue } from '../resolveValue';
+import { logger } from "../utils/logger";
+import { MeshedRow } from "../types";
 
 export type Operator = '<' | '>' | '=';
 

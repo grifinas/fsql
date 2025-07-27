@@ -1,7 +1,6 @@
-import { MeshedRow } from "./meshData";
-import { Property, ResolvedProperty, FieldProperty, FunctionProperty } from "./property";
+import { Property, ResolvedProperty, FieldProperty, FunctionProperty } from "./entities/property";
 import { SQLFactory } from "./sqlFunctions/sqlFactory";
-import { Scalar } from "./types";
+import { MeshedRow, Scalar } from "./types";
 import { getMeshedRowValue } from "./utils/getMeshedRowValue";
 
 export function resolveValue(value: Property, row: MeshedRow): ResolvedProperty {

@@ -1,5 +1,5 @@
-import { AST } from "../src/ast";
-import { FieldProperty } from "../src/property";
+import { AST } from "../../src/entities/ast";
+import { FieldProperty } from "../../src/entities/property";
 
 describe("AST", () => {
   describe("addField", () => {

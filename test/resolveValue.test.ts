@@ -1,4 +1,4 @@
-import { FieldProperty, FunctionProperty, ResolvedProperty } from '../src/property';
+import { FieldProperty, FunctionProperty, ResolvedProperty } from '../src/entities/property';
 import { resolveValue } from '../src/resolveValue';
 describe("resolveValue", () => {
     it("should resolve field property", () => {
