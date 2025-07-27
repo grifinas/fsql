@@ -38,6 +38,7 @@ function parseFileDataSource(stream: TokenStream) {
             path += fileToken.value;
         }
 
+        //TODO feels off, sometimes we do not consume the final token maybe?
         stream.advance();
     }
 

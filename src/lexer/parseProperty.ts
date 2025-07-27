@@ -7,7 +7,7 @@ import { ANY } from "./constants";
 export function parseProperty(stream: TokenStream): Property {
     const varName = parseVariable(stream);
     if (varName) {
-        stream.assert(ANY.DOT).advance();
+        stream.consume(ANY.DOT);
         const field = parseField(stream);
         if (field instanceof FieldProperty) {
             field.source = varName;

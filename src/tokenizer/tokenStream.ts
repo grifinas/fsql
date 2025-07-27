@@ -29,6 +29,12 @@ export class TokenStream {
     return token;
   }
 
+  consume(...matchers: TokenMatcher[]): Token {
+    const token = this.get(...matchers);
+    this.advance();
+    return token;
+  }
+
   getIndexed(i: number): Token {
     const token = this.tokens[i];
     if (!token) {

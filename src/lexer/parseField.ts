@@ -8,8 +8,7 @@ export function parseField(stream: TokenStream): Property {
     let start = stream.getIndex();
 
     do {
-        const token = stream.get(ANY.NUMBER, ANY.WORD, ANY.STRING);
-        stream.advance();
+        const token = stream.consume(ANY.NUMBER, ANY.WORD, ANY.STRING);
         if (token.is(ANY.STRING)) {
             return new ResolvedProperty(token.value);
         } else {
@@ -41,17 +40,15 @@ export function parseField(stream: TokenStream): Property {
 }
 
 function parseFunction(stream: TokenStream): FunctionProperty {
-    const name = stream.get(ANY.WORD).value;
-    stream.next(Symbols.OPEN_PARENTHESIS);
-    stream.advance();
+    const name = stream.consume(ANY.WORD).value;
+    stream.consume(Symbols.OPEN_PARENTHESIS);
 
     const args: Property[] = [];
     do {
         args.push(parseField(stream));
     } while (stream.advanceIf(ANY.COMMA));
 
-    stream.get(Symbols.CLOSE_PARENTHESIS);
-    stream.advance();
+    stream.consume(Symbols.CLOSE_PARENTHESIS);
 
     return new FunctionProperty(name, args);
 }

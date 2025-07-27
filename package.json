@@ -11,13 +11,15 @@
   },
   "scripts": {
     "cli": "node ./dist/cli.mjs --repl",
-    "test": "jest",
-    "confirm": "npm run build && npm run lint:fix && npm run test",
+    "test": "jest --verbose --noStackTrace --silent=false",
+    "test:clean": "jest --verbose --noStackTrace --silent=false --noErrorDetails",
+    "test:minimal": "jest --reporters=./minimalReporter.js --silent",
+    "confirm": "npm run build && npm run lint && npm run test",
     "build": "node esbuild.config.js",
     "build:tsc": "tsc",
     "run": "node ./dist/index.mjs",
     "cc": "npm run build && npm run cli",
-    "lint": "eslint src/**/*.ts",
+    "lint": "npm run lint:fix && npm run build:tsc",
     "lint:fix": "eslint src/**/*.ts --fix"
   },
   "devDependencies": {

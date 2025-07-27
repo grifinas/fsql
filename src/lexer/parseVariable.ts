@@ -6,8 +6,7 @@ export function parseVariable(stream: TokenStream): string | null {
     return null;
   }
 
-  const token = stream.get(ANY.WORD, ANY.NUMBER);
+  const token = stream.consume(ANY.WORD, ANY.NUMBER);
   const value = `@${token.value}`;
-  stream.advance();
   return value;
 }

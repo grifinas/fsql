@@ -30,7 +30,7 @@ export function lex(_stream: TokenStream): AST {
 }
 
 function parseFrom(ast: AST, stream: TokenStream) {
-  stream.assert(KEYWORD.FROM).advance();
+  stream.consume(KEYWORD.FROM);
   ast.setMain(parseDataSource(stream));
 }
 
@@ -71,18 +71,16 @@ function parseWhere(ast: AST, stream: TokenStream): void {
 }
 
 function parseOrderBy(ast: AST, stream: TokenStream): void {
-  stream.assert(KEYWORD.BY);
+  stream.consume(KEYWORD.BY);
   //TODO should parse property
-  const parameter = stream.next(ANY.WORD);
-  const direction = stream.next(KEYWORD.ASC, KEYWORD.DESC);
+  const parameter = stream.consume(ANY.WORD);
+  const direction = stream.consume(KEYWORD.ASC, KEYWORD.DESC);
 
   if (direction.is(KEYWORD.ASC)) {
     ast.order = [parameter.value, 1];
   } else {
     ast.order = [parameter.value, -1];
   }
-
-  stream.advance();
 }
 
 function parseSemicolon(ast: AST, stream: TokenStream): void {
@@ -98,11 +96,11 @@ function parseInto(ast: AST, stream: TokenStream): void {
 }
 
 function parseLimit(ast: AST, stream: TokenStream): void {
-  const limitToken = stream.get(ANY.NUMBER);
+  const limitToken = stream.consume(ANY.NUMBER);
   const limitValue = parseInt(limitToken.value, 10);
-  stream.advance();
   
   if (isNaN(limitValue) || limitValue < 0) {
+    stream.regress();
     stream.unexpectedToken("Number >= 0");
   }
   
@@ -110,11 +108,11 @@ function parseLimit(ast: AST, stream: TokenStream): void {
 }
 
 function parseOffset(ast: AST, stream: TokenStream): void {
-  const offsetToken = stream.get(ANY.NUMBER);
+  const offsetToken = stream.consume(ANY.NUMBER);
   const offsetValue = parseInt(offsetToken.value, 10);
-  stream.advance();
   
   if (isNaN(offsetValue) || offsetValue < 0) {
+    stream.regress();
     stream.unexpectedToken("Number >= 0");
   }
   
@@ -122,21 +120,18 @@ function parseOffset(ast: AST, stream: TokenStream): void {
 }
 
 function parseGroupBy(ast: AST, stream: TokenStream): void {
-  stream.assert(KEYWORD.BY);
-  stream.advance();
+  stream.consume(KEYWORD.BY);
   
   const groupByFields: string[] = [];
   
   // Parse first field
-  const firstField = stream.get(ANY.WORD);
+  const firstField = stream.consume(ANY.WORD);
   groupByFields.push(firstField.value);
-  stream.advance();
   
   // Parse additional fields separated by commas
   while (stream.advanceIf(ANY.COMMA)) {
-    const field = stream.get(ANY.WORD);
+    const field = stream.consume(ANY.WORD);
     groupByFields.push(field.value);
-    stream.advance();
   }
   
   ast.setGroupBy(groupByFields);
