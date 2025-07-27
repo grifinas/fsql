@@ -32,12 +32,14 @@ export class FilterFunction {
             this.right = new ResolvedProperty(this.right.resolve(row));
         }
 
+        const rleft = resolveValue(this.left, row);
+        const rright = resolveValue(this.right, row);
         const result = this.compare(
-            resolveValue(this.left, row),
-            resolveValue(this.right, row)
-        )
+            rleft,
+            rright
+        );
 
-        logger.info("Filter result", row, result);
+        logger.info("Filter result", row, rleft, this.operator, rright, result);
 
         return result;
     }

@@ -4,6 +4,7 @@ export * from "./abs.function";
 export * from "./ceil.function";
 export * from "./floor.function";
 export * from "./length.function";
+export * from "./like.function";
 export * from "./lower.function";
 export * from "./ltrim.function";
 export * from "./now.function";

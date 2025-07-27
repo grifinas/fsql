@@ -6,7 +6,6 @@ import { parseSelectArgs } from "./parseSelectArgs";
 import { logger } from "../utils/logger";
 import { ANY, KEYWORD } from "./constants";
 import { TokenMatcher } from "../tokenMatcher";
-import { parseProperty } from "./parseProperty";
 
 let ast: AST;
 let stream: TokenStream;  
@@ -45,7 +44,7 @@ export function optional(
   if (stream.advanceIf(token)) {
     fn(ast, stream);
   } else {
-    logger.debug("Token not found", token);
+    logger.debug("Optional token not found", token);
   }
 }
 

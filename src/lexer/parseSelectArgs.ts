@@ -7,15 +7,15 @@ import { KEYWORD, ANY, Symbols } from './constants';
 
 export function parseSelectArgs(ast: AST, stream: TokenStream) {
     logger.info("parseSelectArgs", stream.toStringFromCurrent());
-    stream.get(KEYWORD.SELECT);
+    stream.assert(KEYWORD.SELECT);
     stream.advance();
     if (stream.advanceIf(Symbols.ALL)) {
         return;
     }
 
     do {
-        const prop = withAlias(parseProperty, stream);
-        logger.debug("Parsed property", prop, stream.toStringFromCurrent());
-        ast.addField(prop);
+        const property = withAlias(parseProperty, stream);
+        logger.debug("Parsed property", property, stream.toStringFromCurrent());
+        ast.addField(property);
     } while (stream.advanceIf(ANY.COMMA))
 } 

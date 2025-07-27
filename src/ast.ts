@@ -61,9 +61,9 @@ export class AST {
     }
 
     if (this.next) {
-      Object.entries(this.variables).forEach(([key, value]) => {
-        (this.next as AST).assignVariable(key, value);
-      });
+      for (const [key, value] of Object.entries(this.variables)) {
+        this.next.assignVariable(key, value);
+      }
       return this.next.execute();
     } else {
       return mapped;

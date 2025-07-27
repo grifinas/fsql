@@ -72,4 +72,10 @@ describe('SQL Parser Integration Tests', () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual(shallowJson[0]);
   });
+
+  it("should support LIKE as a function", async () => {
+    const result = await main("SELECT * from test-data/shallow.json WHERE LIKE(productName, '%Item')");
+    expect(result).toHaveLength(5);
+    expect(result[0]).toEqual(shallowJson[0]);
+  });
 });
