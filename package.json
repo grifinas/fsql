@@ -1,6 +1,6 @@
 {
   "name": "sqlparse",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "license": "ISC",
   "author": "",
@@ -10,11 +10,12 @@
     "test": "test"
   },
   "scripts": {
-    "cli": "node ./dist/src/cli.js --repl",
+    "cli": "node ./dist/cli.mjs --repl",
     "test": "jest",
     "confirm": "npm run build && npm run lint:fix && npm run test",
-    "build": "tsc -p tsconfig.build.json",
-    "run": "node ./dist/index.js",
+    "build": "node esbuild.config.js",
+    "build:tsc": "tsc",
+    "run": "node ./dist/index.mjs",
     "cc": "npm run build && npm run cli",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
@@ -24,6 +25,7 @@
     "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "esbuild": "^0.25.8",
     "eslint": "^9.0.0",
     "eslint-plugin-import": "^2.0.0",
     "globals": "^15.0.0",
