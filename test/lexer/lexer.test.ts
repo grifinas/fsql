@@ -204,4 +204,21 @@ describe("lexer", () => {
     expect(ast.limit).toBe(10);
     expect(ast.offset).toBe(5);
   });
+
+  it("should lex GROUP BY with single field", () => {
+    const ast = lex(tokenize("SELECT * from fileNameGoesHere GROUP BY category"));
+    expect(ast.groupBy).toEqual(["category"]);
+  });
+
+  it("should lex GROUP BY with multiple fields", () => {
+    const ast = lex(tokenize("SELECT * from fileNameGoesHere GROUP BY category, status, region"));
+    expect(ast.groupBy).toEqual(["category", "status", "region"]);
+  });
+
+  it("should lex GROUP BY with other clauses", () => {
+    const ast = lex(tokenize("SELECT * from fileNameGoesHere WHERE active=true GROUP BY category ORDER BY name ASC"));
+    expect(ast.groupBy).toEqual(["category"]);
+    expect(ast.where?.isEmpty()).toBe(false);
+    expect(ast.order).toEqual(["name", 1]);
+  });
 });

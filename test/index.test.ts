@@ -194,4 +194,14 @@ describe('SQL Parser Integration Tests', () => {
       expect(result).toEqual(expensiveItems.slice(1, 2));
     }
   });
+
+  it('should handle GROUP BY', async () => {
+    const result = await main('SELECT id FROM test-data/shallow.json GROUP BY is_active');
+    expect(result).toHaveLength(2);
+    //Last instance of true and false
+    expect(result).toEqual([
+      { id: 4 },
+      { id: 5 },
+    ]);
+  });
 });

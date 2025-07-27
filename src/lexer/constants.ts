@@ -14,6 +14,7 @@ export const KEYWORD = {
     DESC: new TokenMatcher(Type.word, "DESC"),
     AS: new TokenMatcher(Type.word, "AS"),
     AND: new TokenMatcher(Type.word, "AND"),
+    GROUP: new TokenMatcher(Type.word, "GROUP"),
     LIMIT: new TokenMatcher(Type.word, "LIMIT"),
     OFFSET: new TokenMatcher(Type.word, "OFFSET"),
 } as const;

@@ -7,6 +7,7 @@ import { order } from "./order";
 import { limit } from "./limit";
 import { filter } from "./filter";
 import { write } from "./write";
+import { groupBy } from "./groupBy";
 
 export class AST {
   public all: boolean = true;
@@ -15,6 +16,7 @@ export class AST {
   public joinFiles: Record<string, DataSource> = {};
   public where: FilterFunction = FilterFunction.Empty();
   public order: [string, number] | undefined = undefined;
+  public groupBy: string[] = [];
   public readonly variables: Record<string, object[]> = {};
   public into: DataSource | undefined = undefined;
   public limit: number | undefined = undefined;
@@ -27,6 +29,7 @@ export class AST {
     const data = this.flow(await source(this), [
       mesh,
       filter,
+      groupBy,
       select,
       order,
       limit,
@@ -87,6 +90,10 @@ export class AST {
 
   setOffset(offset: number) {
     this.offset = offset;
+  }
+
+  setGroupBy(fields: string[]) {
+    this.groupBy = fields;
   }
 
   // eslint-disable-next-line
