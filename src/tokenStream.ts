@@ -1,6 +1,10 @@
 import { cliAssert } from "./cliAssert";
 import { Token } from "./token";
+import { TokenMatcher } from "./tokenMatcher";
 import { Type } from "./types";
+
+type TokenExpectations = (Token | TokenMatcher)[];
+type Expectations = TokenExpectations | string;
 
 export class TokenStream {
   private index: number = -1;
@@ -34,9 +38,9 @@ export class TokenStream {
     return token;
   }
 
-  advanceIf(type: Type, value?: string) {
+  advanceIf(token: TokenMatcher) {
     if (this.done()) return false;
-    if (this.get().is(type, value)) {
+    if (this.get().is(token)) {
       this.advance();
       return true;
     }
@@ -81,11 +85,11 @@ export class TokenStream {
     return this.getIndexed(this.index + offset);
   }
 
-  popNextIf(type: Type, value?: string): boolean {
+  popNextIf(token: TokenMatcher): boolean {
     if (!this.hasNext()) {
       return false;
     };
-    if (this.peek().is(type, value)) {
+    if (this.peek().is(token)) {
       this.next();
       return true;
     }
@@ -144,36 +148,35 @@ export class TokenStream {
     ].join('\n');
   }
 
-  assert(type: Type, value?: string): this {
+  assert(match: TokenMatcher): this {
     const token = this.get();
     cliAssert(
-      token.is(type, value),
+      token.is(match),
       () =>
-        `Expected token to be ${type}${value ? `::${value}` : ""
-        }, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
+        `Expected token to be ${match.toString()}, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
     );
 
     return this;
   }
 
-  assertNext(type: Token["type"], value?: string): this {
+  assertNext(match: TokenMatcher): this {
     const token = this.next();
     cliAssert(
-      token.is(type, value),
+      token.is(match),
       () =>
-        `Expected token to be ${type}${value ? `::${value}` : ""
-        }, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
+        `Expected token to be ${match.toString()}, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
     );
 
     return this;
   }
 
-  unexpectedToken(where?: string, expected?: string): never {
+  unexpectedToken(expected: Expectations = []): never {
+    const expectedString = typeof expected === 'string' ? expected : expected.map(token => token.toString()).join(" ");
     const token = this.get();
     cliAssert(
       false,
-      () => `Unexpected token ${where ? `in ${where}` : ""}: ${token.value}::${token.type} 
-          ${expected ? ` Expected: ${expected}` : ""} at ${this.stringifyTokenContext()}`
+      () => `Unexpected token: ${token.value}::${token.type} 
+          ${expected.length > 0 ? ` Expected: ${expectedString}` : ""} at ${this.stringifyTokenContext()}`
     );
   }
 }

@@ -2,6 +2,8 @@ import { TokenStream } from "../../src/tokenStream";
 import { parseVariable } from "../../src/lexer/parseVariable";
 import { Token } from "../../src/token";
 import { Type } from "../../src/types";
+import { ANY, KEYWORD } from "../../src/lexer/constants";
+import { TokenMatcher } from "../../src/tokenMatcher";
 
 describe("parseVariable", () => {
   it("should parse a variable starting with @", () => {
@@ -34,18 +36,18 @@ describe("parseVariable", () => {
       new Token(Type.word, "foo")
     ]);
     parseVariable(stream);
-    expect(stream.get().is(Type.special, "#")).toBe(true);
-    expect(stream.peek().is(Type.word, "foo")).toBe(true);
+    expect(stream.get().is(new TokenMatcher(Type.special, "#"))).toBe(true);
+    expect(stream.peek().value).toBe("foo");
   });
 
   it("should consume both tokens for valid variable", () => {
     const stream = new TokenStream([
       new Token(Type.special, "@"),
       new Token(Type.word, "foo"),
-      new Token(Type.special, ".")
+      new Token(Type.dot, ".")
     ]);
     parseVariable(stream);
-    expect(stream.get().is(Type.special, ".")).toBe(true);
+    expect(stream.get().is(ANY.DOT)).toBe(true);
   });
 
   it("should parse variable with number", () => {

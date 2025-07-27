@@ -1,8 +1,9 @@
 import { TokenStream } from "../../src/tokenStream";
 import { parseField } from "../../src/lexer/parseField";
-import { Type } from "../../src/types";
-import { Token } from "../../src/token";
+import { KEYWORD } from "../../src/lexer/constants";
 import { FieldProperty, FunctionProperty, ResolvedProperty } from "../../src/property";
+import { Token } from "../../src/token";
+import { Type } from "../../src/types";
 
 describe("parseField", () => {
   it("should parse a single word field", () => {
@@ -54,7 +55,7 @@ describe("parseField", () => {
     expect(result).toBeInstanceOf(FieldProperty);
     expect((result as FieldProperty).source).toEqual(null);
     expect((result as FieldProperty).field).toEqual("foo");
-    expect(stream.get().is(Type.word, 'FROM')).toBe(true);
+    expect(stream.get().is(KEYWORD.FROM)).toBe(true);
   });
 
   it("should throw error if not starting with word", () => {

@@ -1,7 +1,7 @@
 import { TokenStream } from "../tokenStream";
-import { Type } from "../types";
 import { FieldProperty, FunctionProperty, Property, ResolvedProperty } from "../property";
-import { RESERVED_WORDS } from "./constants";
+import { ANY, RESERVED_WORDS, Symbols } from "./constants";
+import { logger } from "../utils/logger";
 
 export function parseField(stream: TokenStream): Property {
     const parts: string[] = [];
@@ -9,7 +9,7 @@ export function parseField(stream: TokenStream): Property {
 
     while (true) {
         const token = stream.get();
-        if (stream.advanceIf(Type.string)) {
+        if (stream.advanceIf(ANY.STRING)) {
             return new ResolvedProperty(token.value);
         }
         const value = getValueFromStream(stream);
@@ -21,7 +21,7 @@ export function parseField(stream: TokenStream): Property {
         } else {
             parts.push(String(value));
         }
-        if (!stream.popNextIf(Type.dot)) {
+        if (!stream.popNextIf(ANY.DOT)) {
             break;
         } else {
             stream.advance();
@@ -30,14 +30,15 @@ export function parseField(stream: TokenStream): Property {
 
     stream.advance();
 
-    if (stream.advanceIf(Type.parenthesis, '(')) {
+    if (stream.advanceIf(Symbols.OPEN_PARENTHESIS)) {
         stream.setIndex(start);
         return parseFunction(stream);
     }
 
     const fieldName = parts.join('.');
+    logger.debug("Field name is", fieldName);
     if (RESERVED_WORDS.some(token => token.value?.toLocaleLowerCase() === fieldName.toLocaleLowerCase())) {
-        stream.unexpectedToken();
+        stream.unexpectedToken("Any non-reserved word");
     }
 
     return new FieldProperty(null, fieldName);
@@ -45,32 +46,40 @@ export function parseField(stream: TokenStream): Property {
 
 function getValueFromStream(stream: TokenStream): string | number | boolean {
     const token = stream.get();
-    if (token.is(Type.number)) {
+    if (token.is(ANY.NUMBER)) {
         return Number(token.value);
-    } else if (token.is(Type.word)) {
+    } else if (token.is(ANY.WORD)) {
         return ['true', 'false'].includes(token.value.toLocaleLowerCase()) ? token.value === 'true' : token.value;
-    } else if (token.is(Type.string)) {
+    } else if (token.is(ANY.STRING)) {
         return token.value;
     } else {
-        stream.unexpectedToken();
+        stream.unexpectedToken([
+            ANY.NUMBER,
+            ANY.WORD,
+            ANY.STRING,
+        ]);
     }
 }
 
 function parseFunction(stream: TokenStream): FunctionProperty {
-    stream.assert(Type.word);
+    stream.assert(ANY.WORD);
     const name = stream.get().value;
     stream.advance();
-    if (!stream.advanceIf(Type.parenthesis, '(')) {
-        stream.unexpectedToken();
+    if (!stream.advanceIf(Symbols.OPEN_PARENTHESIS)) {
+        stream.unexpectedToken([
+            Symbols.OPEN_PARENTHESIS,
+        ]);
     }
 
     const args: Property[] = [];
     do {
         args.push(parseField(stream));
-    } while (stream.advanceIf(Type.comma));
+    } while (stream.advanceIf(ANY.COMMA));
 
-    if (!stream.advanceIf(Type.parenthesis, ')')) {
-        stream.unexpectedToken();
+    if (!stream.advanceIf(Symbols.CLOSE_PARENTHESIS)) {
+        stream.unexpectedToken([
+            Symbols.CLOSE_PARENTHESIS,
+        ]);
     }
 
     return new FunctionProperty(name, args);

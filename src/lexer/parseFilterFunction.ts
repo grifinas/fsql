@@ -12,6 +12,6 @@ export function parseFilterFunction(stream: TokenStream): FilterFunction {
     const right = parseProperty(stream);
     return new FilterFunction(left, comparatorToken.value as Operator, right);
   } else {
-    stream.unexpectedToken();
+    stream.unexpectedToken([ANY.COMP, ANY.EQUALS]);
   }
 }    

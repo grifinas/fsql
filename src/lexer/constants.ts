@@ -18,6 +18,14 @@ export const KEYWORD = {
 
 export const RESERVED_WORDS = Object.values(KEYWORD);
 
+export const Symbols = {
+    SLASH: new TokenMatcher(Type.special, "/"),
+    AT: new TokenMatcher(Type.special, "@"),
+    OPEN_PARENTHESIS: new TokenMatcher(Type.parenthesis, "("),
+    CLOSE_PARENTHESIS: new TokenMatcher(Type.parenthesis, ")"),
+    ALL: new TokenMatcher(Type.special, "*"),
+}
+
 export const ANY = {
     WORD: new TokenMatcher(Type.word),
     NUMBER: new TokenMatcher(Type.number),
@@ -30,4 +38,5 @@ export const ANY = {
     SEMICOLON: new TokenMatcher(Type.semicolon),
     EQUALS: new TokenMatcher(Type.equals),
     COMP: new TokenMatcher(Type.comp),
+    STRING: new TokenMatcher(Type.string),
 } as const;

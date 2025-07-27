@@ -1,15 +1,14 @@
 import { TokenStream } from "../tokenStream";
-import { KEYWORD, RESERVED_WORDS } from "./constants";
+import { ANY, KEYWORD, RESERVED_WORDS, Symbols } from "./constants";
 import { IAlias } from '../types';
 import { logger } from "../utils/logger";
-import { Type } from "../types";
 
 export function parseVarAlias(stream: TokenStream): string | null {
     if (!stream.done() && stream.get().is(KEYWORD.AS)) {
-        stream.assertNext(Type.special, '@');
+        stream.assertNext(Symbols.AT);
         const aliasToken = stream.next();
         if (aliasToken.isIn(RESERVED_WORDS)) {
-            stream.unexpectedToken();
+            stream.unexpectedToken("Any non-reserved word");
         }
         stream.advance();
 
@@ -24,7 +23,7 @@ export function parseAlias(stream: TokenStream): string | null {
     if (!stream.done() && stream.get().is(KEYWORD.AS)) {
         const aliasToken = stream.next();
         if (aliasToken.isIn(RESERVED_WORDS)) {
-            stream.unexpectedToken();
+            stream.unexpectedToken("Any non-reserved word");
         }
         stream.advance();
 

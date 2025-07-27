@@ -8,11 +8,9 @@ export class Token {
     public readonly value: string,
   ) {}
 
-  is(token: TokenMatcher): boolean;
-  is(type: Type, value?: string): boolean;
-  is(type: Type | TokenMatcher, value?: string): boolean {
-    const result = type instanceof TokenMatcher ? this.isRawEqual(type.type, type.value) : this.isRawEqual(type, value);
-    logger.debug(`Token ${this.value} is ${type.toString()} ${result}`);
+  is(matcher: TokenMatcher): boolean {
+    const result = this.isRawEqual(matcher.type, matcher.value);
+    logger.debug(`Token ${this.value} is ${matcher.toString()} ${result}`);
     return result;
   }
 

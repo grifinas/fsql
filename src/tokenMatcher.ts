@@ -7,6 +7,8 @@ export class TokenMatcher {
     ) {}
 
     toString(): string {
-        return `${this.type}${this.value ? `::${this.value}` : ""}`;
+        if (this.value) return `${this.type}::${this.value}`;
+
+        return `Any ${this.type}`;
     }
 }

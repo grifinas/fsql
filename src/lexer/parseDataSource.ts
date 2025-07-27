@@ -1,9 +1,9 @@
 import { TokenStream } from "../tokenStream";
-import { Type } from "../types";
 import { parseVariable } from "./parseVariable";
 import { logger } from "../utils/logger";
 import { DataSource, FileDataSource, VariableDataSource } from "../dataSource";
 import { withVarAlias } from './parseAlias';
+import { ANY, Symbols } from "./constants";
 
 export function parseDataSource(stream: TokenStream): DataSource {
     const variable = parseVariable(stream);
@@ -22,22 +22,28 @@ function parseFileDataSource(stream: TokenStream) {
     let lastWasText = false;
     while (!stream.done()) {
         const fileToken = stream.get();
-        if (fileToken.is(Type.dot) || fileToken.is(Type.special, '/')) {
+        if (fileToken.is(ANY.DOT) || fileToken.is(Symbols.SLASH)) {
             path += fileToken.value;
             lastWasText = false;
-        } else if (fileToken.is(Type.word)) {
+        } else if (fileToken.is(ANY.WORD)) {
             if (lastWasText) {
                 return new FileDataSource(path);
             } else {
                 path += fileToken.value;
                 lastWasText = true;
             }
-        } else if (fileToken.is(Type.semicolon)) {
+        } else if (fileToken.is(ANY.SEMICOLON)) {
             return new FileDataSource(path);
-        } else if (fileToken.is(Type.number)) {
+        } else if (fileToken.is(ANY.NUMBER)) {
             path += fileToken.value;
         } else {
-            stream.unexpectedToken();
+            stream.unexpectedToken([
+                ANY.DOT,
+                ANY.WORD,
+                ANY.SEMICOLON,
+                ANY.NUMBER,
+                Symbols.SLASH,
+            ]);
         }
 
         stream.advance();
