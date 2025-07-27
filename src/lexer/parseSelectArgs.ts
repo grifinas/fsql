@@ -7,9 +7,8 @@ import { KEYWORD, ANY, Symbols } from './constants';
 
 export function parseSelectArgs(ast: AST, stream: TokenStream) {
     logger.info("parseSelectArgs", stream.toStringFromCurrent());
-    if (!stream.advanceIf(KEYWORD.SELECT)) {
-        stream.unexpectedToken([KEYWORD.SELECT]);
-    }
+    stream.get(KEYWORD.SELECT);
+    stream.advance();
     if (stream.advanceIf(Symbols.ALL)) {
         return;
     }

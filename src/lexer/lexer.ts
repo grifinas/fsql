@@ -72,17 +72,14 @@ function parseWhere(ast: AST, stream: TokenStream): void {
 
 function parseOrderBy(ast: AST, stream: TokenStream): void {
   stream.assert(KEYWORD.BY);
-  stream.assertNext(ANY.WORD);
   //TODO should parse property
-  const parameter = stream.get();
-  const direction = stream.next();
+  const parameter = stream.next(ANY.WORD);
+  const direction = stream.next(KEYWORD.ASC, KEYWORD.DESC);
 
   if (direction.is(KEYWORD.ASC)) {
     ast.order = [parameter.value, 1];
-  } else if (direction.is(KEYWORD.DESC)) {
-    ast.order = [parameter.value, -1];
   } else {
-    stream.unexpectedToken([KEYWORD.ASC, KEYWORD.DESC]);
+    ast.order = [parameter.value, -1];
   }
 }
 

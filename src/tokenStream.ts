@@ -16,7 +16,7 @@ export class TokenStream {
     return this.tokens.length;
   }
 
-  get(): Token {
+  get(...matchers: TokenMatcher[]): Token {
     //Index starts counting from -1 just so while(stream.hasNext()) stream.next() would work propperly
     if (this.index < 0) this.index = 0;
     const token = this.tokens[this.index];
@@ -24,6 +24,9 @@ export class TokenStream {
       throw new Error(
         `No token at index: ${this.index}, there are ${this.tokens.length} tokens`
       );
+    }
+    if (matchers.length && !matchers.some(matcher => token.is(matcher))) {
+      this.unexpectedToken(matchers);
     }
     return token;
   }
@@ -63,9 +66,9 @@ export class TokenStream {
     return this.index;
   }
 
-  next(): Token {
+  next(...matchers: TokenMatcher[]): Token {
     this.index++;
-    return this.get();
+    return this.get(...matchers);
   }
 
   prev(): Token {

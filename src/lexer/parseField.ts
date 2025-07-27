@@ -45,42 +45,30 @@ export function parseField(stream: TokenStream): Property {
 }
 
 function getValueFromStream(stream: TokenStream): string | number | boolean {
-    const token = stream.get();
+    const token = stream.get(ANY.NUMBER, ANY.WORD, ANY.STRING);
     if (token.is(ANY.NUMBER)) {
         return Number(token.value);
     } else if (token.is(ANY.WORD)) {
         return ['true', 'false'].includes(token.value.toLocaleLowerCase()) ? token.value === 'true' : token.value;
     } else if (token.is(ANY.STRING)) {
         return token.value;
-    } else {
-        stream.unexpectedToken([
-            ANY.NUMBER,
-            ANY.WORD,
-            ANY.STRING,
-        ]);
     }
+
+    throw new Error(`Should be unreachable`);
 }
 
 function parseFunction(stream: TokenStream): FunctionProperty {
-    stream.assert(ANY.WORD);
-    const name = stream.get().value;
+    const name = stream.get(ANY.WORD).value;
+    stream.next(Symbols.OPEN_PARENTHESIS);
     stream.advance();
-    if (!stream.advanceIf(Symbols.OPEN_PARENTHESIS)) {
-        stream.unexpectedToken([
-            Symbols.OPEN_PARENTHESIS,
-        ]);
-    }
 
     const args: Property[] = [];
     do {
         args.push(parseField(stream));
     } while (stream.advanceIf(ANY.COMMA));
 
-    if (!stream.advanceIf(Symbols.CLOSE_PARENTHESIS)) {
-        stream.unexpectedToken([
-            Symbols.CLOSE_PARENTHESIS,
-        ]);
-    }
+    stream.get(Symbols.CLOSE_PARENTHESIS);
+    stream.advance();
 
     return new FunctionProperty(name, args);
 }

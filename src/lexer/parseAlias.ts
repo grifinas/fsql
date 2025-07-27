@@ -1,5 +1,5 @@
 import { TokenStream } from "../tokenStream";
-import { ANY, KEYWORD, RESERVED_WORDS, Symbols } from "./constants";
+import { KEYWORD, RESERVED_WORDS, Symbols } from "./constants";
 import { IAlias } from '../types';
 import { logger } from "../utils/logger";
 

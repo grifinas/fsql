@@ -26,11 +26,11 @@ export class Token {
     return !this.isIn(tokens);
   }
 
-  private isRawEqual(type: Type , value?: string): boolean {
+  private isRawEqual(type: Type, value?: string): boolean {
     const typesEqual = this.type === type;
     let valuesEqual = true;
     if (value) {
-        valuesEqual = this.value.toLocaleLowerCase() === value.toLocaleLowerCase();
+      valuesEqual = this.value.toLocaleLowerCase() === value.toLocaleLowerCase();
     }
     return typesEqual && valuesEqual;
   }

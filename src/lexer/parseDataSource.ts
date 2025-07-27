@@ -21,7 +21,7 @@ function parseFileDataSource(stream: TokenStream) {
     let path = "";
     let lastWasText = false;
     while (!stream.done()) {
-        const fileToken = stream.get();
+        const fileToken = stream.get(ANY.DOT, Symbols.SLASH, ANY.WORD, ANY.SEMICOLON, ANY.NUMBER);
         if (fileToken.is(ANY.DOT) || fileToken.is(Symbols.SLASH)) {
             path += fileToken.value;
             lastWasText = false;
@@ -36,14 +36,6 @@ function parseFileDataSource(stream: TokenStream) {
             return new FileDataSource(path);
         } else if (fileToken.is(ANY.NUMBER)) {
             path += fileToken.value;
-        } else {
-            stream.unexpectedToken([
-                ANY.DOT,
-                ANY.WORD,
-                ANY.SEMICOLON,
-                ANY.NUMBER,
-                Symbols.SLASH,
-            ]);
         }
 
         stream.advance();
