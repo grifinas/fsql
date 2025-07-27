@@ -1,13 +1,13 @@
-import { sourceData } from "../flow/sourceData";
+import { SourceData, sourceData } from "../flow/sourceData";
 import { FilterFunction } from "./filterFunction";
 import { logger } from "../utils/logger";
 import { Property } from "./property";
-import { DataSource, FileDataSource, VariableDataSource } from "./dataSource";
-import { fileUtils } from "../utils/file";
+import { DataSource } from "./dataSource";
 import { meshData } from "../flow/meshData";
 import { selectData } from "../flow/selectData";
 import { orderData } from "../flow/orderData";
 import { filterData } from "../flow/filterData";
+import { writeData } from "../flow/writeData";
 
 export type JoinMap = Record<string, { where: FilterFunction; source: DataSource }>;
 
@@ -25,24 +25,13 @@ export class AST {
   async execute(): Promise<object[]> {
     logger.info("Executing", this);
 
-    const sources = await sourceData(this);
-    logger.info("Sources", sources);
-    const meshed = meshData(sources);
-    logger.info("Meshed", meshed);
-    const filtered = filterData(meshed, this.where);
-    logger.info("Filtered", filtered);
-    const selected: object[] = selectData(filtered, this.fields);
-    logger.info("Selected", selected);
-    const ordered = orderData(selected, this.order);
-    logger.info("Ordered", ordered);
-
-    if (this.into) {
-      if (this.into instanceof VariableDataSource) {
-        this.assignVariable(this.into.variableName, ordered);
-      } else if (this.into instanceof FileDataSource) {
-        fileUtils.writeJson(this.into.filePath, ordered);
-      }
-    }
+    const data = this.flow(await sourceData(this), [
+      meshData,
+      filterData,
+      selectData,
+      orderData,
+      writeData
+    ]);
 
     if (this.next) {
       for (const [key, value] of Object.entries(this.variables)) {
@@ -50,7 +39,7 @@ export class AST {
       }
       return this.next.execute();
     } else {
-      return ordered;
+      return data;
     }
   }
 
@@ -86,5 +75,14 @@ export class AST {
 
     this.all = false;
     this.fields.push(property);
+  }
+
+  flow(data: SourceData[], steps: Function[]) {
+    for (const step of steps) {
+      data = step(data, this);
+      logger.debug(step.name, data);
+    }
+    
+    return data;
   }
 }

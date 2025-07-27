@@ -1,7 +1,8 @@
-export function orderData(mapped: object[], order: [string, number] | undefined): object[] {
-    if (!order) return mapped;
+import { AST } from '../entities/ast';
+export function orderData(mapped: object[], ast: AST): object[] {
+    if (!ast.order) return mapped;
 
-    const [key, value] = order;
+    const [key, value] = ast.order;
     return mapped.sort((a: object, b: object) => {
         if (!(key in a) || !(key in b))
             throw new Error(`No ${key} in some rows`);

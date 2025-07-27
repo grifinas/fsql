@@ -1,8 +1,8 @@
-import { FilterFunction } from "../entities/filterFunction";
+import { AST } from "../entities/ast";
 import { MeshedRow } from "../types";
 
-export function filterData(mapped: MeshedRow[], where: FilterFunction): MeshedRow[] {
-    if (!where) return mapped;
+export function filterData(mapped: MeshedRow[], ast: AST): MeshedRow[] {
+    if (!ast.where) return mapped;
 
-    return mapped.filter((row: MeshedRow) => where.resolve(row));
+    return mapped.filter((row: MeshedRow) => ast.where.resolve(row));
 }

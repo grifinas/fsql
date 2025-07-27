@@ -2,11 +2,12 @@ import { Property } from "../entities/property";
 import { resolveValue } from "../resolveValue";
 import { MeshedRow } from "../types";
 import { logger } from "../utils/logger";
+import { AST } from "../entities/ast";
 
-export function selectData(rows: MeshedRow[], fields: Property[]): object[] {
-    logger.debug("Selecting data", { rows, fields });
+export function selectData(rows: MeshedRow[], ast: AST): object[] {
+    logger.debug("Selecting data", { rows, fields: ast.fields });
     return rows.map((row: MeshedRow) => {
-        return colapse(row, fields);
+        return colapse(row, ast.fields);
     });
 }
 

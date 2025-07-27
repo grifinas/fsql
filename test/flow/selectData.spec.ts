@@ -1,10 +1,14 @@
+import { AST } from '../../src/entities/ast';
 import { FieldProperty, Property } from '../../src/entities/property';
 import { selectData } from '../../src/flow/selectData';
 import { MeshedRow } from '../../src/types';
+import { mock } from 'jest-mock-extended';
 
 describe('selectData', () => {
   describe('when fields array is empty (SELECT *)', () => {
-    const emptyFields: Property[] = [];
+    const emptyFields = mock<AST>({
+      fields: [],
+    });
 
     it('should return an empty array if rows are empty', () => {
       const rows: MeshedRow[] = [];
@@ -83,10 +87,12 @@ describe('selectData', () => {
       const rows: MeshedRow[] = [
         { '@sourceA': { id: 1, name: 'Alice' } },
       ];
-      const fields: Property[] = [
-        new FieldProperty(null, 'name').setAlias('firstname'),
-      ];
-      expect(selectData(rows, fields)).toEqual([
+      const ast = mock<AST>({
+        fields: [
+          new FieldProperty(null, 'name').setAlias('firstname'),
+        ],
+      });
+      expect(selectData(rows, ast)).toEqual([
         { firstname: 'Alice' },
       ]);
     });
@@ -95,10 +101,12 @@ describe('selectData', () => {
       const rows: MeshedRow[] = [
         { '@sourceA': { id: 1, name: 'Alice' }, '@sourceB': { id: 2, name: 'Bob' } },
       ];
-      const fields: Property[] = [
-        new FieldProperty('@sourceA', 'name').setAlias('firstname'),
-      ];
-      expect(selectData(rows, fields)).toEqual([
+      const ast = mock<AST>({
+        fields: [
+          new FieldProperty('@sourceA', 'name').setAlias('firstname'),
+        ],
+      });
+      expect(selectData(rows, ast)).toEqual([
         { firstname: 'Alice' },
       ]);
     });
@@ -107,10 +115,12 @@ describe('selectData', () => {
       const rows: MeshedRow[] = [
         { '@sourceA': { id: 1, name: 'Alice', address: { city: 'New York' } } },
       ];
-      const fields: Property[] = [
-        new FieldProperty('@sourceA', 'address.city').setAlias('city'),
-      ];
-      expect(selectData(rows, fields)).toEqual([
+      const ast = mock<AST>({
+        fields: [
+          new FieldProperty('@sourceA', 'address.city').setAlias('city'),
+        ],
+      });
+      expect(selectData(rows, ast)).toEqual([
         { city: 'New York' },
       ]);
     });
