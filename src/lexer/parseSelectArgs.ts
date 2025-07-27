@@ -1,6 +1,6 @@
 import { AST } from "../ast";
 import { TokenStream } from "../tokenStream";
-import { Type } from "../token";
+import { Type } from "../types";
 import { parseProperty } from "./parseProperty";
 import { logger } from "../utils/logger";
 import { withAlias } from './parseAlias';

@@ -1,6 +1,7 @@
 import { TokenStream } from "../../src/tokenStream";
 import { parseVariable } from "../../src/lexer/parseVariable";
-import { Type, Token } from "../../src/token";
+import { Token } from "../../src/token";
+import { Type } from "../../src/types";
 
 describe("parseVariable", () => {
   it("should parse a variable starting with @", () => {
@@ -19,10 +20,10 @@ describe("parseVariable", () => {
     expect(parseVariable(stream)).toBeNull();
   });
 
-  it("should throw error if @ is not followed by word", () => {
+  it("should throw error if @ is not followed by word/number", () => {
     const stream = new TokenStream([
       new Token(Type.special, "@"),
-      new Token(Type.number, "123")
+      new Token(Type.dot, ".")
     ]);
     expect(() => parseVariable(stream)).toThrow();
   });
@@ -45,5 +46,13 @@ describe("parseVariable", () => {
     ]);
     parseVariable(stream);
     expect(stream.get().is(Type.special, ".")).toBe(true);
+  });
+
+  it("should parse variable with number", () => {
+    const stream = new TokenStream([
+      new Token(Type.special, "@"),
+      new Token(Type.number, "123"),
+    ]);
+    expect(parseVariable(stream)).toBe("@123");
   });
 });

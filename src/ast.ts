@@ -4,7 +4,8 @@ import { FilterFunction } from "./filterFunction";
 import { selectData } from "./selectData";
 import { logger } from "./utils/logger";
 import { Property } from "./property";
-import { DataSource } from "./dataSource";
+import { DataSource, FileDataSource, VariableDataSource } from "./dataSource";
+import { fileUtils } from "./utils/file";
 
 export type JoinMap = Record<string, { where: FilterFunction; source: DataSource }>;
 
@@ -16,7 +17,7 @@ export class AST {
   public where: FilterFunction | undefined;
   public order: [string, number] | undefined = undefined;
   public readonly variables: Record<string, object[]> = {};
-  public intoName: string | undefined = undefined;
+  public into: DataSource | undefined = undefined;
   public next: AST | null = null;
 
   async execute(): Promise<object[]> {
@@ -51,8 +52,12 @@ export class AST {
       });
     }
 
-    if (this.intoName) {
-      this.assignVariable(this.intoName, mapped);
+    if (this.into) {
+      if (this.into instanceof VariableDataSource) {
+        this.assignVariable(this.into.variableName, mapped);
+      } else if (this.into instanceof FileDataSource) {
+        fileUtils.writeJson(this.into.filePath, mapped);
+      }
     }
 
     if (this.next) {
@@ -82,6 +87,9 @@ export class AST {
   }
 
   assignVariable(name: string, data: object[]) {
+    if (!name.startsWith("@")) {
+      throw new Error(`Variable name must start with @, got: ${name}`);
+    }
     this.variables[name] = data;
   }
 

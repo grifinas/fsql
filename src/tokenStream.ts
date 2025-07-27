@@ -1,5 +1,6 @@
 import { cliAssert } from "./cliAssert";
-import { Token, Type } from "./token";
+import { Token } from "./token";
+import { Type } from "./types";
 
 export class TokenStream {
   private index: number = -1;

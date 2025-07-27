@@ -1,11 +1,11 @@
 import { TokenStream } from "../tokenStream";
-import { Type } from "../token";
+import { Type } from "../types";
 import { parseVariable } from "./parseVariable";
 import { logger } from "../utils/logger";
 import { DataSource, FileDataSource, VariableDataSource } from "../dataSource";
 import { withVarAlias } from './parseAlias';
 
-export function parseFile(stream: TokenStream): DataSource {
+export function parseDataSource(stream: TokenStream): DataSource {
     const variable = parseVariable(stream);
     if (variable) {
         logger.debug("File is a variable", variable);

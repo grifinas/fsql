@@ -1,7 +1,8 @@
 import { parseSelectArgs } from '../../src/lexer/parseSelectArgs';
 import { AST } from '../../src/ast';
 import { TokenStream } from '../../src/tokenStream';
-import { Token, Type } from '../../src/token';
+import { Token } from '../../src/token';
+import { Type } from '../../src/types';
 import { FieldProperty } from '../../src/property';
 
 describe('parseSelectArgs - Integration Tests', () => {

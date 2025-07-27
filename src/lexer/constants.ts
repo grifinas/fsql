@@ -1,32 +1,33 @@
-import { Token, Type } from "../token";
+import { TokenMatcher } from "../tokenMatcher";
+import { Type } from "../types";
 
 export const KEYWORD = {
-    SELECT: new Token(Type.word, "SELECT"),
-    FROM: new Token(Type.word, "FROM"),
-    WHERE: new Token(Type.word, "WHERE"),
-    INTO: new Token(Type.word, "INTO"),
-    JOIN: new Token(Type.word, "JOIN"),
-    ON: new Token(Type.word, "ON"),
-    ORDER: new Token(Type.word, "ORDER"),
-    BY: new Token(Type.word, "BY"),
-    ASC: new Token(Type.word, "ASC"),
-    DESC: new Token(Type.word, "DESC"),
-    AS: new Token(Type.word, "AS"),
-    AND: new Token(Type.word, "AND"),
+    SELECT: new TokenMatcher(Type.word, "SELECT"),
+    FROM: new TokenMatcher(Type.word, "FROM"),
+    WHERE: new TokenMatcher(Type.word, "WHERE"),
+    INTO: new TokenMatcher(Type.word, "INTO"),
+    JOIN: new TokenMatcher(Type.word, "JOIN"),
+    ON: new TokenMatcher(Type.word, "ON"),
+    ORDER: new TokenMatcher(Type.word, "ORDER"),
+    BY: new TokenMatcher(Type.word, "BY"),
+    ASC: new TokenMatcher(Type.word, "ASC"),
+    DESC: new TokenMatcher(Type.word, "DESC"),
+    AS: new TokenMatcher(Type.word, "AS"),
+    AND: new TokenMatcher(Type.word, "AND"),
 } as const;
 
 export const RESERVED_WORDS = Object.values(KEYWORD);
 
 export const ANY = {
-    WORD: { type: Type.word },
-    NUMBER: { type: Type.number },
-    BRACKET: { type: Type.bracket },
-    BRACE: { type: Type.brace },
-    PARENTHESIS: { type: Type.parenthesis },
-    SPECIAL: { type: Type.special },
-    DOT: { type: Type.dot },
-    COMMA: { type: Type.comma },
-    SEMICOLON: { type: Type.semicolon },
-    EQUALS: { type: Type.equals },
-    COMP: { type: Type.comp },
+    WORD: new TokenMatcher(Type.word),
+    NUMBER: new TokenMatcher(Type.number),
+    BRACKET: new TokenMatcher(Type.bracket),
+    BRACE: new TokenMatcher(Type.brace),
+    PARENTHESIS: new TokenMatcher(Type.parenthesis),
+    SPECIAL: new TokenMatcher(Type.special),
+    DOT: new TokenMatcher(Type.dot),
+    COMMA: new TokenMatcher(Type.comma),
+    SEMICOLON: new TokenMatcher(Type.semicolon),
+    EQUALS: new TokenMatcher(Type.equals),
+    COMP: new TokenMatcher(Type.comp),
 } as const;

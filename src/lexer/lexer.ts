@@ -1,17 +1,16 @@
 import { AST } from "../ast";
-import { Token, Type } from "../token";
+import { Token } from "../token";
+import { Type } from "../types";
 import { TokenStream } from "../tokenStream";
-import { parseInto } from "./parseInto";
-import { parseFile } from "./parseFile";
+import { parseDataSource } from "./parseDataSource";
 import { parseFilterFunction } from "./parseFilterFunction";
 import { parseSelectArgs } from "./parseSelectArgs";
 import { logger } from "../utils/logger";
 import { KEYWORD } from "./constants";
-import { withAlias } from "./parseAlias";
-import { DataSource, FileDataSource } from "../dataSource";
+import { TokenMatcher } from "../tokenMatcher";
 
 let ast: AST;
-let stream: TokenStream;
+let stream: TokenStream;  
 
 export function lex(_stream: TokenStream): AST {
   stream = _stream;
@@ -32,11 +31,11 @@ export function lex(_stream: TokenStream): AST {
 
 function parseFrom(ast: AST, stream: TokenStream) {
   stream.assert(Type.word, "FROM").advance();
-  ast.setMain(parseFile(stream));
+  ast.setMain(parseDataSource(stream));
 }
 
 export function optional(
-  token: Token,
+  token: TokenMatcher,
   fn: (ast: AST, stream: TokenStream) => void,
 ): void {
   if (stream.done()) {
@@ -51,14 +50,14 @@ export function optional(
   }
 }
 
-export function chainable(token: Token, fn: (ast: AST, stream: TokenStream) => void): void {
+export function chainable(token: TokenMatcher, fn: (ast: AST, stream: TokenStream) => void): void {
   while (stream.advanceIf(token.type, token.value)) {
     fn(ast, stream);
   }
 }
 
 function parseJoin(ast: AST, stream: TokenStream): void {
-  const file = parseFile(stream);
+  const file = parseDataSource(stream);
   if (stream.advanceIf(Type.word, "ON")) {
     ast.addJoin(file, parseFilterFunction(stream));
   } else {
@@ -93,4 +92,8 @@ function parseSemicolon(ast: AST, stream: TokenStream): void {
     return;
   }
   ast.next = lex(stream);
+}
+
+function parseInto(ast: AST, stream: TokenStream): void {
+  ast.into = parseDataSource(stream);
 }

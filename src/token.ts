@@ -1,9 +1,8 @@
-interface TokenMatcher {
-  type: Type;
-  value?: string;
-}
+import { TokenMatcher } from "./tokenMatcher";
+import { Type } from "./types";
+import { logger } from "./utils/logger";
 
-export class Token implements TokenMatcher {
+export class Token {
   constructor(
     public readonly type: Type,
     public readonly value: string,
@@ -12,12 +11,9 @@ export class Token implements TokenMatcher {
   is(token: TokenMatcher): boolean;
   is(type: Type, value?: string): boolean;
   is(type: Type | TokenMatcher, value?: string): boolean {
-    if (typeof type === 'object') {
-      return this.isRawEqual(type.type, type.value);
-    } else {
-      return this.isRawEqual(type, value);
-    }
-    
+    const result = type instanceof TokenMatcher ? this.isRawEqual(type.type, type.value) : this.isRawEqual(type, value);
+    logger.debug(`Token ${this.value} is ${type.toString()} ${result}`);
+    return result;
   }
 
   isIn(tokens: TokenMatcher[] | readonly TokenMatcher[]): boolean {
@@ -29,7 +25,7 @@ export class Token implements TokenMatcher {
   }
 
   isNotIn(tokens: TokenMatcher[] | readonly TokenMatcher[]): boolean {
-    return !tokens.some(token => this.is(token));
+    return !this.isIn(tokens);
   }
 
   private isRawEqual(type: Type , value?: string): boolean {
@@ -40,19 +36,4 @@ export class Token implements TokenMatcher {
     }
     return typesEqual && valuesEqual;
   }
-}
-
-export enum Type {
-  word = "word",
-  string = "string",
-  number = "number",
-  bracket = "bracket",
-  brace = "brace",
-  parenthesis = "parenthesis",
-  special = "special",
-  dot = "dot",
-  comma = "comma",
-  semicolon = "semicolon",
-  equals = "equals",
-  comp = "comp",
 }

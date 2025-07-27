@@ -1,5 +1,5 @@
 import { TokenStream } from "../tokenStream";
-import { Type } from "../token";
+import { Type } from "../types";
 import { FieldProperty, FunctionProperty, Property, ResolvedProperty } from "../property";
 import { RESERVED_WORDS } from "./constants";
 
@@ -36,7 +36,7 @@ export function parseField(stream: TokenStream): Property {
     }
 
     const fieldName = parts.join('.');
-    if (RESERVED_WORDS.some(token => token.value.toLocaleLowerCase() === fieldName.toLocaleLowerCase())) {
+    if (RESERVED_WORDS.some(token => token.value?.toLocaleLowerCase() === fieldName.toLocaleLowerCase())) {
         stream.unexpectedToken();
     }
 

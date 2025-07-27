@@ -158,7 +158,7 @@ describe("lexer", () => {
 
   it("should allow setting variables with INTO keyword", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere INTO @var"));
-    expect(ast.intoName).toBe("@var");
+    expect(ast.into?.ref()).toBe("@var");
   })
 
   it("should allow selecting from variables", () => {

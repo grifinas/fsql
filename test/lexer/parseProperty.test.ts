@@ -1,6 +1,7 @@
 import { TokenStream } from "../../src/tokenStream";
 import { parseProperty } from "../../src/lexer/parseProperty";
-import { Token, Type } from "../../src/token";
+import { Token } from "../../src/token";
+import { Type } from "../../src/types";
 import { FieldProperty } from "../../src/property";
 
 describe("parseProperty Integration tests", () => {

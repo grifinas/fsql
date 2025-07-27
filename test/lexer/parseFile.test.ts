@@ -1,6 +1,7 @@
-import { parseFile } from '../../src/lexer/parseFile';
+import { parseDataSource } from '../../src/lexer/parseDataSource';
 import { TokenStream } from '../../src/tokenStream';
-import { Token, Type } from '../../src/token';
+import { Token } from '../../src/token';
+import { Type } from '../../src/types';
 import { FileDataSource, VariableDataSource } from '../../src/dataSource';
 
 describe('parseFile - Integration Tests', () => {
@@ -12,7 +13,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.word, 'myVar'),
       new Token(Type.semicolon, ';'),
     ]);
-    const result = parseFile(stream);
+    const result = parseDataSource(stream);
     expect(result).toBeInstanceOf(VariableDataSource);
     expect(result.ref()).toBe('@myVar');
     expect(stream.get().value).toBe(';'); // Stream should be at the semicolon
@@ -23,7 +24,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.special, '@'),
       new Token(Type.word, 'myVar'),
     ]);
-    const result = parseFile(stream);
+    const result = parseDataSource(stream);
     expect(result).toBeInstanceOf(VariableDataSource);
     expect(result.ref()).toBe('@myVar');
     expect(stream.done()).toBe(true);
@@ -35,7 +36,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.dot, '.'),
       new Token(Type.word, 'json'),
     ]);
-    const result = parseFile(stream);
+    const result = parseDataSource(stream);
     expect(result).toBeInstanceOf(FileDataSource);
     expect(result.ref()).toBe('data.json');
     expect(stream.done()).toBe(true);
@@ -48,7 +49,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.word, 'json'),
       new Token(Type.semicolon, ';'),
     ]);
-    const result = parseFile(stream);
+    const result = parseDataSource(stream);
     expect(result).toBeInstanceOf(FileDataSource);
     expect(result.ref()).toBe('data.json');
     expect(stream.get().value).toBe(';'); // Should stop before semicolon and regress
@@ -62,7 +63,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.dot, '.'),
       new Token(Type.word, 'txt'),
     ]);
-    const result = parseFile(stream);
+    const result = parseDataSource(stream);
     expect(result).toBeInstanceOf(FileDataSource);
     expect(result.ref()).toBe('folder/file.txt');
     expect(stream.done()).toBe(true);
@@ -78,7 +79,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.word, 'js'),
       new Token(Type.word, 'WHERE'),
     ]);
-    const result = parseFile(stream);
+    const result = parseDataSource(stream);
     expect(result).toBeInstanceOf(FileDataSource);
     expect(result.ref()).toBe('data123.config.js');
     expect(stream.get().value).toBe('WHERE');
@@ -93,7 +94,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.special, '@'),
       new Token(Type.word, 'm'),
     ]);
-    const result = parseFile(stream);
+    const result = parseDataSource(stream);
     expect(result).toBeInstanceOf(FileDataSource);
     expect((result as FileDataSource).filePath).toBe('myFile.csv');
     expect(result.ref()).toBe('@m');
@@ -110,7 +111,7 @@ describe('parseFile - Integration Tests', () => {
     ]);
     // parseFile reads '@', then calls parseVariable. parseVariable expects current token to be '@',
     // but it's 'name'. So parseVariable returns null. parseFile then throws unexpectedToken.
-    expect(() => parseFile(stream)).toThrowError(); // Specific error can be 'Unexpected token: @ of type special...'
+    expect(() => parseDataSource(stream)).toThrowError(); // Specific error can be 'Unexpected token: @ of type special...'
                                                     // or similar depending on exact TokenStream error message for unexpectedToken.
   });
 
@@ -124,7 +125,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.dot, '.'),
       new Token(Type.word, 'json'),
     ]);
-    expect(() => parseFile(stream)).toThrowError(); // Error for '!'
+    expect(() => parseDataSource(stream)).toThrowError(); // Error for '!'
   });
 
    it('should parse path ending with number like folder/file123', () => {
@@ -135,7 +136,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.number, '123'),
       new Token(Type.semicolon, ';'),
     ]);
-    const result = parseFile(stream);
+    const result = parseDataSource(stream);
     expect(result).toBeInstanceOf(FileDataSource);
     expect(result.ref()).toBe('folder/file123');
     expect(stream.get().value).toBe(';');
@@ -146,7 +147,7 @@ describe('parseFile - Integration Tests', () => {
       new Token(Type.number, '12345'),
       new Token(Type.word, 'AS'),
     ]);
-    const result = parseFile(stream);
+    const result = parseDataSource(stream);
     expect(result).toBeInstanceOf(FileDataSource);
     expect(result.ref()).toBe('12345AS');
     expect(stream.done()).toBe(true);

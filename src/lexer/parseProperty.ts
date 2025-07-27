@@ -1,8 +1,8 @@
-import { Type } from "../token";
 import { TokenStream } from "../tokenStream";
 import { FieldProperty, Property, ResolvedProperty } from "../property";
 import { parseField } from "./parseField";
 import { parseVariable } from "./parseVariable";
+import { Type } from "../types";
 
 export function parseProperty(stream: TokenStream): Property {
     const varName = parseVariable(stream);

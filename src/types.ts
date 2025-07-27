@@ -8,3 +8,19 @@ export interface IRef {
 }
 
 export type Scalar = string | number | boolean;
+
+export enum Type {
+    word = "word",
+    string = "string",
+    number = "number",
+    bracket = "bracket",
+    brace = "brace",
+    parenthesis = "parenthesis",
+    special = "special",
+    dot = "dot",
+    comma = "comma",
+    semicolon = "semicolon",
+    equals = "equals",
+    comp = "comp",
+  }
+  

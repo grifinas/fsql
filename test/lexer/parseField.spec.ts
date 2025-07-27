@@ -1,6 +1,6 @@
 import { TokenStream } from "../../src/tokenStream";
 import { parseField } from "../../src/lexer/parseField";
-import { Type } from "../../src/token";
+import { Type } from "../../src/types";
 import { Token } from "../../src/token";
 import { FieldProperty, FunctionProperty, ResolvedProperty } from "../../src/property";
 

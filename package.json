@@ -10,7 +10,7 @@
     "test": "test"
   },
   "scripts": {
-    "cli": "node ./dist/cli.js",
+    "cli": "node ./dist/src/cli.js",
     "test": "jest",
     "build": "tsc",
     "run": "node ./dist/index.js",

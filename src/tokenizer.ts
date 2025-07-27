@@ -1,4 +1,5 @@
-import { Token, Type } from "./token";
+import { Token } from "./token";
+import { Type } from "./types";
 import { TokenStream } from "./tokenStream";
 import { cliAssert } from "./cliAssert";
 import { TypeError } from "./errors";

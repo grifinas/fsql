@@ -1,6 +1,7 @@
 import { TokenStream } from "../../src/tokenStream";
 import { parseFilterFunction } from "../../src/lexer/parseFilterFunction";
-import { Token, Type } from "../../src/token";
+import { Token } from "../../src/token";
+import { Type } from "../../src/types";
 import { FieldProperty } from "../../src/property";
 
 describe("parseWhereFunction Integration tests", () => {

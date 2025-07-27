@@ -2,7 +2,7 @@ import { TokenStream } from "../tokenStream";
 import { KEYWORD, RESERVED_WORDS } from "./constants";
 import { IAlias } from '../types';
 import { logger } from "../utils/logger";
-import { Type } from "../token";
+import { Type } from "../types";
 
 export function parseVarAlias(stream: TokenStream): string | null {
     if (!stream.done() && stream.get().is(KEYWORD.AS)) {
