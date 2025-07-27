@@ -1,8 +1,8 @@
-import { source } from "../../src/data/source";
-import { fileUtils } from "../../src/utils/file";
-import { FilterFunction } from "../../src/entities/filterFunction";
-import { AST, JoinMap } from "../../src/data/ast";
-import { FileDataSource } from "../../src/entities/dataSource";
+import { source } from "@src/data/source";
+import { fileUtils } from "@src/utils/file";
+import { FilterFunction } from "@src/entities/filterFunction";
+import { AST, JoinMap } from "@src/data/ast";
+import { FileDataSource } from "@src/entities/dataSource";
 import { mock } from 'jest-mock-extended';
 
 describe("sourceData", () => {

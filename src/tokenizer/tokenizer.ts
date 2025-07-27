@@ -1,10 +1,10 @@
-import { Type } from "../types";
-import { cliAssert, logger } from "../utils";
+import { Type } from "@types";
+import { cliAssert, logger } from "@utils";
 import { Token } from "./token";
 import { TokenStream } from "./tokenStream";
 
 function isWord(char: string): boolean {
-  return /[a-zA-Z\-\_]/.test(char);
+  return /[a-zA-Z\-_]/.test(char);
 }
 
 function isNumber(char: string): boolean {
@@ -105,9 +105,7 @@ export function tokenize(input: string): TokenStream {
 
     //Comment
     if (char === "#") {
-      let comment = "";
       while (current < input.length && input[current] !== "\n") {
-        comment += input[current];
         current++;
       }
       continue;

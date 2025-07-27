@@ -1,10 +1,17 @@
-import { main } from '../src';
+import { main } from '@src/index';
 import shallowJson from '../test-data/shallow.json';
 
 describe('SQL Parser Integration Tests', () => {
   it('should select all fields from a file', async () => {
     const result = await main('SELECT * FROM test-data/shallow.json');
     expect(result).toEqual(shallowJson);
+  });
+
+  it('should select specific fields', async () => {
+    const result = await main('SELECT productName, is_active FROM test-data/shallow.json');
+    expect(result).toHaveLength(5);
+    expect(result.every((item: Record<string, any>) => Object.keys(item).length === 2)).toBe(true);
+    expect(result[0]).toEqual({ productName: "First Item", is_active: true });
   });
 
   it('should select specific fields', async () => {

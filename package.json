@@ -14,10 +14,19 @@
     "test": "jest",
     "build": "tsc",
     "run": "node ./dist/index.js",
-    "cc": "npm run build && npm run cli"
+    "cc": "npm run build && npm run cli",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/jest": "^29.5.14",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-import": "^2.0.0",
+    "globals": "^15.0.0",
+    "jest-mock-extended": "4.0.0",
     "jest": "^29.7.0",
     "prettier": "^3.5.3",
     "ts-jest": "^29.3.4",

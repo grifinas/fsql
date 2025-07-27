@@ -1,4 +1,4 @@
-import { MeshedRow } from "../types";
+import { MeshedRow } from "@types";
 import { SourceData } from "./source";
 
 export function mesh(sources: SourceData[]): MeshedRow[] {

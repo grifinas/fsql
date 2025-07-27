@@ -1,6 +1,6 @@
-import { FieldProperty, ResolvedProperty } from "../../src/entities/property";
-import { LengthFunction } from "../../src/sqlFunctions/length.function";
-import { MeshedRow } from "../../src/types";
+import { FieldProperty, ResolvedProperty } from "@src/entities/property";
+import { LengthFunction } from "@src/sqlFunctions/length.function";
+import { MeshedRow } from "@src/types";
 
 describe("LENGTH function", () => {
     const testRow: MeshedRow = {

@@ -1,8 +1,8 @@
-import { TokenStream } from "../tokenizer";
-import { FilterFunction, Operator } from "../entities";
+import { TokenStream } from "@tokenizer";
+import { FilterFunction, Operator } from "@entities";
 import { parseProperty } from "./parseProperty";
 import { ANY, RESERVED_WORDS } from "./constants";
-import { ResolvedProperty } from "../entities";
+import { ResolvedProperty } from "@entities";
 
 export function parseFilterFunction(stream: TokenStream): FilterFunction {
   const left = parseProperty(stream);

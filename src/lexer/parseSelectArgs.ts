@@ -1,7 +1,7 @@
-import { AST } from "../data";
-import { TokenStream } from "../tokenizer";
+import { AST } from "@data";
+import { TokenStream } from "@tokenizer";
 import { parseProperty } from "./parseProperty";
-import { logger } from "../utils";
+import { logger } from "@utils";
 import { withAlias } from './parseAlias';
 import { KEYWORD, ANY, Symbols } from './constants';
 

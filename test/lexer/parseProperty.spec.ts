@@ -1,10 +1,10 @@
-import { TokenStream } from "../../src/tokenizer/tokenStream";
-import { parseProperty } from "../../src/lexer/parseProperty";
-import * as parseVariableDep from "../../src/lexer/parseVariable";
-import * as parseFieldDep from "../../src/lexer/parseField";
-import { Token } from "../../src/tokenizer/token";
-import { Type } from "../../src/types";
-import { FieldProperty } from "../../src/entities/property";
+import { TokenStream } from "@src/tokenizer/tokenStream";
+import { parseProperty } from "@src/lexer/parseProperty";
+import * as parseVariableDep from "@src/lexer/parseVariable";
+import * as parseFieldDep from "@src/lexer/parseField";
+import { Token } from "@src/tokenizer/token";
+import { Type } from "@src/types";
+import { FieldProperty } from "@src/entities/property";
 
 describe("parseProperty", () => {
   const parseVariable = jest.spyOn(parseVariableDep, "parseVariable");

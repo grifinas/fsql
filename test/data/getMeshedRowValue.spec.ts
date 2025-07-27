@@ -1,4 +1,4 @@
-import { getMeshedRowValue } from "../../src/data/resolveValue";
+import { getMeshedRowValue } from "@src/data/resolveValue";
 
 describe("getMeshedRowValue", () => {
     it("should throw error if field doesn't exist", () => {

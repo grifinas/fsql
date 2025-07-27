@@ -1,7 +1,7 @@
-import { Property, ResolvedProperty, FieldProperty, FunctionProperty } from "../entities";
-import { SQLFactory } from "../sqlFunctions";
-import { MeshedRow, Scalar } from "../types";
-import { logger, pathValue } from "../utils";
+import { Property, ResolvedProperty, FieldProperty, FunctionProperty } from "@entities";
+import { SQLFactory } from "@sqlFunctions";
+import { MeshedRow, Scalar } from "@types";
+import { logger, pathValue } from "@utils";
 
 export function resolveValue(value: Property, row: MeshedRow): ResolvedProperty {
     if (value instanceof ResolvedProperty) {

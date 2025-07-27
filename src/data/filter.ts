@@ -1,5 +1,5 @@
 import { AST } from "./ast";
-import { MeshedRow } from "../types";
+import { MeshedRow } from "@types";
 
 export function filter(mapped: MeshedRow[], ast: AST): MeshedRow[] {
     if (!ast.where) return mapped;

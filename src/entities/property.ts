@@ -1,4 +1,4 @@
-import { IAlias, IRef, Scalar } from "../types";
+import { IAlias, IRef, Scalar } from "@types";
 
 export abstract class Property implements IAlias, IRef {
     public __type: string = 'property';

@@ -1,8 +1,8 @@
-import { TokenStream } from "../../src/tokenizer/tokenStream";
-import { parseFilterFunction } from "../../src/lexer/parseFilterFunction";
-import { Token } from "../../src/tokenizer/token";
-import { Type } from "../../src/types";
-import { FieldProperty, ResolvedProperty } from "../../src/entities/property";
+import { TokenStream } from "@src/tokenizer/tokenStream";
+import { parseFilterFunction } from "@src/lexer/parseFilterFunction";
+import { Token } from "@src/tokenizer/token";
+import { Type } from "@src/types";
+import { FieldProperty, ResolvedProperty } from "@src/entities/property";
 
 describe("parseWhereFunction Integration tests", () => {
     it("should parse where function", () => {

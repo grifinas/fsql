@@ -11,9 +11,19 @@
       "rootDir": "./",
       "forceConsistentCasingInFileNames": true,
       "skipLibCheck": true,
-      "sourceMap": true
+      "sourceMap": true,
+      "baseUrl": "./src",
+      "paths": {
+        "@data": ["data/index"],
+        "@entities": ["entities/index"],
+        "@lexer": ["lexer/index"],
+        "@sqlFunctions": ["sqlFunctions/index"],
+        "@tokenizer": ["tokenizer/index"],
+        "@utils": ["utils/index"],
+        "@src/*": ["./*"],
+        "@types": ["types"]
+      }
     },
     "include": ["src", "jestSetup.ts", "test"],
     "exclude": ["node_modules", "dist"]
   }
-  

@@ -1,8 +1,6 @@
 import { SourceData, source } from "./source";
-import { FilterFunction } from "../entities";
-import { logger } from "../utils";
-import { Property } from "../entities";
-import { DataSource } from "../entities";
+import { FilterFunction, Property, DataSource } from "@entities";
+import { logger } from "@utils";
 import { mesh } from "./mesh";
 import { select } from "./select";
 import { order } from "./order";
@@ -77,6 +75,7 @@ export class AST {
     this.fields.push(property);
   }
 
+  // eslint-disable-next-line
   flow(data: SourceData[], steps: Function[]) {
     for (const step of steps) {
       data = step(data, this);

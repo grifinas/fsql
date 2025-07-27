@@ -1,4 +1,5 @@
 import { AST } from './ast';
+
 export function order(mapped: object[], ast: AST): object[] {
     if (!ast.order) return mapped;
 

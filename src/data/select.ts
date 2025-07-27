@@ -1,7 +1,7 @@
-import { Property } from "../entities";
+import { Property } from "@entities";
 import { resolveValue } from "./resolveValue";
-import { MeshedRow } from "../types";
-import { logger } from "../utils";
+import { MeshedRow } from "@types";
+import { logger } from "@utils";
 import { AST } from "./ast";
 
 export function select(rows: MeshedRow[], ast: AST): object[] {

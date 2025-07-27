@@ -1,5 +1,5 @@
 import { SQLFactory } from "./sqlFactory";
-import { SQLFunction, ValidatedArgs } from "./sqlFunction";
+import { SQLFunction } from "./sqlFunction";
 import * as z from "zod";
 
 const Validation = z.tuple([]);
@@ -9,7 +9,7 @@ export class NowFunction extends SQLFunction<Date, typeof Validation> {
         return Validation;
     }
 
-    public subResolve(args: ValidatedArgs<this>): Date {
+    public subResolve(): Date {
         return new Date();
     }
 }

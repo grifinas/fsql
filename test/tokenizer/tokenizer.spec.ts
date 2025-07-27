@@ -1,5 +1,5 @@
-import { tokenize } from "../../src/tokenizer/tokenizer";
-import { Type } from "../../src/types";
+import { tokenize } from "@src/tokenizer/tokenizer";
+import { Type } from "@src/types";
 
 describe("tokenizer", () => {
   it("should parse select 1", () => {

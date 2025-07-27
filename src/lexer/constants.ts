@@ -1,5 +1,5 @@
-import { TokenMatcher } from "../tokenizer";
-import { Type } from "../types";
+import { TokenMatcher } from "@tokenizer";
+import { Type } from "@types";
 
 export const KEYWORD = {
     SELECT: new TokenMatcher(Type.word, "SELECT"),

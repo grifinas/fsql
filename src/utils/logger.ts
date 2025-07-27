@@ -27,31 +27,31 @@ class Logger {
     return this.level >= level;
   }
 
-  error(...args: any[]): void {
+  error(...args: unknown[]): void {
     if (this.shouldLog(LogLevel.ERROR)) {
       console.error(...args);
     }
   }
 
-  warn(...args: any[]): void {
+  warn(...args: unknown[]): void {
     if (this.shouldLog(LogLevel.WARN)) {
       console.warn(...args);
     }
   }
 
-  info(...args: any[]): void {
+  info(...args: unknown[]): void {
     if (this.shouldLog(LogLevel.INFO)) {
       console.info(...args);
     }
   }
 
-  debug(...args: any[]): void {
+  debug(...args: unknown[]): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       console.debug(...args);
     }
   }
 
-  log(...args: any[]): void {
+  log(...args: unknown[]): void {
     if (this.shouldLog(LogLevel.INFO)) {
       console.log(...args);
     }

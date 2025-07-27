@@ -1,7 +1,7 @@
-import { TokenStream } from "../tokenizer";
+import { TokenStream } from "@tokenizer";
 import { KEYWORD, RESERVED_WORDS, Symbols } from "./constants";
-import { IAlias } from '../types';
-import { logger } from "../utils";
+import { IAlias } from '@types';
+import { logger } from "@utils";
 
 export function parseVarAlias(stream: TokenStream): string | null {
     if (!stream.done() && stream.get().is(KEYWORD.AS)) {

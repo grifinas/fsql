@@ -1,7 +1,7 @@
-import { AST } from '../../src/data/ast';
-import { FieldProperty, Property } from '../../src/entities/property';
-import { select } from '../../src/data/select';
-import { MeshedRow } from '../../src/types';
+import { AST } from '@src/data/ast';
+import { FieldProperty, Property } from '@src/entities/property';
+import { select } from '@src/data/select';
+import { MeshedRow } from '@src/types';
 import { mock } from 'jest-mock-extended';
 
 describe('selectData', () => {

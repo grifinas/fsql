@@ -1,7 +1,6 @@
 import { AST, JoinMap } from "./ast";
-import { DataSource, FileDataSource } from "../entities";
-import { FilterFunction } from "../entities";
-import { fileUtils } from "../utils";
+import { DataSource, FileDataSource, FilterFunction } from "@entities";
+import { fileUtils } from "@utils";
 
 export interface SourceData {
   source: string;

@@ -1,8 +1,8 @@
-import { lex } from "../../src/lexer/lexer";
-import { AST } from "../../src/data/ast";
-import { FilterFunction } from "../../src/entities/filterFunction";
-import { FieldProperty, FunctionProperty } from "../../src/entities/property";
-import { tokenize } from "../../src/tokenizer/tokenizer";
+import { lex } from "@src/lexer/lexer";
+import { AST } from "@src/data/ast";
+import { FilterFunction } from "@src/entities/filterFunction";
+import { FieldProperty, FunctionProperty } from "@src/entities/property";
+import { tokenize } from "@src/tokenizer/tokenizer";
 
 describe("lexer", () => {
   it("should expose lex function", () => {

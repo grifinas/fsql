@@ -1,9 +1,9 @@
-import { TokenStream } from "../../src/tokenizer/tokenStream";
-import { parseVariable } from "../../src/lexer/parseVariable";
-import { Token } from "../../src/tokenizer/token";
-import { Type } from "../../src/types";
-import { ANY } from "../../src/lexer/constants";
-import { TokenMatcher } from "../../src/tokenizer/tokenMatcher";
+import { TokenStream } from "@src/tokenizer/tokenStream";
+import { parseVariable } from "@src/lexer/parseVariable";
+import { Token } from "@src/tokenizer/token";
+import { Type } from "@src/types";
+import { ANY } from "@src/lexer/constants";
+import { TokenMatcher } from "@src/tokenizer/tokenMatcher";
 
 describe("parseVariable", () => {
   it("should parse a variable starting with @", () => {

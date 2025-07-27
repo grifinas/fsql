@@ -1,11 +1,10 @@
-import { AST } from "../data";
-import { TokenStream } from "../tokenizer";
-import { parseDataSource } from "./parseDataSource";
 import { parseFilterFunction } from "./parseFilterFunction";
 import { parseSelectArgs } from "./parseSelectArgs";
-import { logger } from "../utils";
+import { logger } from "@utils";
 import { ANY, KEYWORD } from "./constants";
-import { TokenMatcher } from "../tokenizer";
+import { parseDataSource } from "./parseDataSource";
+import { TokenMatcher, TokenStream } from "@tokenizer";
+import { AST } from "@data";
 
 let ast: AST;
 let stream: TokenStream;  

@@ -1,10 +1,10 @@
-import { FieldProperty, ResolvedProperty, FunctionProperty } from "../../src/entities/property";
-import { SQLFunction, ValidatedArgs } from "../../src/sqlFunctions/sqlFunction";
-import { SQLFactory } from "../../src/sqlFunctions/sqlFactory";
-import { LengthFunction } from "../../src/sqlFunctions/length.function";
-import { TrimFunction } from "../../src/sqlFunctions/trim.function";
+import { FieldProperty, ResolvedProperty, FunctionProperty } from "@src/entities/property";
+import { SQLFunction, ValidatedArgs } from "@src/sqlFunctions/sqlFunction";
+import { SQLFactory } from "@src/sqlFunctions/sqlFactory";
+import { LengthFunction } from "@src/sqlFunctions/length.function";
+import { TrimFunction } from "@src/sqlFunctions/trim.function";
 import * as z from "zod";
-import { MeshedRow } from "../../src/types";
+import { MeshedRow } from "@src/types";
 
 // Custom test function for testing the SQLFunction base class
 const TestValidation = z.tuple([

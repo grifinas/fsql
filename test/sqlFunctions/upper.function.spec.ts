@@ -1,6 +1,6 @@
-import { FieldProperty, ResolvedProperty } from "../../src/entities/property";
-import { UpperFunction } from "../../src/sqlFunctions/upper.function";
-import { MeshedRow } from "../../src/types";
+import { FieldProperty, ResolvedProperty } from "@src/entities/property";
+import { UpperFunction } from "@src/sqlFunctions/upper.function";
+import { MeshedRow } from "@src/types";
 
 describe("UPPER function", () => {
     const testRow: MeshedRow = {
