@@ -24,7 +24,8 @@ export async function source(tree: AST): Promise<SourceData[]> {
       const filePromise = fileMap.get(source.filePath);
 
       if (source.getAlias()) {
-        if (aliases.has(source.getAlias())) throw new Error(`Duplicate alias: ${source.getAlias()}`);
+        if (aliases.has(source.getAlias()))
+          throw new Error(`Duplicate alias: ${source.getAlias()}`);
         aliases.add(source.getAlias());
       }
 
@@ -40,21 +41,22 @@ export async function source(tree: AST): Promise<SourceData[]> {
     }
   }
 
-  const result: SourceData[] = [{
-    source: main.ref(),
-    data: await refMap.get(main.ref())!
-  }];
+  const result: SourceData[] = [
+    {
+      source: main.ref(),
+      data: await refMap.get(main.ref())!,
+    },
+  ];
 
   for (const [joinFile, source] of Object.entries(joins)) {
     result.push({
       source: source.ref(),
       where: source.filter,
-      data: await refMap.get(joinFile)!
+      data: await refMap.get(joinFile)!,
     });
   }
 
   return result;
-
 }
 
 async function loadData(file: string): Promise<object[]> {

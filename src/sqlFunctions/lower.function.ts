@@ -2,20 +2,18 @@ import { SQLFactory } from "./sqlFactory";
 import { SQLFunction, ValidatedArgs } from "./sqlFunction";
 import * as z from "zod";
 
-const Validation = z.tuple([
-    z.string()
-]);
+const Validation = z.tuple([z.string()]);
 
 export class LowerFunction extends SQLFunction<string, typeof Validation> {
-    public validation(): typeof Validation {
-        return Validation;
-    }
+  public validation(): typeof Validation {
+    return Validation;
+  }
 
-    public subResolve(args: ValidatedArgs<this>): string {
-        const [str] = args;
+  public subResolve(args: ValidatedArgs<this>): string {
+    const [str] = args;
 
-        return str.toLowerCase();
-    }
+    return str.toLowerCase();
+  }
 }
 
 SQLFactory.register("LOWER", LowerFunction);

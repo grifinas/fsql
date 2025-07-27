@@ -92,7 +92,7 @@ export function tokenize(input: string): TokenStream {
       continue;
     }
 
-    if(['"', "'", "`"].includes(char)) {
+    if (['"', "'", "`"].includes(char)) {
       current++;
       const start = current;
       while (current < input.length && char !== input[current]) {
@@ -119,7 +119,7 @@ export function tokenize(input: string): TokenStream {
 
     logger.error(
       "Unexpected char near:",
-      input.substring(current - 10, current + 10)
+      input.substring(current - 10, current + 10),
     );
 
     throw new TypeError("Unexpected character: " + char);
@@ -135,21 +135,21 @@ export function tokenAssert(token: Token, type: Token["type"], value?: string) {
     typesEqual && valuesEqual,
     `Expected token to be ${type}${
       value ? `::${value}` : ""
-    }, but got: ${JSON.stringify(token, null, 2)} at ${new Error().stack}`
+    }, but got: ${JSON.stringify(token, null, 2)} at ${new Error().stack}`,
   );
 }
 
 export function unexpectedToken(
   token: Token,
   where?: string,
-  expected?: string
+  expected?: string,
 ): never {
   cliAssert(
     false,
     `Unexpected token ${where ? `in ${where}` : ""}: ${JSON.stringify(
       token,
       null,
-      2
-    )}${expected ? ` Expected: ${expected}` : ""}`
+      2,
+    )}${expected ? ` Expected: ${expected}` : ""}`,
   );
 }

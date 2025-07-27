@@ -11,7 +11,7 @@ export function mesh(sources: SourceData[]): MeshedRow[] {
   }
 
   const rows = buildRecursively(sources);
-  return rows.filter(row => {
+  return rows.filter((row) => {
     for (const source of sources) {
       if (source.where && !source.where.resolve(row)) {
         return false;
@@ -20,7 +20,6 @@ export function mesh(sources: SourceData[]): MeshedRow[] {
     return true;
   });
 }
-
 
 function buildRecursively(sources: SourceData[], rows: MeshedRow[] = []) {
   const [source, ...rest] = sources;

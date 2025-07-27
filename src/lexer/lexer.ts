@@ -7,7 +7,7 @@ import { TokenMatcher, TokenStream } from "@tokenizer";
 import { AST } from "@data";
 
 let ast: AST;
-let stream: TokenStream;  
+let stream: TokenStream;
 
 export function lex(_stream: TokenStream): AST {
   stream = _stream;
@@ -46,11 +46,18 @@ export function optional(
   if (stream.advanceIf(token)) {
     fn(ast, stream);
   } else {
-    logger.debug("Optional token not found", token, stream.toStringFromCurrent());
+    logger.debug(
+      "Optional token not found",
+      token,
+      stream.toStringFromCurrent(),
+    );
   }
 }
 
-export function chainable(token: TokenMatcher, fn: (ast: AST, stream: TokenStream) => void): void {
+export function chainable(
+  token: TokenMatcher,
+  fn: (ast: AST, stream: TokenStream) => void,
+): void {
   while (stream.advanceIf(token)) {
     fn(ast, stream);
   }
@@ -98,41 +105,41 @@ function parseInto(ast: AST, stream: TokenStream): void {
 function parseLimit(ast: AST, stream: TokenStream): void {
   const limitToken = stream.consume(ANY.NUMBER);
   const limitValue = parseInt(limitToken.value, 10);
-  
+
   if (isNaN(limitValue) || limitValue < 0) {
     stream.regress();
     stream.unexpectedToken("Number >= 0");
   }
-  
+
   ast.setLimit(limitValue);
 }
 
 function parseOffset(ast: AST, stream: TokenStream): void {
   const offsetToken = stream.consume(ANY.NUMBER);
   const offsetValue = parseInt(offsetToken.value, 10);
-  
+
   if (isNaN(offsetValue) || offsetValue < 0) {
     stream.regress();
     stream.unexpectedToken("Number >= 0");
   }
-  
+
   ast.setOffset(offsetValue);
 }
 
 function parseGroupBy(ast: AST, stream: TokenStream): void {
   stream.consume(KEYWORD.BY);
-  
+
   const groupByFields: string[] = [];
-  
+
   // Parse first field
   const firstField = stream.consume(ANY.WORD);
   groupByFields.push(firstField.value);
-  
+
   // Parse additional fields separated by commas
   while (stream.advanceIf(ANY.COMMA)) {
     const field = stream.consume(ANY.WORD);
     groupByFields.push(field.value);
   }
-  
+
   ast.setGroupBy(groupByFields);
 }

@@ -8,7 +8,7 @@ export function parseFilterFunction(stream: TokenStream): FilterFunction {
   const left = parseProperty(stream);
 
   if (stream.done()) {
-    return new FilterFunction(left, '=', new ResolvedProperty(true));
+    return new FilterFunction(left, "=", new ResolvedProperty(true));
   }
 
   const token = stream.get();
@@ -17,8 +17,8 @@ export function parseFilterFunction(stream: TokenStream): FilterFunction {
     stream.advance();
     const right = parseProperty(stream);
     return new FilterFunction(left, token.value as Operator, right);
-  } else if (RESERVED_WORDS.some(token => token.value === token.value)) {
-    return new FilterFunction(left, '=', new ResolvedProperty(true));
+  } else if (RESERVED_WORDS.some((token) => token.value === token.value)) {
+    return new FilterFunction(left, "=", new ResolvedProperty(true));
   } else {
     stream.unexpectedToken("Comparison or reserved word");
   }

@@ -5,27 +5,27 @@ import { logger } from "@utils";
 import { AST } from "./ast";
 
 export function select(rows: MeshedRow[], ast: AST): object[] {
-    logger.debug("Selecting data", { rows, fields: ast.fields });
-    return rows.map((row: MeshedRow) => {
-        return colapse(row, ast.fields);
-    });
+  logger.debug("Selecting data", { rows, fields: ast.fields });
+  return rows.map((row: MeshedRow) => {
+    return colapse(row, ast.fields);
+  });
 }
 
 function colapse(row: MeshedRow, fields: Property[]): object {
-    const m: Record<string, unknown> = {};
-    if (fields.length === 0) {
-        for (let source in row) {
-            const data = row[source];
-            for (let field in data) {
-                m[field] = data[field as keyof typeof data];
-            }
-        }    
-
-        return m;
+  const m: Record<string, unknown> = {};
+  if (fields.length === 0) {
+    for (let source in row) {
+      const data = row[source];
+      for (let field in data) {
+        m[field] = data[field as keyof typeof data];
+      }
     }
 
-    for (let field of fields) {
-        m[field.ref()] = resolveValue(field, row).value;
-    }
     return m;
+  }
+
+  for (let field of fields) {
+    m[field.ref()] = resolveValue(field, row).value;
+  }
+  return m;
 }

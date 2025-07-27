@@ -9,8 +9,7 @@ type Expectations = TokenExpectations | string;
 export class TokenStream {
   private index: number = 0;
 
-  constructor(private readonly tokens: Token[]) {
-  }
+  constructor(private readonly tokens: Token[]) {}
 
   get length(): number {
     return this.tokens.length;
@@ -20,10 +19,10 @@ export class TokenStream {
     const token = this.tokens[this.index];
     if (!token) {
       throw new Error(
-        `No token at index: ${this.index}, there are ${this.tokens.length} tokens`
+        `No token at index: ${this.index}, there are ${this.tokens.length} tokens`,
       );
     }
-    if (matchers.length && !matchers.some(matcher => token.is(matcher))) {
+    if (matchers.length && !matchers.some((matcher) => token.is(matcher))) {
       this.unexpectedToken(matchers);
     }
     return token;
@@ -39,7 +38,7 @@ export class TokenStream {
     const token = this.tokens[i];
     if (!token) {
       throw new Error(
-        `No token at index: ${i}, there are ${this.tokens.length} tokens`
+        `No token at index: ${i}, there are ${this.tokens.length} tokens`,
       );
     }
     return token;
@@ -57,7 +56,7 @@ export class TokenStream {
   advance() {
     this.index++;
   }
-  
+
   regress() {
     this.index--;
   }
@@ -110,32 +109,34 @@ export class TokenStream {
     const relevantTokens = this.tokens.slice(startIdx, endIdx);
 
     // Create the token visualization line
-    const tokenLine = relevantTokens.map((token, i) => {
-      const str = stringifyToken(token);
-      return startIdx + i === this.index ? `[${str}]` : str;
-    }).join(' ');
+    const tokenLine = relevantTokens
+      .map((token, i) => {
+        const str = stringifyToken(token);
+        return startIdx + i === this.index ? `[${str}]` : str;
+      })
+      .join(" ");
 
     // Create the pointer line
     const beforeTokens = relevantTokens.slice(0, this.index - startIdx);
     const pointerOffset = beforeTokens.reduce(
       (l, token) => l + stringifyToken(token).length + 1, // +1 for the space we added
-      0
+      0,
     );
 
     // Create a detailed token info line
     const currentToken = this.tokens[this.index];
-    const tokenInfo = currentToken ?
-      `Current token: ${currentToken.type}::${currentToken.value}` :
-      'No current token';
+    const tokenInfo = currentToken
+      ? `Current token: ${currentToken.type}::${currentToken.value}`
+      : "No current token";
 
     return [
-      '\nToken stream context:',
+      "\nToken stream context:",
       tokenLine,
-      ' '.repeat(pointerOffset) + '^',
+      " ".repeat(pointerOffset) + "^",
       tokenInfo,
       `Position: ${this.index + 1}/${this.tokens.length}`,
-      new Error().stack
-    ].join('\n');
+      new Error().stack,
+    ].join("\n");
   }
 
   assert(match: TokenMatcher): this {
@@ -143,7 +144,7 @@ export class TokenStream {
     cliAssert(
       token.is(match),
       () =>
-        `Expected token to be ${match.toString()}, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
+        `Expected token to be ${match.toString()}, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`,
     );
 
     return this;
@@ -154,19 +155,22 @@ export class TokenStream {
     cliAssert(
       token.is(match),
       () =>
-        `Expected token to be ${match.toString()}, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`
+        `Expected token to be ${match.toString()}, but got: ${token.value}::${token.type} at ${this.stringifyTokenContext()}`,
     );
 
     return this;
   }
 
   unexpectedToken(expected: Expectations = []): never {
-    const expectedString = typeof expected === 'string' ? expected : expected.map(token => token.toString()).join(" ");
+    const expectedString =
+      typeof expected === "string"
+        ? expected
+        : expected.map((token) => token.toString()).join(" ");
     const token = this.get();
     cliAssert(
       false,
       () => `Unexpected token: ${token.value}::${token.type} 
-          ${expected.length > 0 ? ` Expected: ${expectedString}` : ""} at ${this.stringifyTokenContext()}`
+          ${expected.length > 0 ? ` Expected: ${expectedString}` : ""} at ${this.stringifyTokenContext()}`,
     );
   }
 }

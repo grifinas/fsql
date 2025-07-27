@@ -19,8 +19,9 @@
     "build:tsc": "tsc",
     "run": "node ./dist/index.mjs",
     "cc": "npm run build && npm run cli",
-    "lint": "npm run lint:fix && npm run build:tsc",
-    "lint:fix": "eslint src/**/*.ts --fix"
+    "lint": "npm run build:tsc && run prettier && npm run lint:fix",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "prettier": "prettier --write src/**/*.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

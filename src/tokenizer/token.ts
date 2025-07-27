@@ -13,7 +13,7 @@ export class Token {
   }
 
   isIn(tokens: TokenMatcher[] | readonly TokenMatcher[]): boolean {
-    return tokens.some(token => this.is(token));
+    return tokens.some((token) => this.is(token));
   }
 
   isNot(token: TokenMatcher): boolean {
@@ -28,7 +28,8 @@ export class Token {
     const typesEqual = this.type === type;
     let valuesEqual = true;
     if (value) {
-      valuesEqual = this.value.toLocaleLowerCase() === value.toLocaleLowerCase();
+      valuesEqual =
+        this.value.toLocaleLowerCase() === value.toLocaleLowerCase();
     }
     return typesEqual && valuesEqual;
   }

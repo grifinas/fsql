@@ -33,7 +33,7 @@ export class AST {
       select,
       order,
       limit,
-      write
+      write,
     ]);
 
     if (this.next) {
@@ -76,7 +76,7 @@ export class AST {
 
   addField(property: Property) {
     // Check for duplicate fields when no alias is provided
-    if (this.fields.some(f => f.ref() === property.ref())) {
+    if (this.fields.some((f) => f.ref() === property.ref())) {
       throw new Error(`Field '${property.ref()}' has already been added`);
     }
 
@@ -102,7 +102,7 @@ export class AST {
       data = step(data, this);
       logger.debug(step.name, data);
     }
-    
+
     return data;
   }
 }

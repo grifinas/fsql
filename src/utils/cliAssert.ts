@@ -2,7 +2,7 @@ import { logger } from "./logger";
 
 export function cliAssert(
   value: unknown,
-  message?: string | (() => string)
+  message?: string | (() => string),
 ): asserts value {
   if (value) return;
 
