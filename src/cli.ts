@@ -2,9 +2,8 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { Arguments, CommandModule, Argv } from "yargs";
 import { main } from ".";
-import { logger, LogLevel } from "./utils/logger";
+import { logger, LogLevel, fileUtils } from "./utils";
 import { startRepl } from "./repl";
-import { fileUtils } from "./utils/file";
 
 interface SqlArgs extends Arguments {
     sql: string;

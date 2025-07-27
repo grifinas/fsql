@@ -1,7 +1,7 @@
-import { sourceData } from "../../src/flow/sourceData";
+import { source } from "../../src/data/source";
 import { fileUtils } from "../../src/utils/file";
 import { FilterFunction } from "../../src/entities/filterFunction";
-import { AST, JoinMap } from "../../src/entities/ast";
+import { AST, JoinMap } from "../../src/data/ast";
 import { FileDataSource } from "../../src/entities/dataSource";
 import { mock } from 'jest-mock-extended';
 
@@ -36,7 +36,7 @@ describe("sourceData", () => {
         variables: {}
       }
     );
-    const result = await sourceData(ast);
+    const result = await source(ast);
     expect(result).toEqual([
       { source: '@m', data: mainData }
     ]);
@@ -63,7 +63,7 @@ describe("sourceData", () => {
         variables: {}
       }
     );
-    const result = await sourceData(ast);
+    const result = await source(ast);
     expect(result).toEqual([
       { source: "@m", data: mainData },
       { source: "@j", where: blankFilter, data: joinData }
@@ -85,7 +85,7 @@ describe("sourceData", () => {
         variables: {}
       }
     );
-    const result = await sourceData(ast);
+    const result = await source(ast);
     expect(result).toEqual([
       { source: "@m", data: mainData },
       { source: "@j", where: blankFilter, data: mainData }
@@ -105,7 +105,7 @@ describe("sourceData", () => {
         variables: {}
       }
     );
-    await expect(sourceData(ast))
+    await expect(source(ast))
       .rejects.toThrow("Duplicate alias: @j");
   });
 });

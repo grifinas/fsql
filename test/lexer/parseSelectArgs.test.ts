@@ -1,5 +1,5 @@
 import { parseSelectArgs } from '../../src/lexer/parseSelectArgs';
-import { AST } from '../../src/entities/ast';
+import { AST } from '../../src/data/ast';
 import { TokenStream } from '../../src/tokenizer/tokenStream';
 import { Token } from '../../src/tokenizer/token';
 import { Type } from '../../src/types';

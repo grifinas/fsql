@@ -1,13 +1,13 @@
-import { SourceData, sourceData } from "../flow/sourceData";
-import { FilterFunction } from "./filterFunction";
-import { logger } from "../utils/logger";
-import { Property } from "./property";
-import { DataSource } from "./dataSource";
-import { meshData } from "../flow/meshData";
-import { selectData } from "../flow/selectData";
-import { orderData } from "../flow/orderData";
-import { filterData } from "../flow/filterData";
-import { writeData } from "../flow/writeData";
+import { SourceData, source } from "./source";
+import { FilterFunction } from "../entities";
+import { logger } from "../utils";
+import { Property } from "../entities";
+import { DataSource } from "../entities";
+import { mesh } from "./mesh";
+import { select } from "./select";
+import { order } from "./order";
+import { filter } from "./filter";
+import { write } from "./write";
 
 export type JoinMap = Record<string, { where: FilterFunction; source: DataSource }>;
 
@@ -25,12 +25,12 @@ export class AST {
   async execute(): Promise<object[]> {
     logger.info("Executing", this);
 
-    const data = this.flow(await sourceData(this), [
-      meshData,
-      filterData,
-      selectData,
-      orderData,
-      writeData
+    const data = this.flow(await source(this), [
+      mesh,
+      filter,
+      select,
+      order,
+      write
     ]);
 
     if (this.next) {

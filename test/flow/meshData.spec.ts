@@ -1,5 +1,5 @@
 import { FilterFunction } from "../../src/entities/filterFunction";
-import { meshData } from "../../src/flow/meshData";
+import { mesh } from "../../src/data/mesh";
 import { MeshedRow } from "../../src/types";
 import { mock } from 'jest-mock-extended';
 
@@ -14,7 +14,7 @@ describe("meshData", () => {
                 ]
             }
         ];
-        const result = meshData(sources);
+        const result = mesh(sources);
         expect(result).toEqual([
             { "@m": { id: 1, name: "John" } },
             { "@m": { id: 2, name: "Jane" } },
@@ -38,7 +38,7 @@ describe("meshData", () => {
                 ]
             }
         ];
-        const result = meshData(sources);
+        const result = mesh(sources);
         expect(result).toEqual(expect.arrayContaining([
             { "@m": { id: 1, name: "John" }, "@j": { id: 1, name: "John" } },
             { "@m": { id: 1, name: "John" }, "@j": { id: 2, name: "Jane" } },
@@ -67,7 +67,7 @@ describe("meshData", () => {
                 ]
             }
         ];
-        const result = meshData(sources);
+        const result = mesh(sources);
         expect(result).toEqual([]);
     });
 
@@ -95,7 +95,7 @@ describe("meshData", () => {
                 ]
             }
         ];
-        const result = meshData(sources);
+        const result = mesh(sources);
         expect(result).toEqual(expect.arrayContaining([
             { "@m": { id: 1, name: "John" }, "@j": { id: 1, name: "John" }, "@k": { id: 1, name: "Steve" } },
             { "@m": { id: 1, name: "John" }, "@j": { id: 2, name: "Jane" }, "@k": { id: 1, name: "Steve" } },
@@ -144,7 +144,7 @@ describe("meshData", () => {
                 ]
             }
         ];
-        const result = meshData(sources);
+        const result = mesh(sources);
         expect(result).toEqual(expect.arrayContaining([
             { "@m": { id: 1, name: "John" }, "@j": { id: 2, name: "Jane" }, "@k": { id: 2, name: "Mark" } },
             { "@m": { id: 2, name: "Jane" }, "@j": { id: 2, name: "Jane" }, "@k": { id: 2, name: "Mark" } },
@@ -178,7 +178,7 @@ describe("meshData", () => {
             },
         ];
 
-        const result = meshData(sources);
+        const result = mesh(sources);
         expect(result.length).toBe(4);
     })
 })

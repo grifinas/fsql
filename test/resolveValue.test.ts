@@ -1,5 +1,5 @@
 import { FieldProperty, FunctionProperty, ResolvedProperty } from '../src/entities/property';
-import { resolveValue } from '../src/resolveValue';
+import { resolveValue } from '../src/data/resolveValue';
 describe("resolveValue", () => {
     it("should resolve field property", () => {
         const result = resolveValue(new FieldProperty(null, "foo"), { "@m": { foo: 1 } });

@@ -1,4 +1,4 @@
-import { TokenMatcher } from "../tokenizer/tokenMatcher";
+import { TokenMatcher } from "../tokenizer";
 import { Type } from "../types";
 
 export const KEYWORD = {

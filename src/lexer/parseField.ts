@@ -1,7 +1,7 @@
-import { TokenStream } from "../tokenizer/tokenStream";
-import { FieldProperty, FunctionProperty, Property, ResolvedProperty } from "../entities/property";
+import { TokenStream } from "../tokenizer";
+import { FieldProperty, FunctionProperty, Property, ResolvedProperty } from "../entities";
 import { ANY, RESERVED_WORDS, Symbols } from "./constants";
-import { logger } from "../utils/logger";
+import { logger } from "../utils";
 
 export function parseField(stream: TokenStream): Property {
     const parts: string[] = [];

@@ -1,8 +1,8 @@
-import { AST } from '../entities/ast';
-import { fileUtils } from '../utils/file';
-import { FileDataSource, VariableDataSource } from '../entities/dataSource';
+import { AST } from './ast';
+import { fileUtils } from '../utils';
+import { FileDataSource, VariableDataSource } from '../entities';
 
-export function writeData(data: object[], ast: AST) {
+export function write(data: object[], ast: AST) {
   if (ast.into) {
     if (ast.into instanceof VariableDataSource) {
       ast.assignVariable(ast.into.variableName, data);

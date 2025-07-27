@@ -1,7 +1,7 @@
-import { AST, JoinMap } from "../entities/ast";
-import { DataSource, FileDataSource } from "../entities/dataSource";
-import { FilterFunction } from "../entities/filterFunction";
-import { fileUtils } from "../utils/file";
+import { AST, JoinMap } from "./ast";
+import { DataSource, FileDataSource } from "../entities";
+import { FilterFunction } from "../entities";
+import { fileUtils } from "../utils";
 
 export interface SourceData {
   source: string;
@@ -9,7 +9,7 @@ export interface SourceData {
   data: object[];
 }
 
-export async function sourceData(tree: AST): Promise<SourceData[]> {
+export async function source(tree: AST): Promise<SourceData[]> {
   if (!tree.mainfile) {
     throw new Error("No main file specified");
   }

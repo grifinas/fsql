@@ -1,6 +1,6 @@
-import { AST } from '../../src/entities/ast';
+import { AST } from '../../src/data/ast';
 import { FieldProperty, Property } from '../../src/entities/property';
-import { selectData } from '../../src/flow/selectData';
+import { select } from '../../src/data/select';
 import { MeshedRow } from '../../src/types';
 import { mock } from 'jest-mock-extended';
 
@@ -12,14 +12,14 @@ describe('selectData', () => {
 
     it('should return an empty array if rows are empty', () => {
       const rows: MeshedRow[] = [];
-      expect(selectData(rows, emptyFields)).toEqual([]);
+      expect(select(rows, emptyFields)).toEqual([]);
     });
 
     it('should collapse a single row with a single source', () => {
       const rows: MeshedRow[] = [
         { '@sourceA': { id: 1, name: 'Alice' } },
       ];
-      expect(selectData(rows, emptyFields)).toEqual([
+      expect(select(rows, emptyFields)).toEqual([
         { id: 1, name: 'Alice' },
       ]);
     });
@@ -31,7 +31,7 @@ describe('selectData', () => {
           '@sourceB': { age: 30, city: 'New York' },
         },
       ];
-      expect(selectData(rows, emptyFields)).toEqual([
+      expect(select(rows, emptyFields)).toEqual([
         { id: 1, name: 'Alice', age: 30, city: 'New York' },
       ]);
     });
@@ -47,7 +47,7 @@ describe('selectData', () => {
           '@sourceB': { age: 25 },
         },
       ];
-      expect(selectData(rows, emptyFields)).toEqual([
+      expect(select(rows, emptyFields)).toEqual([
         { id: 1, name: 'Alice', age: 30 },
         { id: 2, name: 'Bob', age: 25 },
       ]);
@@ -60,7 +60,7 @@ describe('selectData', () => {
           '@sourceB': {},
         },
       ];
-      expect(selectData(rows, emptyFields)).toEqual([
+      expect(select(rows, emptyFields)).toEqual([
         { id: 1, name: 'Alice' },
       ]);
     });
@@ -76,7 +76,7 @@ describe('selectData', () => {
       // Depending on object key order (not guaranteed) or iteration order in selectData
       // This test assumes sourceB's status will overwrite sourceA's if 'id' is the same
       // Or rather, it just merges all properties. Let's assume simple merge.
-      expect(selectData(rows, emptyFields)).toEqual([
+      expect(select(rows, emptyFields)).toEqual([
         { id: 101, status: 'inactive' }, // If sourceB properties are processed after sourceA for the same output object
       ]);
     });
@@ -92,7 +92,7 @@ describe('selectData', () => {
           new FieldProperty(null, 'name').setAlias('firstname'),
         ],
       });
-      expect(selectData(rows, ast)).toEqual([
+      expect(select(rows, ast)).toEqual([
         { firstname: 'Alice' },
       ]);
     });
@@ -106,7 +106,7 @@ describe('selectData', () => {
           new FieldProperty('@sourceA', 'name').setAlias('firstname'),
         ],
       });
-      expect(selectData(rows, ast)).toEqual([
+      expect(select(rows, ast)).toEqual([
         { firstname: 'Alice' },
       ]);
     });
@@ -120,7 +120,7 @@ describe('selectData', () => {
           new FieldProperty('@sourceA', 'address.city').setAlias('city'),
         ],
       });
-      expect(selectData(rows, ast)).toEqual([
+      expect(select(rows, ast)).toEqual([
         { city: 'New York' },
       ]);
     });

@@ -1,5 +1,5 @@
-import { AST } from '../entities/ast';
-export function orderData(mapped: object[], ast: AST): object[] {
+import { AST } from './ast';
+export function order(mapped: object[], ast: AST): object[] {
     if (!ast.order) return mapped;
 
     const [key, value] = ast.order;

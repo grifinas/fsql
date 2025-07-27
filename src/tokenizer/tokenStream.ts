@@ -1,4 +1,4 @@
-import { cliAssert } from "../utils/cliAssert";
+import { cliAssert } from "../utils";
 import { Token } from "./token";
 import { TokenMatcher } from "./tokenMatcher";
 import { Type } from "../types";

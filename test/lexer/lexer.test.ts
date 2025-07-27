@@ -1,5 +1,5 @@
 import { lex } from "../../src/lexer/lexer";
-import { AST } from "../../src/entities/ast";
+import { AST } from "../../src/data/ast";
 import { FilterFunction } from "../../src/entities/filterFunction";
 import { FieldProperty, FunctionProperty } from "../../src/entities/property";
 import { tokenize } from "../../src/tokenizer/tokenizer";

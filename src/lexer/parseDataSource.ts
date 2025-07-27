@@ -1,6 +1,6 @@
-import { TokenStream } from "../tokenizer/tokenStream";
+import { TokenStream } from "../tokenizer";
 import { parseVariable } from "./parseVariable";
-import { logger } from "../utils/logger";
+import { logger } from "../utils";
 import { withVarAlias } from './parseAlias';
 import { ANY, Symbols } from "./constants";
 import { DataSource, VariableDataSource, FileDataSource } from "../entities/dataSource";

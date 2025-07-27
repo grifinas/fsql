@@ -1,4 +1,4 @@
-import { logger } from "../utils/logger";
+import { logger } from "../utils";
 import { SQLFactory } from "./sqlFactory";
 import { SQLFunction, ValidatedArgs } from "./sqlFunction";
 import * as z from "zod";

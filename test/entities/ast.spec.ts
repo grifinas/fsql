@@ -1,4 +1,4 @@
-import { AST } from "../../src/entities/ast";
+import { AST } from "../../src/data/ast";
 import { FieldProperty } from "../../src/entities/property";
 
 describe("AST", () => {

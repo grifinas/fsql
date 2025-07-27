@@ -1,6 +1,6 @@
 import { Property, ResolvedProperty } from "./property";
-import { resolveValue } from '../resolveValue';
-import { logger } from "../utils/logger";
+import { resolveValue } from '../data';
+import { logger } from "../utils";
 import { MeshedRow } from "../types";
 
 export type Operator = '<' | '>' | '=';

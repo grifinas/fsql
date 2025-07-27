@@ -1,7 +1,6 @@
 import "./sqlFunctions";
-import { lex } from "./lexer/lexer";
-import { TokenStream } from "./tokenizer/tokenStream";
-import { tokenize } from "./tokenizer/tokenizer";
+import { lex } from "./lexer";
+import { TokenStream, tokenize } from "./tokenizer";
 
 export async function main(sql: string, variables: Record<string, object[]> = {}): Promise<object[]> {
     const tokens: TokenStream = tokenize(sql);

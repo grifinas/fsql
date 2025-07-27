@@ -1,8 +1,26 @@
+import { Property, ResolvedProperty, FieldProperty, FunctionProperty } from "../entities";
+import { SQLFactory } from "../sqlFunctions";
 import { MeshedRow, Scalar } from "../types";
-import { logger } from "./logger";
-import { pathValue } from "./pathValue";
+import { logger, pathValue } from "../utils";
 
-//TODO this file is very core and should not be in utils
+export function resolveValue(value: Property, row: MeshedRow): ResolvedProperty {
+    if (value instanceof ResolvedProperty) {
+        return value;
+    }
+
+    if (value instanceof FieldProperty) {
+        return new ResolvedProperty(getMeshedRowValue(row, value.source, value.field));
+    }
+
+    if (value instanceof FunctionProperty) {
+        const fn = SQLFactory.make<Scalar>(value);
+
+        return new ResolvedProperty(fn.resolve(row));
+    }
+
+    throw new Error(`Unknown property type ${value}, ${typeof value}, ${value.constructor.name}`);
+}
+
 export function getMeshedRowValue(row: MeshedRow, source: string | null, field: string): Scalar {
     if (source) {
         const sourceData = row[source];

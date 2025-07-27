@@ -1,6 +1,5 @@
 import { Type } from "../types";
-import { cliAssert } from "../utils/cliAssert";
-import { logger } from "../utils/logger";
+import { cliAssert, logger } from "../utils";
 import { Token } from "./token";
 import { TokenStream } from "./tokenStream";
 

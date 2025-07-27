@@ -1,4 +1,4 @@
-import { FunctionProperty, Property } from "../entities/property";
+import { FunctionProperty, Property } from "../entities";
 import { MeshedRow } from "../types";
 
 type Constructor = new (name: string, fnArguments: Property[]) => Resolvable;

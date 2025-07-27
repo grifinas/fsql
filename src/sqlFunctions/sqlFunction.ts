@@ -1,7 +1,7 @@
-import { Property } from "../entities/property";
+import { Property } from "../entities";
 import * as z from "zod";
-import { resolveValue } from "../resolveValue";
-import { logger } from "../utils/logger";
+import { resolveValue } from "../data";
+import { logger } from "../utils";
 import { MeshedRow, Scalar } from "../types";
 
 export type ValidatedArgs<SQL extends SQLFunction> = z.infer<ReturnType<SQL["validation"]>>;

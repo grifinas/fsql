@@ -1,7 +1,7 @@
 import { MeshedRow } from "../types";
-import { SourceData } from "./sourceData";
+import { SourceData } from "./source";
 
-export function meshData(sources: SourceData[]): MeshedRow[] {
+export function mesh(sources: SourceData[]): MeshedRow[] {
   if (sources.length === 0) {
     return [];
   }

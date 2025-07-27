@@ -1,5 +1,5 @@
 import * as readline from 'readline';
-import { logger } from './utils/logger';
+import { logger } from './utils';
 import { main } from '.';
 
 export async function startRepl(): Promise<object[] | null> {
