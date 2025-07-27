@@ -1,6 +1,5 @@
 import { TokenMatcher } from "./tokenMatcher";
 import { Type } from "./types";
-import { logger } from "./utils/logger";
 
 export class Token {
   constructor(
@@ -10,7 +9,6 @@ export class Token {
 
   is(matcher: TokenMatcher): boolean {
     const result = this.isRawEqual(matcher.type, matcher.value);
-    logger.debug(`Token ${this.value} is ${matcher.toString()} ${result}`);
     return result;
   }
 

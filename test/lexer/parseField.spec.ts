@@ -14,7 +14,7 @@ describe("parseField", () => {
     expect(result).toBeInstanceOf(FieldProperty);
     expect((result as FieldProperty).source).toEqual(null);
     expect((result as FieldProperty).field).toEqual("foo");
-    expect(stream.getIndex()).toBe(stream.length);
+    expect(stream.done()).toBe(true);
   });
 
   it("should parse dot-separated fields", () => {
@@ -27,7 +27,7 @@ describe("parseField", () => {
     expect(result).toBeInstanceOf(FieldProperty);
     expect((result as FieldProperty).source).toEqual(null);
     expect((result as FieldProperty).field).toEqual("foo.bar");
-    expect(stream.getIndex()).toBe(stream.length);
+    expect(stream.done()).toBe(true);
   });
 
   it("should parse multiple dot-separated fields", () => {
@@ -42,7 +42,7 @@ describe("parseField", () => {
     expect(result).toBeInstanceOf(FieldProperty);
     expect((result as FieldProperty).source).toEqual(null);
     expect((result as FieldProperty).field).toEqual("foo.bar.baz");
-    expect(stream.getIndex()).toBe(stream.length);
+    expect(stream.done()).toBe(true);
   });
 
   it("should understand that you cant have two words in a row in a field", () => {

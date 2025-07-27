@@ -7,7 +7,7 @@ type TokenExpectations = (Token | TokenMatcher)[];
 type Expectations = TokenExpectations | string;
 
 export class TokenStream {
-  private index: number = -1;
+  private index: number = 0;
 
   constructor(private readonly tokens: Token[]) {
   }
@@ -17,8 +17,6 @@ export class TokenStream {
   }
 
   get(...matchers: TokenMatcher[]): Token {
-    //Index starts counting from -1 just so while(stream.hasNext()) stream.next() would work propperly
-    if (this.index < 0) this.index = 0;
     const token = this.tokens[this.index];
     if (!token) {
       throw new Error(
@@ -80,23 +78,8 @@ export class TokenStream {
     return this.index >= this.tokens.length;
   }
 
-  hasNext(): boolean {
-    return this.tokens.length > this.index + 1;
-  }
-
   peek(offset: number = 1): Token {
     return this.getIndexed(this.index + offset);
-  }
-
-  popNextIf(token: TokenMatcher): boolean {
-    if (!this.hasNext()) {
-      return false;
-    };
-    if (this.peek().is(token)) {
-      this.next();
-      return true;
-    }
-    return false;
   }
 
   multiPeek(offset: number = 1): Token[] {
@@ -112,8 +95,6 @@ export class TokenStream {
   }
 
   toStringFromCurrent(): string {
-    //TODO feels very off
-    if (this.index < 0) this.index = 0;
     return [...this.tokens].splice(this.index).map(stringifyToken).join("");
   }
 

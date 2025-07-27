@@ -21,8 +21,9 @@ describe("tokenizer", () => {
     const stream = tokenize('1 21 357 654813258821');
     expect(stream.length).toBe(4);
 
-    while (stream.hasNext()) {
-      expect(stream.next().type).toBe(Type.number);
+    while (!stream.done()) {
+      expect(stream.get().type).toBe(Type.number);
+      stream.advance();
     }
   });
 
@@ -30,7 +31,7 @@ describe("tokenizer", () => {
     const input = '{[()]()}[]';
     const stream = tokenize(input);
     expect(stream.length).toBe(input.length);
-    expect(stream.next().type).toBe(Type.brace);
+    expect(stream.get().type).toBe(Type.brace);
     expect(stream.next().type).toBe(Type.bracket);
     expect(stream.next().type).toBe(Type.parenthesis);
     expect(stream.next().type).toBe(Type.parenthesis);
@@ -46,7 +47,7 @@ describe("tokenizer", () => {
     const input = ',.;';
     const stream = tokenize(input);
     expect(stream.length).toBe(input.length);
-    expect(stream.next().type).toBe(Type.comma);
+    expect(stream.get().type).toBe(Type.comma);
     expect(stream.next().type).toBe(Type.dot);
     expect(stream.next().type).toBe(Type.semicolon);
   });
@@ -55,7 +56,7 @@ describe("tokenizer", () => {
     const input = '<=>';
     const stream = tokenize(input);
     expect(stream.length).toBe(input.length);
-    const lt = stream.next();
+    const lt = stream.get();
     expect(lt.type).toBe(Type.comp);
     expect(lt.value).toBe('<');
     expect(stream.next().type).toBe(Type.equals);
@@ -80,8 +81,10 @@ describe("tokenizer", () => {
     const input = 'foo#😀😔😤\nbar';
     const stream = tokenize(input);
     expect(stream.length).toBe(2);
+    expect(stream.get().type).toBe(Type.word);
+    expect(stream.get().value).toBe('foo');
     expect(stream.next().type).toBe(Type.word);
-    expect(stream.next().type).toBe(Type.word);
+    expect(stream.get().value).toBe('bar');
   });
 
   it("should parse quotes", () => {

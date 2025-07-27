@@ -7,32 +7,28 @@ export function parseField(stream: TokenStream): Property {
     const parts: string[] = [];
     let start = stream.getIndex();
 
-    while (true) {
-        const token = stream.get();
-        if (stream.advanceIf(ANY.STRING)) {
+    do {
+        const token = stream.get(ANY.NUMBER, ANY.WORD, ANY.STRING);
+        stream.advance();
+        if (token.is(ANY.STRING)) {
             return new ResolvedProperty(token.value);
-        }
-        const value = getValueFromStream(stream);
-        if (typeof value === 'string') {
-            parts.push(value);
-        } else if (parts.length === 0) {
-            stream.advance();
-            return new ResolvedProperty(value);
         } else {
-            parts.push(String(value));
+            parts.push(token.value);
         }
-        if (!stream.popNextIf(ANY.DOT)) {
-            break;
-        } else {
-            stream.advance();
-        }
-    }
-
-    stream.advance();
+    } while (stream.advanceIf(ANY.DOT))
 
     if (stream.advanceIf(Symbols.OPEN_PARENTHESIS)) {
         stream.setIndex(start);
         return parseFunction(stream);
+    }
+
+    if (parts.length === 1) {
+        const [arg] = parts;
+        if (['true', 'false'].includes(arg.toLocaleLowerCase())) {
+            return new ResolvedProperty(arg === 'true');
+        } else if (!isNaN(Number(arg))) {
+            return new ResolvedProperty(Number(arg));
+        }
     }
 
     const fieldName = parts.join('.');
@@ -42,19 +38,6 @@ export function parseField(stream: TokenStream): Property {
     }
 
     return new FieldProperty(null, fieldName);
-}
-
-function getValueFromStream(stream: TokenStream): string | number | boolean {
-    const token = stream.get(ANY.NUMBER, ANY.WORD, ANY.STRING);
-    if (token.is(ANY.NUMBER)) {
-        return Number(token.value);
-    } else if (token.is(ANY.WORD)) {
-        return ['true', 'false'].includes(token.value.toLocaleLowerCase()) ? token.value === 'true' : token.value;
-    } else if (token.is(ANY.STRING)) {
-        return token.value;
-    }
-
-    throw new Error(`Should be unreachable`);
 }
 
 function parseFunction(stream: TokenStream): FunctionProperty {
