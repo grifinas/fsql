@@ -152,4 +152,40 @@ describe('parseDataSource - Integration Tests', () => {
     expect(result.ref()).toBe('12345AS');
     expect(stream.done()).toBe(true);
   });
+
+  it('should parse a tmpfile like /var/folders/r6/60svyt3d4z50k0csszbzzppw0000gr/T/sql.GbpWX1t', async () => {
+    stream = new TokenStream([
+      new Token(Type.special, '/'),
+      new Token(Type.word, 'var'),
+      new Token(Type.special, '/'),
+      new Token(Type.word, 'folders'),
+      new Token(Type.special, '/'),
+      new Token(Type.word, 'r6'),
+      new Token(Type.special, '/'),
+      new Token(Type.number, '60'),
+      new Token(Type.word, 'svyt'),
+      new Token(Type.number, '3'),
+      new Token(Type.word, 'd'),
+      new Token(Type.number, '4'),
+      new Token(Type.word, 'z'),
+      new Token(Type.number, '50'),
+      new Token(Type.word, 'k'),
+      new Token(Type.number, '0'),
+      new Token(Type.word, 'csszbzzppw'),
+      new Token(Type.number, '0000'),
+      new Token(Type.word, 'gr'),
+      new Token(Type.special, '/'),
+      new Token(Type.word, 'T'),
+      new Token(Type.special, '/'),
+      new Token(Type.word, 'sql'),
+      new Token(Type.dot, '.'),
+      new Token(Type.word, 'GbpWX'),
+      new Token(Type.number, '1'),
+      new Token(Type.word, 't'),
+    ]);
+    const result = parseDataSource(stream);
+    expect(result).toBeInstanceOf(FileDataSource);
+    expect(result.ref()).toBe('/var/folders/r6/60svyt3d4z50k0csszbzzppw0000gr/T/sql.GbpWX1t');
+    expect(stream.done()).toBe(true);
+  });
 });

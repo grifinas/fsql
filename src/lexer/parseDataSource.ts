@@ -42,6 +42,7 @@ function parseFileDataSource(stream: TokenStream) {
       return new FileDataSource(path);
     } else if (fileToken.is(ANY.NUMBER)) {
       path += fileToken.value;
+      lastWasText = false;
     }
 
     //TODO feels off, sometimes we do not consume the final token maybe?
