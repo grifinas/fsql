@@ -19,7 +19,7 @@ export function parseDataSource(stream: TokenStream): DataSource {
 
 function parseFileDataSource(stream: TokenStream) {
   let path = "";
-  let lastWasText = false;
+  let expectedPos = 0;
   while (!stream.done()) {
     const fileToken = stream.get(
       ANY.DOT,
@@ -28,24 +28,23 @@ function parseFileDataSource(stream: TokenStream) {
       ANY.SEMICOLON,
       ANY.NUMBER,
     );
+    //positions don't match, found a space
+    if (expectedPos > 0 && expectedPos !== fileToken.position) {
+      return new FileDataSource(path);
+    } else {
+      expectedPos = fileToken.position + fileToken.value.length
+    }
+
     if (fileToken.is(ANY.DOT) || fileToken.is(Symbols.SLASH)) {
       path += fileToken.value;
-      lastWasText = false;
     } else if (fileToken.is(ANY.WORD)) {
-      if (lastWasText) {
-        return new FileDataSource(path);
-      } else {
         path += fileToken.value;
-        lastWasText = true;
-      }
     } else if (fileToken.is(ANY.SEMICOLON)) {
       return new FileDataSource(path);
     } else if (fileToken.is(ANY.NUMBER)) {
       path += fileToken.value;
-      lastWasText = false;
     }
 
-    //TODO feels off, sometimes we do not consume the final token maybe?
     stream.advance();
   }
 

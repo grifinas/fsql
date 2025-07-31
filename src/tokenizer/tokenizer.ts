@@ -88,7 +88,7 @@ export function tokenize(input: string): TokenStream {
       continue;
     }
 
-    if (["@", "$", "%", "^", "&", "*", "/"].includes(char)) {
+    if (["@", "$", "%", "^", "&", "*", "/", '!'].includes(char)) {
       tokens.push(new Token(Type.special, char, current));
       current++;
       continue;
