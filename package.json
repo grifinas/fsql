@@ -1,5 +1,5 @@
 {
-  "name": "sqlparse",
+  "name": "fsql",
   "version": "0.2.0",
   "description": "",
   "license": "ISC",
@@ -10,7 +10,7 @@
     "test": "test"
   },
   "bin": {
-    "jsql": "./dist/cli.mjs"
+    "fsql": "./dist/cli.mjs"
   },
   "scripts": {
     "release": "standard-version",
