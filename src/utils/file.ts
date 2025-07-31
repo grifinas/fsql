@@ -1,5 +1,6 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import { logger } from '@utils';
 
 export class FileUtils {
   async readJson(filepath: string): Promise<object> {
@@ -15,6 +16,8 @@ export class FileUtils {
     const filePath = path.isAbsolute(filepath)
       ? filepath
       : path.join(process.cwd(), filepath);
+
+    logger.log("Reading sql", filePath);
 
     const content = await fs.readFile(filePath);
     return content.toString();

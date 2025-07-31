@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { Arguments, CommandModule, Argv } from "yargs";
@@ -90,18 +91,39 @@ const parseCommand: CommandModule<{}, SqlArgs> = {
 
 void yargs(hideBin(process.argv))
   .command(parseCommand)
-  .example("$0 --repl", "Start the interactive REPL mode")
+  .example(
+    "$0 --repl",
+    "Start the interactive REPL mode"
+  )
+  .example(
+    "$0 --file query.sql",
+    "Execute SQL from a file"
+  )
   .example(
     "$0 'SELECT * FROM data.json'",
-    "Parse and execute a simple SQL query",
+    "Parse and execute a simple SQL query"
   )
   .example(
     "$0 parse 'SELECT * FROM data.json'",
-    "Parse and execute a simple SQL query (using explicit parse command)",
+    "Parse and execute a simple SQL query (using explicit parse command)"
   )
   .example(
     "$0 'SELECT data FROM file.json >> SELECT nested FROM $0'",
-    "Parse and execute a chained SQL query",
+    "Parse and execute a chained SQL query"
   )
-  .demandCommand(0, 1, "Provide a SQL query or use --repl for interactive mode")
+  .check((argv) => {
+    const hasFile = Boolean(argv.file);
+    const hasRepl = Boolean(argv.repl);
+    const hasSql = Boolean(argv._.length > 0);
+
+    if (hasFile && hasSql) {
+      throw new Error('Cannot provide both SQL query and --file option');
+    }
+
+    if (!hasFile && !hasRepl && !hasSql) {
+      throw new Error('Provide a SQL query, use --repl for interactive mode, or use --file to execute from file');
+    }
+
+    return true;
+  })
   .help().argv;

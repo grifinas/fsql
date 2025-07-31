@@ -9,6 +9,9 @@
   "directories": {
     "test": "test"
   },
+  "bin": {
+    "jsql": "./dist/cli.mjs"
+  },
   "scripts": {
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
@@ -19,7 +22,7 @@
     "test:clean": "jest --verbose --noStackTrace --silent=false --noErrorDetails",
     "test:minimal": "jest --reporters=./minimalReporter.js --silent",
     "confirm": "npm run build && npm run lint && npm run test",
-    "build": "node esbuild.config.js",
+    "build": "node esbuild.config.js && chmod +x ./dist/cli.mjs",
     "build:tsc": "tsc",
     "run": "node ./dist/index.mjs",
     "cc": "npm run build && npm run cli",
