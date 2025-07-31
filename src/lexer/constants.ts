@@ -4,19 +4,19 @@ import { Type } from "@types";
 export const KEYWORD = {
   SELECT: new TokenMatcher(Type.word, "SELECT"),
   FROM: new TokenMatcher(Type.word, "FROM"),
-  WHERE: new TokenMatcher(Type.word, "WHERE"),
-  INTO: new TokenMatcher(Type.word, "INTO"),
   JOIN: new TokenMatcher(Type.word, "JOIN"),
-  ON: new TokenMatcher(Type.word, "ON"),
+  WHERE: new TokenMatcher(Type.word, "WHERE"),
   ORDER: new TokenMatcher(Type.word, "ORDER"),
+  GROUP: new TokenMatcher(Type.word, "GROUP"),
+  LIMIT: new TokenMatcher(Type.word, "LIMIT"),
+  OFFSET: new TokenMatcher(Type.word, "OFFSET"),
+  INTO: new TokenMatcher(Type.word, "INTO"),
+  ON: new TokenMatcher(Type.word, "ON"),
   BY: new TokenMatcher(Type.word, "BY"),
   ASC: new TokenMatcher(Type.word, "ASC"),
   DESC: new TokenMatcher(Type.word, "DESC"),
   AS: new TokenMatcher(Type.word, "AS"),
   AND: new TokenMatcher(Type.word, "AND"),
-  GROUP: new TokenMatcher(Type.word, "GROUP"),
-  LIMIT: new TokenMatcher(Type.word, "LIMIT"),
-  OFFSET: new TokenMatcher(Type.word, "OFFSET"),
 } as const;
 
 export const RESERVED_WORDS = Object.values(KEYWORD);

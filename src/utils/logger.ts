@@ -3,7 +3,8 @@ export enum LogLevel {
   ERROR = 1,
   WARN = 2,
   INFO = 3,
-  DEBUG = 4,
+  VERBOSE = 4,
+  DEBUG = 5,
 }
 
 class Logger {
@@ -52,7 +53,7 @@ class Logger {
   }
 
   log(...args: unknown[]): void {
-    if (this.shouldLog(LogLevel.INFO)) {
+    if (this.shouldLog(LogLevel.VERBOSE)) {
       console.log(...args);
     }
   }

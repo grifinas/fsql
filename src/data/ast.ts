@@ -24,7 +24,7 @@ export class AST {
   public next: AST | null = null;
 
   async execute(): Promise<object[]> {
-    logger.info("Executing", this);
+    logger.log("Executing", this);
 
     const data = this.flow(await source(this), [
       mesh,

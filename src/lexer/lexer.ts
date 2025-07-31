@@ -14,24 +14,58 @@ export function lex(_stream: TokenStream): AST {
   const _ast = new AST();
   ast = _ast;
 
-  logger.info("lex", stream.toString());
+  logger.log("lex", stream.toString());
   parseSelectArgs(ast, stream);
-  parseFrom(ast, stream);
-  chainable(KEYWORD.JOIN, parseJoin);
-  optional(KEYWORD.WHERE, parseWhere);
-  optional(KEYWORD.GROUP, parseGroupBy);
-  optional(KEYWORD.ORDER, parseOrderBy);
-  optional(KEYWORD.LIMIT, parseLimit);
-  optional(KEYWORD.OFFSET, parseOffset);
-  optional(KEYWORD.INTO, parseInto);
-  optional(ANY.SEMICOLON, parseSemicolon);
+  conditional(
+    KEYWORD.FROM,
+    (ast: AST, stream: TokenStream) => {
+      parseFrom(ast, stream);
+      chainable(KEYWORD.JOIN, parseJoin);
+      optional(KEYWORD.WHERE, parseWhere);
+      optional(KEYWORD.GROUP, parseGroupBy);
+      optional(KEYWORD.ORDER, parseOrderBy);
+      optional(KEYWORD.LIMIT, parseLimit);
+      optional(KEYWORD.OFFSET, parseOffset);
+      optional(KEYWORD.INTO, parseInto);
+      optional(ANY.SEMICOLON, parseSemicolon);
+    },
+    parseWithoutFrom,
+  );
+
+  if (!stream.done())
+    throw new Error(
+      `Expected stream to be done, but found token: ${stream.get()}`,
+    );
 
   return _ast;
 }
 
+function parseWithoutFrom() {
+  optional(KEYWORD.INTO, parseInto);
+  optional(ANY.SEMICOLON, parseSemicolon);
+}
+
 function parseFrom(ast: AST, stream: TokenStream) {
-  stream.consume(KEYWORD.FROM);
   ast.setMain(parseDataSource(stream));
+}
+
+export function conditional(
+  token: TokenMatcher,
+  trueFn: (ast: AST, stream: TokenStream) => void,
+  falseFn: (ast: AST, stream: TokenStream) => void,
+): void {
+  if (stream.done()) {
+    logger.debug("Stream is done");
+    return;
+  }
+
+  if (stream.advanceIf(token)) {
+    logger.debug("Conditional true", token);
+    trueFn(ast, stream);
+  } else {
+    logger.debug("Conditional false", token);
+    falseFn(ast, stream);
+  }
 }
 
 export function optional(
@@ -72,12 +106,18 @@ function parseJoin(ast: AST, stream: TokenStream): void {
 }
 
 function parseWhere(ast: AST, stream: TokenStream): void {
+  if (!ast.mainfile) {
+    throw new Error("WHERE clause requires FROM");
+  }
   do {
     ast.addAnd(parseFilterFunction(stream));
   } while (stream.advanceIf(KEYWORD.AND));
 }
 
 function parseOrderBy(ast: AST, stream: TokenStream): void {
+  if (!ast.mainfile) {
+    throw new Error("ORDER BY clause requires FROM");
+  }
   stream.consume(KEYWORD.BY);
   //TODO should parse property
   const parameter = stream.consume(ANY.WORD);

@@ -5,11 +5,11 @@ export class Token {
   constructor(
     public readonly type: Type,
     public readonly value: string,
+    public readonly position: number = 0,
   ) {}
 
   is(matcher: TokenMatcher): boolean {
-    const result = this.isRawEqual(matcher.type, matcher.value);
-    return result;
+    return this.isRawEqual(matcher.type, matcher.value);
   }
 
   isIn(tokens: TokenMatcher[] | readonly TokenMatcher[]): boolean {

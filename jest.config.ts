@@ -15,7 +15,7 @@ const config: Config = {
   
   // Clean output formatting - just show test names with ✓ or ✗
   verbose: false,
-  silent: true,
+  silent: false,
   noStackTrace: true,
   passWithNoTests: true,
   collectCoverage: false,

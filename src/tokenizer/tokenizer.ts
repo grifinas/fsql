@@ -20,74 +20,76 @@ export function tokenize(input: string): TokenStream {
 
     if (isWord(char)) {
       let value = "";
+      const start = current;
       while (current < input.length && isWord(input[current])) {
         value += input[current];
         current++;
       }
-      tokens.push(new Token(Type.word, value));
+      tokens.push(new Token(Type.word, value, start));
       continue;
     }
 
     if (isNumber(char)) {
       let value = "";
+      const start = current;
       while (current < input.length && isNumber(input[current])) {
         value += input[current];
         current++;
       }
-      tokens.push(new Token(Type.number, value));
+      tokens.push(new Token(Type.number, value, start));
       continue;
     }
 
     if (char === "[" || char === "]") {
-      tokens.push(new Token(Type.bracket, char));
+      tokens.push(new Token(Type.bracket, char, current));
       current++;
       continue;
     }
 
     if (char === "{" || char === "}") {
-      tokens.push(new Token(Type.brace, char));
+      tokens.push(new Token(Type.brace, char, current));
       current++;
       continue;
     }
 
     if (char === "(" || char === ")") {
-      tokens.push(new Token(Type.parenthesis, char));
+      tokens.push(new Token(Type.parenthesis, char, current));
       current++;
       continue;
     }
 
     if (char === ".") {
-      tokens.push(new Token(Type.dot, char));
+      tokens.push(new Token(Type.dot, char, current));
       current++;
       continue;
     }
 
     if (char === ";") {
-      tokens.push(new Token(Type.semicolon, char));
+      tokens.push(new Token(Type.semicolon, char, current));
       current++;
       continue;
     }
 
     if (char === ",") {
-      tokens.push(new Token(Type.comma, char));
+      tokens.push(new Token(Type.comma, char, current));
       current++;
       continue;
     }
 
     if (char === "=") {
-      tokens.push(new Token(Type.equals, char));
+      tokens.push(new Token(Type.equals, char, current));
       current++;
       continue;
     }
 
     if (char === ">" || char === "<") {
-      tokens.push(new Token(Type.comp, char));
+      tokens.push(new Token(Type.comp, char, current));
       current++;
       continue;
     }
 
     if (["@", "$", "%", "^", "&", "*", "/"].includes(char)) {
-      tokens.push(new Token(Type.special, char));
+      tokens.push(new Token(Type.special, char, current));
       current++;
       continue;
     }
@@ -98,7 +100,9 @@ export function tokenize(input: string): TokenStream {
       while (current < input.length && char !== input[current]) {
         current++;
       }
-      tokens.push(new Token(Type.string, input.substring(start, current)));
+      tokens.push(
+        new Token(Type.string, input.substring(start, current), start),
+      );
       current++;
       continue;
     }

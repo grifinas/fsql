@@ -21,7 +21,9 @@ const config = {
         '@sqlFunctions': path.resolve(__dirname, 'src/sqlFunctions/index.ts'),
         '@tokenizer': path.resolve(__dirname, 'src/tokenizer/index.ts'),
         '@utils': path.resolve(__dirname, 'src/utils/index.ts'),
+        '@repl': path.resolve(__dirname, 'src/repl/index.ts'),
         '@types': path.resolve(__dirname, 'src/types.ts'),
+        '@main': path.resolve(__dirname, 'src/index.ts'),
         '@src': path.resolve(__dirname, 'src')
     },
     external: [

@@ -204,4 +204,28 @@ describe('SQL Parser Integration Tests', () => {
       { id: 5 },
     ]);
   });
+
+  describe('Queries without FROM clause', () => {
+    it('should execute function calls', async () => {
+      const result = await main('SELECT NOW()');  
+      expect(result).toHaveLength(1);
+      expect(result[0]).toHaveProperty('NOW');
+    });
+
+    it('should execute multiple function calls', async () => {
+      const result = await main('SELECT NOW(), UPPER("hello")');  
+      expect(result).toHaveLength(1);
+      expect(result[0]).toHaveProperty('NOW');
+      expect(result[0]).toHaveProperty('UPPER');
+      expect((result[0] as Record<string, string>).UPPER).toBe('HELLO');
+    });
+
+    it('should throw when using WHERE without FROM', async () => {
+      await expect(main('SELECT NOW() WHERE id=1')).rejects.toThrow();
+    });
+
+    it('should throw when using ORDER BY without FROM', async () => {
+      await expect(main('SELECT NOW() ORDER BY id')).rejects.toThrow();
+    });
+  });
 });

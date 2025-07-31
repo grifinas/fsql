@@ -13,3 +13,5 @@ export * from "./round.function";
 export * from "./rtrim.function";
 export * from "./trim.function";
 export * from "./upper.function";
+export * from "./parse.function";
+export * from "./cwd.function";

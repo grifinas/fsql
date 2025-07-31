@@ -20,8 +20,10 @@
         "@sqlFunctions": ["sqlFunctions/index"],
         "@tokenizer": ["tokenizer/index"],
         "@utils": ["utils/index"],
+        "@repl": ["repl/index"],
         "@src/*": ["./*"],
-        "@types": ["types"]
+        "@types": ["types"],
+        "@main": ["index"]
       }
     },
     "include": ["src", "jestSetup.ts", "test"],

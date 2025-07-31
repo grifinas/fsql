@@ -20,6 +20,10 @@ export class SQLFactory {
     return new ctor(property.name, property.args) as Resolvable<T>;
   }
 
+  static list(): string[] {
+    return Array.from(SQLFunctions.keys());
+  }
+
   static register(name: string, constructor: Constructor) {
     SQLFunctions.set(name.toUpperCase(), constructor);
   }

@@ -6,7 +6,7 @@ import { withAlias } from "./parseAlias";
 import { KEYWORD, ANY, Symbols } from "./constants";
 
 export function parseSelectArgs(ast: AST, stream: TokenStream) {
-  logger.info("parseSelectArgs", stream.toStringFromCurrent());
+  logger.log("parseSelectArgs", stream.toStringFromCurrent());
   stream.consume(KEYWORD.SELECT);
   if (stream.advanceIf(Symbols.ALL)) {
     return;

@@ -3,6 +3,9 @@ import { AST } from "@src/data/ast";
 import { FilterFunction } from "@src/entities/filterFunction";
 import { FieldProperty, FunctionProperty } from "@src/entities/property";
 import { tokenize } from "@src/tokenizer/tokenizer";
+import { TokenStream } from "@src/tokenizer/tokenStream";
+import { Token } from "@src/tokenizer/token";
+import { Type } from "@src/types";
 
 describe("lexer", () => {
   it("should expose lex function", () => {
@@ -220,5 +223,79 @@ describe("lexer", () => {
     expect(ast.groupBy).toEqual(["category"]);
     expect(ast.where?.isEmpty()).toBe(false);
     expect(ast.order).toEqual(["name", 1]);
+  });
+
+  describe("optional FROM clause", () => {
+    it("should parse query without FROM clause", () => {
+      const stream = new TokenStream([
+        new Token(Type.word, "SELECT"),
+        new Token(Type.word, "NOW"),
+        new Token(Type.parenthesis, "("),
+        new Token(Type.parenthesis, ")")
+      ]);
+      const ast = lex(stream);
+      expect(ast.mainfile).toBeUndefined();
+      expect(ast.all).toBe(false);
+    });
+
+    it("should throw when using WHERE without FROM", () => {
+      const stream = new TokenStream([
+        new Token(Type.word, "SELECT"),
+        new Token(Type.word, "col"),
+        new Token(Type.word, "WHERE"),
+        new Token(Type.word, "id"),
+        new Token(Type.equals, "="),
+        new Token(Type.number, "1")
+      ]);
+      //TODO better errors
+      expect(() => lex(stream)).toThrow();
+    });
+
+    it("should throw when using ORDER BY without FROM", () => {
+      const stream = new TokenStream([
+        new Token(Type.word, "SELECT"),
+        new Token(Type.word, "col"),
+        new Token(Type.word, "ORDER"),
+        new Token(Type.word, "BY"),
+        new Token(Type.word, "name"),
+        new Token(Type.word, "DESC")
+      ]);
+      expect(() => lex(stream)).toThrow();
+    });
+
+    it("should parse query with multiple functions", () => {
+      const stream = new TokenStream([
+        new Token(Type.word, "SELECT"),
+        new Token(Type.word, "NOW"),
+        new Token(Type.parenthesis, "("),
+        new Token(Type.parenthesis, ")"),
+        new Token(Type.comma, ","),
+        new Token(Type.word, "VERSION"),
+        new Token(Type.parenthesis, "("),
+        new Token(Type.parenthesis, ")")
+      ]);
+      const ast = lex(stream);
+      expect(ast.mainfile).toBeUndefined();
+      expect(ast.fields?.length).toBe(2);
+    });
+
+    it("should parse multiple statements with and without FROM", () => {
+      const stream = new TokenStream([
+        new Token(Type.word, "SELECT"),
+        new Token(Type.word, "NOW"),
+        new Token(Type.parenthesis, "("),
+        new Token(Type.parenthesis, ")"),
+        new Token(Type.semicolon, ";"),
+        new Token(Type.word, "SELECT"),
+        new Token(Type.special, "*"),
+        new Token(Type.word, "FROM"),
+        new Token(Type.word, "data.json")
+      ]);
+      const ast = lex(stream);
+      expect(ast.mainfile).toBeUndefined();
+      expect(ast.next).toBeDefined();
+      expect(ast.next?.mainfile).toBeDefined();
+      expect(ast.next?.mainfile?.ref()).toBe("data.json");
+    });
   });
 });

@@ -1,7 +1,7 @@
 import { cliAssert } from "@utils";
 import { Token } from "./token";
 import { TokenMatcher } from "./tokenMatcher";
-import { Type } from "@types";
+import chalk from "chalk";
 
 type TokenExpectations = (Token | TokenMatcher)[];
 type Expectations = TokenExpectations | string;
@@ -74,6 +74,10 @@ export class TokenStream {
     return this.get(...matchers);
   }
 
+  hasNext(): boolean {
+    return this.index + 1 < this.tokens.length;
+  }
+
   prev(): Token {
     this.index--;
     return this.get();
@@ -87,41 +91,37 @@ export class TokenStream {
     return this.getIndexed(this.index + offset);
   }
 
-  multiPeek(offset: number = 1): Token[] {
-    const results = [];
-    for (let i = 0; i < offset; i++) {
-      results.push(this.getIndexed(this.index + i));
-    }
-    return results;
-  }
-
   toString(): string {
-    return this.tokens.map(stringifyToken).join("");
+    return this.tokens
+      .map((token, i) => stringifyToken(token, this.tokens[i + 1]))
+      .join("");
   }
 
   toStringFromCurrent(): string {
-    return [...this.tokens].splice(this.index).map(stringifyToken).join("");
+    const currentTokens = [...this.tokens].splice(this.index);
+    return currentTokens
+      .map((token, i) => stringifyToken(token, currentTokens[i + 1]))
+      .join("");
   }
 
-  stringifyTokenContext(start: number = 5, end: number = 2): string {
+  stringifyTokenContext(start: number = 10, end: number = 3): string {
     const startIdx = Math.max(0, this.index - start);
     const endIdx = Math.min(this.tokens.length, this.index + end);
     const relevantTokens = this.tokens.slice(startIdx, endIdx);
+    let pointerOffset = 0;
 
     // Create the token visualization line
     const tokenLine = relevantTokens
       .map((token, i) => {
-        const str = stringifyToken(token);
-        return startIdx + i === this.index ? `[${str}]` : str;
+        const [strToken, spaces] = stringifyToken(token, relevantTokens[i + 1]);
+        if (startIdx + i === this.index) {
+          pointerOffset++;
+          return `[${chalk.red(strToken)}]${spaces}`;
+        }
+        pointerOffset += strToken.length + spaces.length;
+        return chalk.green(strToken + spaces);
       })
-      .join(" ");
-
-    // Create the pointer line
-    const beforeTokens = relevantTokens.slice(0, this.index - startIdx);
-    const pointerOffset = beforeTokens.reduce(
-      (l, token) => l + stringifyToken(token).length + 1, // +1 for the space we added
-      0,
-    );
+      .join("");
 
     // Create a detailed token info line
     const currentToken = this.tokens[this.index];
@@ -130,12 +130,11 @@ export class TokenStream {
       : "No current token";
 
     return [
-      "\nToken stream context:",
+      "\n",
       tokenLine,
       " ".repeat(pointerOffset) + "^",
       tokenInfo,
       `Position: ${this.index + 1}/${this.tokens.length}`,
-      new Error().stack,
     ].join("\n");
   }
 
@@ -169,18 +168,22 @@ export class TokenStream {
     const token = this.get();
     cliAssert(
       false,
-      () => `Unexpected token: ${token.value}::${token.type} 
+      () => `Unexpected ${token.type}: ${token.value} 
           ${expected.length > 0 ? ` Expected: ${expectedString}` : ""} at ${this.stringifyTokenContext()}`,
     );
   }
 }
 
-export function stringifyToken(token: Token): string {
-  switch (token.type) {
-    case Type.equals:
-    case Type.word:
-      return token.value + " ";
-    default:
-      return token.value;
+export function stringifyToken(
+  token: Token,
+  nextToken?: Token,
+): [string, string] {
+  // If there's a next token, we can calculate the space between them
+  if (nextToken) {
+    const spaceBetween =
+      nextToken.position - (token.position + token.value.length);
+    return [token.value, spaceBetween > 0 ? " ".repeat(spaceBetween) : ""];
   }
+  // For the last token, just return its value
+  return [token.value, ""];
 }

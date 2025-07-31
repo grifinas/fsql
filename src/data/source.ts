@@ -10,7 +10,8 @@ export interface SourceData {
 
 export async function source(tree: AST): Promise<SourceData[]> {
   if (!tree.mainfile) {
-    throw new Error("No main file specified");
+    // Return empty source data when no main file is specified
+    return [{ source: "", data: [{}] }];
   }
   const { mainfile: main, joinFiles: joins, variables } = tree;
 

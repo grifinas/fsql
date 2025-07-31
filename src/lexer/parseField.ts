@@ -50,15 +50,18 @@ export function parseField(stream: TokenStream): Property {
 }
 
 function parseFunction(stream: TokenStream): FunctionProperty {
-  const name = stream.consume(ANY.WORD).value;
+  const fnName = stream.consume(ANY.WORD).value;
   stream.consume(Symbols.OPEN_PARENTHESIS);
 
+  const token = stream.get();
   const args: Property[] = [];
-  do {
-    args.push(parseField(stream));
-  } while (stream.advanceIf(ANY.COMMA));
+  if (token.isNot(Symbols.CLOSE_PARENTHESIS)) {
+    do {
+      args.push(parseField(stream));
+    } while (stream.advanceIf(ANY.COMMA));
+  }
 
   stream.consume(Symbols.CLOSE_PARENTHESIS);
 
-  return new FunctionProperty(name, args);
+  return new FunctionProperty(fnName, args);
 }
