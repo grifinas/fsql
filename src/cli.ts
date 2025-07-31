@@ -29,7 +29,6 @@ const parseCommand: CommandModule<{}, SqlArgs> = {
     yargs
       .boolean("repl")
       .describe("repl", "Start the REPL")
-      .default("repl", false)
       .conflicts("repl", "file");
     yargs
       .string("file")
