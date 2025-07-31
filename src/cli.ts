@@ -7,18 +7,18 @@ import { logger, LogLevel, fileUtils } from "@utils";
 import { startRepl } from "@repl";
 
 interface SqlArgs extends Arguments {
-  sql: string;
-  repl: boolean;
   logLevel: LogLevel;
+  sql?: string;
+  repl?: boolean;
   file?: string;
   into?: string;
 }
 
-const parseCommand: CommandModule<{}, SqlArgs> = {
+const parseCommand: CommandModule<object, SqlArgs> = {
   command: "*",
   aliases: ["parse"],
   describe: "Parse and execute a SQL query",
-  builder: (yargs: Argv<{}>): Argv<SqlArgs> => {
+  builder: (yargs: Argv<object>): Argv<SqlArgs> => {
     yargs.positional("sql", {
       describe: "SQL query to parse and execute",
       type: "string",
