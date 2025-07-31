@@ -15,3 +15,4 @@ export * from "./trim.function";
 export * from "./upper.function";
 export * from "./parse.function";
 export * from "./cwd.function";
+export * from "./concat.function";
