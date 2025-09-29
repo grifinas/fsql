@@ -32,13 +32,13 @@ function parseFileDataSource(stream: TokenStream) {
     if (expectedPos > 0 && expectedPos !== fileToken.position) {
       return new FileDataSource(path);
     } else {
-      expectedPos = fileToken.position + fileToken.value.length
+      expectedPos = fileToken.position + fileToken.value.length;
     }
 
     if (fileToken.is(ANY.DOT) || fileToken.is(Symbols.SLASH)) {
       path += fileToken.value;
     } else if (fileToken.is(ANY.WORD)) {
-        path += fileToken.value;
+      path += fileToken.value;
     } else if (fileToken.is(ANY.SEMICOLON)) {
       return new FileDataSource(path);
     } else if (fileToken.is(ANY.NUMBER)) {

@@ -1,32 +1,42 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { logger } from '@utils';
+import { logger } from "@utils";
+import { pluginRegistry } from "@plugins";
 
 export class FileUtils {
+  /**
+   * Read and parse a file using the plugin system
+   * @param filepath - Path to the file
+   * @returns Promise resolving to array of objects
+   */
+  async readData(filepath: string): Promise<object[]> {
+    const filePath = _(filepath);
+
+    const plugin = await pluginRegistry.getPluginForFile(filePath);
+
+    logger.debug(`Using plugin '${plugin.name}' to read file`);
+    return await plugin.readFile(filePath);
+  }
+
+  /**
+   * @deprecated Use readData instead for plugin-based file reading
+   */
   async readJson(filepath: string): Promise<object> {
-    const filePath = path.isAbsolute(filepath)
-      ? filepath
-      : path.join(process.cwd(), filepath);
+    const filePath = _(filepath);
 
     const content = await fs.readFile(filePath);
     return JSON.parse(content.toString());
   }
 
   async readSql(filepath: string): Promise<string> {
-    const filePath = path.isAbsolute(filepath)
-      ? filepath
-      : path.join(process.cwd(), filepath);
-
-    logger.log("Reading sql", filePath);
+    const filePath = _(filepath);
 
     const content = await fs.readFile(filePath);
     return content.toString();
   }
 
   async writeJson(filepath: string, data: object): Promise<void> {
-    const filePath = path.isAbsolute(filepath)
-      ? filepath
-      : path.join(process.cwd(), filepath);
+    const filePath = _(filepath);
     await fs.writeFile(filePath, JSON.stringify(data, null, 2));
   }
 
@@ -36,9 +46,7 @@ export class FileUtils {
   ): Promise<
     Array<{ name: string; type: "file" | "directory"; size?: number }>
   > {
-    const directory = path.isAbsolute(dirPath)
-      ? dirPath
-      : path.join(process.cwd(), dirPath);
+    const directory = _(dirPath);
 
     const entries = await fs.readdir(directory, { withFileTypes: true });
     return await Promise.all(
@@ -55,6 +63,12 @@ export class FileUtils {
       }),
     );
   }
+}
+
+function _(filepath: string): string {
+  return path.isAbsolute(filepath)
+    ? filepath
+    : path.join(process.cwd(), filepath);
 }
 
 export const fileUtils = new FileUtils();

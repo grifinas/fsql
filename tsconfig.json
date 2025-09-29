@@ -23,9 +23,11 @@
         "@repl": ["repl/index"],
         "@src/*": ["./*"],
         "@types": ["types"],
+        "@dir": ["utils/dir"],
+        "@plugins": ["plugins/index"],
         "@main": ["index"]
       }
     },
-    "include": ["src", "jestSetup.ts", "test"],
+    "include": ["src", "jestSetup.ts", "test", "src/plugins/types.d.ts"],
     "exclude": ["node_modules", "dist"]
   }

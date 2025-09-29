@@ -1,5 +1,6 @@
 const { build } = require('esbuild');
 const path = require('path');
+const fs = require('fs/promises');
 
 const config = {
     entryPoints: [
@@ -35,7 +36,22 @@ const config = {
     }
 };
 
-build(config).then(() => {
+
+const builtInPlugins = [
+    'json'
+];
+
+Promise.all([
+    build(config),
+    build({
+        ...config,
+        entryPoints: builtInPlugins.map(p => `src/plugins/readers/${p}.plugin.ts`),
+        outdir: 'dist/plugins',
+    })
+]).then(() => Promise.all([
+    fs.writeFile('dist/plugins.json', JSON.stringify(builtInPlugins.map(p => ({ name: p, module: `./plugins/${p}.plugin.mjs`, enabled: true })), null, 2)),
+])
+).then(() => {
     console.log('✅ Build completed successfully');
 }).catch((error) => {
     console.error('❌ Build failed:', error);

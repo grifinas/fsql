@@ -5,7 +5,8 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "index.js",
+  "main": "./dist/index.mjs",
+  "types": "./dist/plugins.d.ts",
   "directories": {
     "test": "test"
   },
@@ -22,7 +23,8 @@
     "test:clean": "jest --verbose --noStackTrace --silent=false --noErrorDetails",
     "test:minimal": "jest --reporters=./minimalReporter.js --silent",
     "confirm": "npm run build && npm run lint && npm run test",
-    "build": "node esbuild.config.js && chmod +x ./dist/cli.mjs",
+    "build": "node esbuild.config.js && chmod +x ./dist/cli.mjs && npm run build:declarations",
+    "build:declarations": "cp ./src/plugins/types.d.ts ./dist/plugins.d.ts",
     "build:tsc": "tsc",
     "run": "node ./dist/index.mjs",
     "cc": "npm run build && npm run cli",

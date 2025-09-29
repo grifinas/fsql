@@ -10,7 +10,7 @@ export class ConcatFunction extends SQLFunction<string, typeof Validation> {
   }
 
   public subResolve(args: ValidatedArgs<this>): string {
-    return args.join('');
+    return args.join("");
   }
 }
 

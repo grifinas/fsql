@@ -25,6 +25,9 @@ module.exports = [
     rules: {
       ...js.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
+      // Allow redeclare for TypeScript pattern: const Schema = z.object({}); type Schema = z.infer<typeof Schema>;
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-redeclare': 'off',
     },
   },
   

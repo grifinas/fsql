@@ -52,6 +52,7 @@ const parseCommand: CommandModule<object, SqlArgs> = {
   },
   handler: async (argv: SqlArgs) => {
     logger.setLevel(argv.logLevel);
+    logger.debug("CLI arguments:", argv);
     if (argv.repl) {
       logger.info("Starting REPL");
       const result = await startRepl();
@@ -64,6 +65,10 @@ const parseCommand: CommandModule<object, SqlArgs> = {
     if (argv.file) {
       logger.info("Starting file execution");
       argv.sql = await fileUtils.readSql(argv.file);
+    }
+
+    if (!argv.sql && argv._.length > 0) {
+      argv.sql = argv._[0] as string;
     }
 
     if (!argv.sql) {

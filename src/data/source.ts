@@ -61,6 +61,5 @@ export async function source(tree: AST): Promise<SourceData[]> {
 }
 
 async function loadData(file: string): Promise<object[]> {
-  const data = await fileUtils.readJson(file);
-  return Array.isArray(data) ? data : [data as object];
+  return await fileUtils.readData(file);
 }

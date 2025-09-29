@@ -18,12 +18,8 @@ describe("sourceData", () => {
     { foo: 6, bar: "bar6" },
   ];
 
-  afterEach(() => {
-    jest.resetAllMocks();
-  });
-
   it("should return main data when no joins", async () => {
-    jest.spyOn(fileUtils, "readJson").mockResolvedValue(mainData);
+    jest.spyOn(fileUtils, "readData").mockResolvedValue(mainData);
     const ast = mock<AST>(
       {
         mainfile: new FileDataSource("main.json").setAlias("@m"),
@@ -42,7 +38,7 @@ describe("sourceData", () => {
       { value: 10 },
       { value: 20 },
     ];
-    jest.spyOn(fileUtils, "readJson")
+    jest.spyOn(fileUtils, "readData")
       .mockResolvedValueOnce(mainData)
       .mockResolvedValueOnce(joinData);
 
@@ -67,7 +63,7 @@ describe("sourceData", () => {
       "@j": new FileDataSource("main.json").setAlias("@j")
     };
 
-    jest.spyOn(fileUtils, "readJson")
+    jest.spyOn(fileUtils, "readData")
       .mockResolvedValueOnce(mainData);
 
     const ast = mock<AST>(
@@ -81,8 +77,8 @@ describe("sourceData", () => {
     expect(main).toEqual({ source: "@m", data: mainData });
     expect(join).toEqual({ source: "@j", data: mainData, where: joins["@j"].filter });
 
-    // Verify readJson was only called once
-    expect(fileUtils.readJson).toHaveBeenCalledTimes(1);
+    // Verify readData was only called once
+    expect(fileUtils.readData).toHaveBeenCalledTimes(1);
   });
 
   it("should throw error if two aliases are the same", async () => {

@@ -29,7 +29,9 @@ const config: Config = {
     "^@tokenizer$": "<rootDir>/src/tokenizer/index",
     "^@utils$": "<rootDir>/src/utils/index",
     "^@types$": "<rootDir>/src/types",
-    "^@src/(.*)$": "<rootDir>/src/$1"
+    "^@src/(.*)$": "<rootDir>/src/$1",
+    "^@plugins$": "<rootDir>/src/plugins/index",
+    "^@dir$": "<rootDir>/src/utils/dir",
   },
 };
 
