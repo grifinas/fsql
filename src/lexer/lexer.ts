@@ -5,6 +5,8 @@ import { ANY, KEYWORD } from "./constants";
 import { parseDataSource } from "./parseDataSource";
 import { TokenMatcher, TokenStream } from "@tokenizer";
 import { AST } from "@data";
+import { parseField } from '@src/lexer/parseField';
+import { FieldProperty, ResolvedProperty } from '@entities';
 
 let ast: AST;
 let stream: TokenStream;
@@ -169,16 +171,24 @@ function parseOffset(ast: AST, stream: TokenStream): void {
 function parseGroupBy(ast: AST, stream: TokenStream): void {
   stream.consume(KEYWORD.BY);
 
-  const groupByFields: string[] = [];
+  const groupByFields: FieldProperty[] = [];
 
   // Parse first field
-  const firstField = stream.consume(ANY.WORD);
-  groupByFields.push(firstField.value);
+  const firstField = parseField(stream);
+  if (firstField instanceof FieldProperty) {
+    groupByFields.push(firstField);
+  } else {
+    stream.unexpectedToken(`Expected a field property, got: ${firstField.__type}`);
+  }
 
   // Parse additional fields separated by commas
   while (stream.advanceIf(ANY.COMMA)) {
-    const field = stream.consume(ANY.WORD);
-    groupByFields.push(field.value);
+    const field = parseField(stream);
+    if (field instanceof FieldProperty) {
+      groupByFields.push(field);
+    } else {
+      stream.unexpectedToken(`Expected a field property, got: ${field.__type}`);
+    }
   }
 
   ast.setGroupBy(groupByFields);

@@ -4,9 +4,16 @@ import { MeshedRow } from "@types";
 import { logger } from "@utils";
 import { AST } from "./ast";
 
-export function select(rows: MeshedRow[], ast: AST): object[] {
+export function select(rows: MeshedRow[][], ast: AST): object[] {
   logger.debug("Selecting data", { rows, fields: ast.fields });
-  return rows.map((row: MeshedRow) => {
+
+  const hasGroupBy = (ast.groupBy?.length ?? 0) > 0;
+
+  const selectedRows: MeshedRow[] = hasGroupBy
+    ? rows.map((g) => g[g.length - 1])
+    : rows.flat();
+
+  return selectedRows.map((row: MeshedRow) => {
     return colapse(row, ast.fields);
   });
 }

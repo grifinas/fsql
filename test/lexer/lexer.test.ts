@@ -47,7 +47,9 @@ describe("lexer", () => {
     ];
 
     const ast = lex(
-      tokenize(`SELECT * from file_name_goes_here JOIN ${files.join(" JOIN ")}`)
+      tokenize(`SELECT *
+                from file_name_goes_here
+                         JOIN ${files.join(" JOIN ")}`),
     );
     expect(Object.keys(ast.joinFiles)).toEqual(files);
   });
@@ -61,8 +63,10 @@ describe("lexer", () => {
     const conditions = ["a=b", "c=d", "d=a"];
     const ast = lex(
       tokenize(
-        `SELECT * from file_name_goes_here where ${conditions.join(" AND ")}`
-      )
+        `SELECT *
+         from file_name_goes_here
+         where ${conditions.join(" AND ")}`,
+      ),
     );
 
     expect(ast.where?.getLeft()).toBeInstanceOf(FilterFunction);
@@ -83,7 +87,7 @@ describe("lexer", () => {
 
   it("should lex JOIN and ORDER BY clauses together", () => {
     const ast = lex(
-      tokenize("SELECT * from file_name_goes_here JOIN foo ORDER BY date ASC")
+      tokenize("SELECT * from file_name_goes_here JOIN foo ORDER BY date ASC"),
     );
     expect(ast.order).toEqual(["date", 1]);
     expect(Object.keys(ast.joinFiles)).toEqual(["foo"]);
@@ -92,8 +96,8 @@ describe("lexer", () => {
   it("should lex WHERE and ORDER BY clauses together", () => {
     const ast = lex(
       tokenize(
-        "SELECT * from file_name_goes_here WHERE foo>1 ORDER BY date DESC"
-      )
+        "SELECT * from file_name_goes_here WHERE foo>1 ORDER BY date DESC",
+      ),
     );
     expect(ast.where?.isEmpty()).toBe(false);
     expect(ast.order).toEqual(["date", -1]);
@@ -130,21 +134,21 @@ describe("lexer", () => {
 
   it("should set 'joinFiles' to whatever is in JOIN", () => {
     const ast = lex(
-      tokenize("SELECT * from fileNameGoesHere JOIN first JOIN second")
+      tokenize("SELECT * from fileNameGoesHere JOIN first JOIN second"),
     );
     expect(Object.keys(ast.joinFiles)).toEqual(["first", "second"]);
   });
 
   it("should set order when ORDER BY is specified", () => {
     const ast = lex(
-      tokenize("SELECT * from fileNameGoesHere ORDER BY foo ASC")
+      tokenize("SELECT * from fileNameGoesHere ORDER BY foo ASC"),
     );
     expect(ast.order).toEqual(["foo", 1]);
   });
 
   it("should set next when semicolon is specified and more tokens exist after semicolon", () => {
     const ast = lex(
-      tokenize("SELECT * from fileNameGoesHere; SELECT * from fileNameGoesThere")
+      tokenize("SELECT * from fileNameGoesHere; SELECT * from fileNameGoesThere"),
     );
     expect(ast.next).toBeInstanceOf(AST);
   });
@@ -210,17 +214,31 @@ describe("lexer", () => {
 
   it("should lex GROUP BY with single field", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere GROUP BY category"));
-    expect(ast.groupBy).toEqual(["category"]);
+    expect(ast.groupBy).toEqual([
+      expect.objectContaining({
+        field: "category",
+      }),
+    ]);
   });
 
   it("should lex GROUP BY with multiple fields", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere GROUP BY category, status, region"));
-    expect(ast.groupBy).toEqual(["category", "status", "region"]);
+    expect(ast.groupBy).toEqual([
+      expect.objectContaining({
+        field: "category",
+      })
+      , expect.objectContaining({
+        field: "status",
+      }), expect.objectContaining({
+        field: "region",
+      })]);
   });
 
   it("should lex GROUP BY with other clauses", () => {
     const ast = lex(tokenize("SELECT * from fileNameGoesHere WHERE active=true GROUP BY category ORDER BY name ASC"));
-    expect(ast.groupBy).toEqual(["category"]);
+    expect(ast.groupBy).toEqual([expect.objectContaining({
+      field: "category",
+    })]);
     expect(ast.where?.isEmpty()).toBe(false);
     expect(ast.order).toEqual(["name", 1]);
   });
@@ -231,7 +249,7 @@ describe("lexer", () => {
         new Token(Type.word, "SELECT"),
         new Token(Type.word, "NOW"),
         new Token(Type.parenthesis, "("),
-        new Token(Type.parenthesis, ")")
+        new Token(Type.parenthesis, ")"),
       ]);
       const ast = lex(stream);
       expect(ast.mainfile).toBeUndefined();
@@ -245,7 +263,7 @@ describe("lexer", () => {
         new Token(Type.word, "WHERE"),
         new Token(Type.word, "id"),
         new Token(Type.equals, "="),
-        new Token(Type.number, "1")
+        new Token(Type.number, "1"),
       ]);
       //TODO better errors
       expect(() => lex(stream)).toThrow();
@@ -258,7 +276,7 @@ describe("lexer", () => {
         new Token(Type.word, "ORDER"),
         new Token(Type.word, "BY"),
         new Token(Type.word, "name"),
-        new Token(Type.word, "DESC")
+        new Token(Type.word, "DESC"),
       ]);
       expect(() => lex(stream)).toThrow();
     });
@@ -272,7 +290,7 @@ describe("lexer", () => {
         new Token(Type.comma, ","),
         new Token(Type.word, "VERSION"),
         new Token(Type.parenthesis, "("),
-        new Token(Type.parenthesis, ")")
+        new Token(Type.parenthesis, ")"),
       ]);
       const ast = lex(stream);
       expect(ast.mainfile).toBeUndefined();
@@ -289,7 +307,7 @@ describe("lexer", () => {
         new Token(Type.word, "SELECT"),
         new Token(Type.special, "*"),
         new Token(Type.word, "FROM"),
-        new Token(Type.word, "data.json")
+        new Token(Type.word, "data.json"),
       ]);
       const ast = lex(stream);
       expect(ast.mainfile).toBeUndefined();

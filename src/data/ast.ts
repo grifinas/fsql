@@ -1,5 +1,5 @@
 import { SourceData, source } from "./source";
-import { FilterFunction, Property, DataSource } from "@entities";
+import { FilterFunction, Property, DataSource, FieldProperty } from "@entities";
 import { logger } from "@utils";
 import { mesh } from "./mesh";
 import { select } from "./select";
@@ -16,7 +16,7 @@ export class AST {
   public joinFiles: Record<string, DataSource> = {};
   public where: FilterFunction = FilterFunction.Empty();
   public order: [string, number] | undefined = undefined;
-  public groupBy: string[] = [];
+  public groupBy: FieldProperty[] = [];
   public readonly variables: Record<string, object[]> = {};
   public into: DataSource | undefined = undefined;
   public limit: number | undefined = undefined;
@@ -92,7 +92,7 @@ export class AST {
     this.offset = offset;
   }
 
-  setGroupBy(fields: string[]) {
+  setGroupBy(fields: FieldProperty[]) {
     this.groupBy = fields;
   }
 
