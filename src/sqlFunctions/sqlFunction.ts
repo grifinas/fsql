@@ -3,6 +3,7 @@ import * as z from "zod";
 import { resolveValue } from "@data";
 import { logger } from "@utils";
 import { MeshedRow, Scalar } from "@types";
+import { Resolvable } from './sqlFactory';
 
 export type ValidatedArgs<SQL extends SQLFunction> = z.infer<
   ReturnType<SQL["validation"]>
@@ -11,7 +12,7 @@ export type ValidatedArgs<SQL extends SQLFunction> = z.infer<
 export abstract class SQLFunction<
   R extends Scalar | unknown = unknown,
   V extends z.ZodSchema = z.ZodSchema,
-> {
+> implements Resolvable<R> {
   arguments: Property[];
 
   constructor(
@@ -22,12 +23,13 @@ export abstract class SQLFunction<
   }
 
   public abstract validation(): V;
+
   protected abstract subResolve(args: ValidatedArgs<this>, row: MeshedRow): R;
 
   public resolve(row: MeshedRow): R {
     const validation = this.validation();
 
-    const resolved = this.arguments.map((arg) => resolveValue(arg, row));
+    const resolved = this.arguments.map((arg) => resolveValue(arg, [row]));
 
     try {
       //TODO maybe frame errors a bit better
@@ -38,6 +40,51 @@ export abstract class SQLFunction<
         throw new Error(formatZodError(this, error));
       }
       throw new Error(`Error resolving ${this.name} function: ${error}`);
+    }
+  }
+}
+
+export abstract class AggregateFunction<
+  R extends Scalar | unknown = unknown,
+  V extends z.ZodSchema = z.ZodSchema,
+> implements Resolvable<R> {
+  arguments: Property[];
+
+  constructor(
+    public name: string,
+    fnArguments: Property[] = [],
+  ) {
+    this.arguments = fnArguments;
+  }
+
+  public abstract validation(): V;
+
+  protected abstract subResolveAggregate(
+    args: z.infer<V>[],
+    rows: MeshedRow[],
+  ): R;
+
+  public resolve(): R {
+    throw new Error(
+      `${this.name.toUpperCase()} is an aggregate function and can only be resolved over a group of rows`,
+    );
+  }
+
+  public resolveAggregate(rows: MeshedRow[]): R {
+    const validation = this.validation();
+
+    const resolved = rows.map((row) =>
+      this.arguments.map((arg) => resolveValue(arg, [row]).value),
+    );
+
+    try {
+      const args = resolved.map((rowArgs) => validation.parse(rowArgs));
+      return this.subResolveAggregate(args, rows);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new Error(formatZodError(this as unknown as SQLFunction, error));
+      }
+      throw new Error(`Error resolving ${this.name} aggregate function: ${error}`);
     }
   }
 }
@@ -76,8 +123,3 @@ function formatZodError(sqlFunction: SQLFunction, error: z.ZodError): string {
     .join(" and ");
   return result;
 }
-
-//TODO
-// export class AggregateFunction extends SQLFunction {
-
-// }

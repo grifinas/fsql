@@ -4,28 +4,34 @@ import {
   FieldProperty,
   FunctionProperty,
 } from "@entities";
-import { SQLFactory } from "@sqlFunctions";
+import { AggregateFunction, SQLFactory } from "@sqlFunctions";
 import { MeshedRow, Scalar } from "@types";
 import { logger, pathValue } from "@utils";
 
 export function resolveValue(
   value: Property,
-  row: MeshedRow,
+  groupRows: MeshedRow[],
 ): ResolvedProperty {
   if (value instanceof ResolvedProperty) {
     return value;
   }
 
+  const representativeRow = groupRows[groupRows.length - 1];
+
   if (value instanceof FieldProperty) {
     return new ResolvedProperty(
-      getMeshedRowValue(row, value.source, value.field),
+      getMeshedRowValue(representativeRow, value.source, value.field),
     );
   }
 
   if (value instanceof FunctionProperty) {
     const fn = SQLFactory.make<Scalar>(value);
 
-    return new ResolvedProperty(fn.resolve(row));
+    if (fn instanceof AggregateFunction) {
+      return new ResolvedProperty(fn.resolveAggregate(groupRows))
+    } else {
+      return new ResolvedProperty(fn.resolve(representativeRow));
+    }
   }
 
   throw new Error(

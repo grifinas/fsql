@@ -46,8 +46,8 @@ export class FilterFunction {
       this.right = new ResolvedProperty(this.right.resolve(row));
     }
 
-    const rleft = resolveValue(this.left, row);
-    const rright = resolveValue(this.right, row);
+    const rleft = resolveValue(this.left, [row]);
+    const rright = resolveValue(this.right, [row]);
     const result = this.compare(rleft, rright);
 
     logger.debug("Filter result", row, rleft, this.operator, rright, result);

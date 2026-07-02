@@ -1,28 +1,37 @@
-import { Property } from "@entities";
+import { FunctionProperty, Property } from "@entities";
 import { resolveValue } from "./resolveValue";
 import { MeshedRow } from "@types";
 import { logger } from "@utils";
 import { AST } from "./ast";
+import { SQLFactory } from "@sqlFunctions";
 
 export function select(rows: MeshedRow[][], ast: AST): object[] {
   logger.debug("Selecting data", { rows, fields: ast.fields });
+  if (rows.length === 0) return [];
 
+  const hasAggregates = ast.fields.some((f) => {
+    if (!(f instanceof FunctionProperty)) return false;
+    return SQLFactory.isAggregateProperty(f);
+  });
   const hasGroupBy = (ast.groupBy?.length ?? 0) > 0;
 
-  const selectedRows: MeshedRow[] = hasGroupBy
-    ? rows.map((g) => g[g.length - 1])
-    : rows.flat();
-
-  return selectedRows.map((row: MeshedRow) => {
-    return colapse(row, ast.fields);
-  });
+  if (hasGroupBy || hasAggregates) {
+    return rows.map(groupRows => projectGroup(groupRows, ast.fields));
+  } else {
+    return rows.flat().map((row) => projectGroup([row], ast.fields));
+  }
 }
 
-function colapse(row: MeshedRow, fields: Property[]): object {
+function projectGroup(groupRows: MeshedRow[], fields: Property[]): object {
   const m: Record<string, unknown> = {};
+
+  const representativeRow = groupRows[groupRows.length - 1];
+  if (!representativeRow) return m;
+
+  //All case
   if (fields.length === 0) {
-    for (let source in row) {
-      const data = row[source];
+    for (let source in representativeRow) {
+      const data = representativeRow[source];
       for (let field in data) {
         m[field] = data[field as keyof typeof data];
       }
@@ -32,7 +41,7 @@ function colapse(row: MeshedRow, fields: Property[]): object {
   }
 
   for (let field of fields) {
-    m[field.ref()] = resolveValue(field, row).value;
+    m[field.ref()] = resolveValue(field, groupRows).value;
   }
   return m;
 }

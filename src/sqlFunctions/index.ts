@@ -16,3 +16,4 @@ export * from "./upper.function";
 export * from "./parse.function";
 export * from "./cwd.function";
 export * from "./concat.function";
+export * from "./count.function";

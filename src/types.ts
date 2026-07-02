@@ -26,4 +26,4 @@ export enum Type {
 
 export interface MeshedRow {
     [sourceRef: string]: object;
-};
+}

@@ -42,7 +42,7 @@ describe('SQL Parser Integration Tests', () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       productName: 'Fourth Item',
-      'unit-price': 45.00
+      'unit-price': 45.00,
     });
   });
 
@@ -69,8 +69,8 @@ describe('SQL Parser Integration Tests', () => {
       'unit-price': 19.99,
       ProductMetadata: expect.objectContaining({
         color_code: 'blue',
-        itemSize: 'medium'
-      })
+        itemSize: 'medium',
+      }),
     }));
   });
 
@@ -155,7 +155,7 @@ describe('SQL Parser Integration Tests', () => {
     expect(result.every((item: Record<string, any>) => Object.keys(item).length === 2)).toBe(true);
     expect(result[0]).toEqual({
       productName: shallowJson[1].productName,
-      'unit-price': shallowJson[1]['unit-price']
+      'unit-price': shallowJson[1]['unit-price'],
     });
   });
 
@@ -167,15 +167,15 @@ describe('SQL Parser Integration Tests', () => {
 
   it('should work with complex query combining multiple features', async () => {
     const result = await main('SELECT productName, unit-price FROM test-data/shallow.json WHERE is_active=true ORDER BY unit-price ASC LIMIT 1 OFFSET 1');
-    
+
     // Get active items, sort by price ascending, take 1 item starting from index 1
     const activeItems = shallowJson.filter(item => item.is_active);
     const sortedActive = activeItems.sort((a, b) => a['unit-price'] - b['unit-price']);
     const expected = sortedActive.slice(1, 2).map(item => ({
       productName: item.productName,
-      'unit-price': item['unit-price']
+      'unit-price': item['unit-price'],
     }));
-    
+
     expect(result).toHaveLength(1);
     expect(result).toEqual(expected);
   });
@@ -205,15 +205,47 @@ describe('SQL Parser Integration Tests', () => {
     ]);
   });
 
+  it('should handle GROUP BY with SELECT ALL', async () => {
+    const result = await main('SELECT * FROM test-data/shallow.json GROUP BY is_active');
+    expect(result).toHaveLength(2);
+    //Last instance of true and false
+    expect(result).toEqual([
+      {
+        "id": 4,
+        "pairID": null,
+        "productName": "Fourth Item",
+        "is_active": true,
+        "unit-price": 45.00,
+        "tags": ["premium", "new-arrival"],
+        "ProductMetadata": {
+          "color_code": "black",
+          "itemSize": "xl",
+        },
+      },
+      {
+        "id": 5,
+        "pairID": 2,
+        "productName": "Fifth Item",
+        "is_active": false,
+        "unit-price": 9.99,
+        "tags": ["last-chance", "budget-friendly"],
+        "ProductMetadata": {
+          "color_code": "white",
+          "itemSize": "xs",
+        },
+      },
+    ]);
+  });
+
   describe('Queries without FROM clause', () => {
     it('should execute function calls', async () => {
-      const result = await main('SELECT NOW()');  
+      const result = await main('SELECT NOW()');
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('NOW');
     });
 
     it('should execute multiple function calls', async () => {
-      const result = await main('SELECT NOW(), UPPER("hello")');  
+      const result = await main('SELECT NOW(), UPPER("hello")');
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('NOW');
       expect(result[0]).toHaveProperty('UPPER');
@@ -228,4 +260,36 @@ describe('SQL Parser Integration Tests', () => {
       await expect(main('SELECT NOW() ORDER BY id')).rejects.toThrow();
     });
   });
+
+  describe('Aggregate functions', () => {
+    it('should be able to count ids', async () => {
+      const result = await main('SELECT count(id) FROM test-data/shallow.json GROUP BY is_active');
+      expect(result).toHaveLength(2);
+      expect(result).toEqual(
+        expect.arrayContaining([
+          { count: 3 },
+          { count: 2 },
+        ]),
+      );
+    });
+
+    it('should be able to count ids even without GROUP BY', async () => {
+      const result = await main('SELECT count(id) FROM test-data/shallow.json');
+      expect(result).toHaveLength(1);
+      expect(result).toEqual([
+          { count: 5 },
+        ],
+      );
+    });
+
+    //TODO
+    it.skip('should be able to count ALL', async () => {
+      const result = await main('SELECT count(*) FROM test-data/shallow.json');
+      expect(result).toHaveLength(1);
+      expect(result).toEqual([
+          { count: 5 },
+        ],
+      );
+    });
+  })
 });
