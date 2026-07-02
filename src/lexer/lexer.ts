@@ -5,8 +5,8 @@ import { ANY, KEYWORD } from "./constants";
 import { parseDataSource } from "./parseDataSource";
 import { TokenMatcher, TokenStream } from "@tokenizer";
 import { AST } from "@data";
-import { parseField } from '@src/lexer/parseField';
-import { FieldProperty, ResolvedProperty } from '@entities';
+import { parseField } from "./parseField";
+import { FieldProperty } from "@entities";
 
 let ast: AST;
 let stream: TokenStream;
@@ -178,7 +178,9 @@ function parseGroupBy(ast: AST, stream: TokenStream): void {
   if (firstField instanceof FieldProperty) {
     groupByFields.push(firstField);
   } else {
-    stream.unexpectedToken(`Expected a field property, got: ${firstField.__type}`);
+    stream.unexpectedToken(
+      `Expected a field property, got: ${firstField.__type}`,
+    );
   }
 
   // Parse additional fields separated by commas

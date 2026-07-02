@@ -21,7 +21,7 @@ export const KEYWORD = {
 
 export const RESERVED_WORDS = Object.values(KEYWORD);
 
-export const Symbols = {
+export const SYMBOL = {
   SLASH: new TokenMatcher(Type.special, "/"),
   AT: new TokenMatcher(Type.special, "@"),
   OPEN_PARENTHESIS: new TokenMatcher(Type.parenthesis, "("),

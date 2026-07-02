@@ -3,7 +3,7 @@ import * as z from "zod";
 import { resolveValue } from "@data";
 import { logger } from "@utils";
 import { MeshedRow, Scalar } from "@types";
-import { Resolvable } from './sqlFactory';
+import { Resolvable } from "./sqlFactory";
 
 export type ValidatedArgs<SQL extends SQLFunction> = z.infer<
   ReturnType<SQL["validation"]>
@@ -12,7 +12,8 @@ export type ValidatedArgs<SQL extends SQLFunction> = z.infer<
 export abstract class SQLFunction<
   R extends Scalar | unknown = unknown,
   V extends z.ZodSchema = z.ZodSchema,
-> implements Resolvable<R> {
+> implements Resolvable<R>
+{
   arguments: Property[];
 
   constructor(
@@ -47,7 +48,8 @@ export abstract class SQLFunction<
 export abstract class AggregateFunction<
   R extends Scalar | unknown = unknown,
   V extends z.ZodSchema = z.ZodSchema,
-> implements Resolvable<R> {
+> implements Resolvable<R>
+{
   arguments: Property[];
 
   constructor(
@@ -84,7 +86,9 @@ export abstract class AggregateFunction<
       if (error instanceof z.ZodError) {
         throw new Error(formatZodError(this as unknown as SQLFunction, error));
       }
-      throw new Error(`Error resolving ${this.name} aggregate function: ${error}`);
+      throw new Error(
+        `Error resolving ${this.name} aggregate function: ${error}`,
+      );
     }
   }
 }

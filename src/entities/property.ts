@@ -53,3 +53,16 @@ export class ResolvedProperty extends Property {
     return this.alias || this.value.toString();
   }
 }
+
+/**
+ * Represents the entire row. Parsed when parseField parses `*`
+ */
+export class IdentityProperty extends Property {
+  constructor(public source: string | null) {
+    super();
+  }
+
+  ref(): string {
+    return this.alias || "all";
+  }
+}

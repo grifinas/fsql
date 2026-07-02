@@ -1,11 +1,11 @@
 import { TokenStream } from "@tokenizer";
-import { ANY, KEYWORD, RESERVED_WORDS, Symbols } from "./constants";
+import { ANY, KEYWORD, RESERVED_WORDS, SYMBOL } from "./constants";
 import { IAlias } from "@types";
 import { logger } from "@utils";
 
 export function parseVarAlias(stream: TokenStream): string | null {
   if (stream.advanceIf(KEYWORD.AS)) {
-    stream.consume(Symbols.AT);
+    stream.consume(SYMBOL.AT);
     const aliasToken = stream.consume(ANY.WORD);
     if (aliasToken.isIn(RESERVED_WORDS)) {
       stream.regress();

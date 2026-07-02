@@ -1,6 +1,6 @@
 import { Arguments, CommandModule, Argv } from "yargs";
 import { logger, LogLevel } from "@utils";
-import { pluginRegistry } from "../plugins/registry";
+import { pluginRegistry } from "@plugins";
 
 interface PluginsArgs extends Arguments {
   logLevel: LogLevel;
@@ -33,7 +33,7 @@ export const pluginsCommand: CommandModule<object, PluginsArgs> = {
   },
   handler: async (argv: PluginsArgs) => {
     logger.setLevel(argv.logLevel);
-    
+
     // Load external pluginsk
     await pluginRegistry.loadExternalPlugins();
 
@@ -43,7 +43,7 @@ export const pluginsCommand: CommandModule<object, PluginsArgs> = {
 
       console.log("📦 Loaded Plugins:");
       console.log("==================");
-      
+
       if (plugins.length === 0) {
         console.log("No plugins loaded.");
         return;
@@ -51,13 +51,17 @@ export const pluginsCommand: CommandModule<object, PluginsArgs> = {
 
       plugins.forEach((plugin, index) => {
         console.log(`${index + 1}. ${plugin.name}`);
-        console.log(`   Extensions: ${plugin.extensions.map(ext => `.${ext}`).join(", ")}`);
+        console.log(
+          `   Extensions: ${plugin.extensions.map((ext) => `.${ext}`).join(", ")}`,
+        );
         console.log("");
       });
 
       console.log(`📋 Summary:`);
       console.log(`   Total plugins: ${plugins.length}`);
-      console.log(`   Supported extensions: ${supportedExtensions.map(ext => `.${ext}`).join(", ")}`);
+      console.log(
+        `   Supported extensions: ${supportedExtensions.map((ext) => `.${ext}`).join(", ")}`,
+      );
     } else {
       // Default behavior - show help
       console.log("Use --list to see all loaded plugins");

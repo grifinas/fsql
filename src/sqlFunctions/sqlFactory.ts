@@ -21,8 +21,10 @@ export class SQLFactory {
   }
 
   static isAggregate(ctor: Constructor): boolean {
-    return typeof (ctor as unknown as { prototype: { resolveAggregate?: unknown } }).prototype
-      .resolveAggregate === "function";
+    return (
+      typeof (ctor as unknown as { prototype: { resolveAggregate?: unknown } })
+        .prototype.resolveAggregate === "function"
+    );
   }
 
   static isAggregateProperty(property: FunctionProperty): boolean {

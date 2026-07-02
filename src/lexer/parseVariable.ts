@@ -1,8 +1,8 @@
 import { TokenStream } from "@tokenizer";
-import { ANY, Symbols } from "./constants";
+import { ANY, SYMBOL } from "./constants";
 
 export function parseVariable(stream: TokenStream): string | null {
-  if (!stream.advanceIf(Symbols.AT)) {
+  if (!stream.advanceIf(SYMBOL.AT)) {
     return null;
   }
 

@@ -3,12 +3,12 @@ import { TokenStream } from "@tokenizer";
 import { parseProperty } from "./parseProperty";
 import { logger } from "@utils";
 import { withAlias } from "./parseAlias";
-import { KEYWORD, ANY, Symbols } from "./constants";
+import { KEYWORD, ANY, SYMBOL } from "./constants";
 
 export function parseSelectArgs(ast: AST, stream: TokenStream) {
   logger.log("parseSelectArgs", stream.toStringFromCurrent());
   stream.consume(KEYWORD.SELECT);
-  if (stream.advanceIf(Symbols.ALL)) {
+  if (stream.advanceIf(SYMBOL.ALL)) {
     return;
   }
 

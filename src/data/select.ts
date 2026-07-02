@@ -16,7 +16,7 @@ export function select(rows: MeshedRow[][], ast: AST): object[] {
   const hasGroupBy = (ast.groupBy?.length ?? 0) > 0;
 
   if (hasGroupBy || hasAggregates) {
-    return rows.map(groupRows => projectGroup(groupRows, ast.fields));
+    return rows.map((groupRows) => projectGroup(groupRows, ast.fields));
   } else {
     return rows.flat().map((row) => projectGroup([row], ast.fields));
   }

@@ -2,7 +2,7 @@ import { TokenStream } from "@tokenizer";
 import { parseVariable } from "./parseVariable";
 import { logger } from "@utils";
 import { withVarAlias } from "./parseAlias";
-import { ANY, Symbols } from "./constants";
+import { ANY, SYMBOL } from "./constants";
 import { DataSource, VariableDataSource, FileDataSource } from "@entities";
 
 export function parseDataSource(stream: TokenStream): DataSource {
@@ -23,7 +23,7 @@ function parseFileDataSource(stream: TokenStream) {
   while (!stream.done()) {
     const fileToken = stream.get(
       ANY.DOT,
-      Symbols.SLASH,
+      SYMBOL.SLASH,
       ANY.WORD,
       ANY.SEMICOLON,
       ANY.NUMBER,
@@ -35,7 +35,7 @@ function parseFileDataSource(stream: TokenStream) {
       expectedPos = fileToken.position + fileToken.value.length;
     }
 
-    if (fileToken.is(ANY.DOT) || fileToken.is(Symbols.SLASH)) {
+    if (fileToken.is(ANY.DOT) || fileToken.is(SYMBOL.SLASH)) {
       path += fileToken.value;
     } else if (fileToken.is(ANY.WORD)) {
       path += fileToken.value;

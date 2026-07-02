@@ -3,6 +3,7 @@ import {
   ResolvedProperty,
   FieldProperty,
   FunctionProperty,
+  IdentityProperty,
 } from "@entities";
 import { AggregateFunction, SQLFactory } from "@sqlFunctions";
 import { MeshedRow, Scalar } from "@types";
@@ -22,16 +23,18 @@ export function resolveValue(
     return new ResolvedProperty(
       getMeshedRowValue(representativeRow, value.source, value.field),
     );
-  }
-
-  if (value instanceof FunctionProperty) {
+  } else if (value instanceof FunctionProperty) {
     const fn = SQLFactory.make<Scalar>(value);
 
     if (fn instanceof AggregateFunction) {
-      return new ResolvedProperty(fn.resolveAggregate(groupRows))
+      return new ResolvedProperty(fn.resolveAggregate(groupRows));
     } else {
       return new ResolvedProperty(fn.resolve(representativeRow));
     }
+  } else if (value instanceof IdentityProperty) {
+    //Identity represents the entire document, but resolved property cannot represent it, so we pass *
+    //FIXME pass identity properly
+    return new ResolvedProperty("*");
   }
 
   throw new Error(

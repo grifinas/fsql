@@ -282,8 +282,7 @@ describe('SQL Parser Integration Tests', () => {
       );
     });
 
-    //TODO
-    it.skip('should be able to count ALL', async () => {
+    it('should be able to count ALL', async () => {
       const result = await main('SELECT count(*) FROM test-data/shallow.json');
       expect(result).toHaveLength(1);
       expect(result).toEqual([

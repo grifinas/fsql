@@ -38,7 +38,8 @@ const config = {
 
 
 const builtInPlugins = [
-    'json'
+    'json',
+    'csv'
 ];
 
 Promise.all([

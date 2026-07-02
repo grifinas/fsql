@@ -2,15 +2,21 @@ import { TokenStream } from "@tokenizer";
 import {
   FieldProperty,
   FunctionProperty,
+  IdentityProperty,
   Property,
   ResolvedProperty,
 } from "@entities";
-import { ANY, RESERVED_WORDS, Symbols } from "./constants";
+import { ANY, RESERVED_WORDS, SYMBOL } from "./constants";
 import { logger } from "@utils";
 
 export function parseField(stream: TokenStream): Property {
   const parts: string[] = [];
   let start = stream.getIndex();
+
+  if (stream.advanceIf(SYMBOL.ALL)) {
+    //TODO can be more than null
+    return new IdentityProperty(null);
+  }
 
   do {
     const token = stream.consume(ANY.NUMBER, ANY.WORD, ANY.STRING);
@@ -21,7 +27,7 @@ export function parseField(stream: TokenStream): Property {
     }
   } while (stream.advanceIf(ANY.DOT));
 
-  if (stream.advanceIf(Symbols.OPEN_PARENTHESIS)) {
+  if (stream.advanceIf(SYMBOL.OPEN_PARENTHESIS)) {
     stream.setIndex(start);
     return parseFunction(stream);
   }
@@ -51,17 +57,17 @@ export function parseField(stream: TokenStream): Property {
 
 function parseFunction(stream: TokenStream): FunctionProperty {
   const fnName = stream.consume(ANY.WORD).value;
-  stream.consume(Symbols.OPEN_PARENTHESIS);
+  stream.consume(SYMBOL.OPEN_PARENTHESIS);
 
   const token = stream.get();
   const args: Property[] = [];
-  if (token.isNot(Symbols.CLOSE_PARENTHESIS)) {
+  if (token.isNot(SYMBOL.CLOSE_PARENTHESIS)) {
     do {
       args.push(parseField(stream));
     } while (stream.advanceIf(ANY.COMMA));
   }
 
-  stream.consume(Symbols.CLOSE_PARENTHESIS);
+  stream.consume(SYMBOL.CLOSE_PARENTHESIS);
 
   return new FunctionProperty(fnName, args);
 }
