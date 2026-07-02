@@ -1,5 +1,5 @@
 import * as readline from 'readline';
-import { logger } from './utils';
+import { logger } from '@utils';
 import { main } from '.';
 
 export async function startRepl(): Promise<object[] | null> {
@@ -44,7 +44,7 @@ export async function startRepl(): Promise<object[] | null> {
             }
             
             try {
-                const result = await main(trimmedInput, {'@0': lastResult || []});
+                const result = await main(trimmedInput, {'@0': lastResult || [], '@last': lastResult || []});
                 lastResult = result;
                 console.log(JSON.stringify(result, null, 2));
             } catch (error: unknown) {

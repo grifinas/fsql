@@ -2,28 +2,22 @@ import * as z from "zod";
 import { SQLFactory } from "./sqlFactory";
 import { AggregateFunction } from "./sqlFunction";
 
-const Validation = z.tuple([z.any()]);
+const Validation = z.tuple([z.number()]);
 
-export class CountFunction extends AggregateFunction<
-  number,
-  typeof Validation
-> {
+export class SumFunction extends AggregateFunction<number, typeof Validation> {
   public validation(): typeof Validation {
     return Validation;
   }
 
   protected subResolveAggregate(args: z.infer<typeof Validation>[]): number {
-    let count = 0;
+    let total = 0;
 
     for (const rowArgs of args) {
-      const value = rowArgs[0];
-      if (value !== null && value !== undefined) {
-        count++;
-      }
+      total += rowArgs[0];
     }
 
-    return count;
+    return total;
   }
 }
 
-SQLFactory.register("COUNT", CountFunction);
+SQLFactory.register("SUM", SumFunction);
