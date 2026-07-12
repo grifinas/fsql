@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import "./sqlFunctions";
 import { lex } from "@lexer";
 import { TokenStream, tokenize } from "@tokenizer";

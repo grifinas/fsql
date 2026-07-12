@@ -32,7 +32,7 @@ git push --follow-tags origin master
 
 ASSET="fsql-$TAG.tar.gz"
 echo "==> Packaging dist/ into $ASSET..."
-tar -czf "$ASSET" dist/
+tar -czf "$ASSET" dist/ scripts/setup.sh
 
 echo "==> Creating GitHub release $TAG..."
 gh release create "$TAG" "$ASSET" \
