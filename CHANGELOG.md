@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/grifinas/fsql/compare/v0.3.2...v0.4.0) (2026-07-12)
+
+
+### Features
+
+* make release version a bit more usable ([4cdebfc](https://github.com/grifinas/fsql/commit/4cdebfc25081c139062a5025d11d79b1ee4a907b))
+
 ### [0.3.2](https://github.com/grifinas/fsql/compare/v0.3.1...v0.3.2) (2026-07-12)
 
 ### [0.3.1](https://github.com/grifinas/fsql/compare/v0.3.0...v0.3.1) (2026-07-12)
