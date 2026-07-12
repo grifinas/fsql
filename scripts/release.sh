@@ -30,9 +30,15 @@ npm run build
 echo "==> Pushing branch and tag..."
 git push --follow-tags origin master
 
+ASSET="fsql-$TAG.tar.gz"
+echo "==> Packaging dist/ into $ASSET..."
+tar -czf "$ASSET" dist/
+
 echo "==> Creating GitHub release $TAG..."
-gh release create "$TAG" dist/* \
+gh release create "$TAG" "$ASSET" \
   --title "$TAG" \
   --notes-file CHANGELOG.md
+
+rm "$ASSET"
 
 echo "==> Released $TAG successfully."
